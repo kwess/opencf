@@ -39,7 +39,7 @@ public class Packet {
 
 	@Override
 	public String toString() {
-		return "Packet [dataLengt=" + dataLengt + ", data=" + data + "]";
+		return "Packet [dataLengt=" + dataLengt + ", rawData=" + Arrays.toString(rawData) + ", data=" + data + "]";
 	}
 
 	@Override

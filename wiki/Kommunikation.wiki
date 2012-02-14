@@ -149,8 +149,8 @@ Sender: Agent
 Erwartete Antwort: keine
 <code language="js">
 {
-  status: STATUS,
-  message: MESSAGE
+  automation_status: STATUS,
+  automation_message: MESSAGE
 }
 </code>
 || *Feld* || *Datentyp* || *Wert/Beschreibung* ||

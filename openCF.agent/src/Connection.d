@@ -21,6 +21,7 @@ class Connection {
 	public bool connect() {
 		this.socket = new TcpSocket(new InternetAddress(this.hostname, this.port));
 		this.stream = new SocketStream(socket);
+		
 		this.connected = true;
 		return true;
 	}
@@ -29,26 +30,19 @@ class Connection {
 		if(connected == false) {
 			return false;
 		}
-//		auto jsons = [
-//			"{agent_id:1}",
-//			"{agent_version:1}",
-//			"{agent_plattform:windows}"
-//        ];
+		
 
-        JSONValue root;
-        root.type = JSON_TYPE.OBJECT;
-        JSONValue[1] leaves;
-        JSONValue agentID;
-        agentID.type = JSON_TYPE.STRING;
-        agentID.str = "{agent_id:1}";
-        leaves[0] = agentID;
-        root.array = leaves;
-        string message = toJSON(&root.array);
-//        writeln(message);
-        
-//		string message = toJSON(&root);
-//        writeln(message);
-//		send(message);
+JSONValue root;
+root.type = JSON_TYPE.OBJECT;
+root.object["agent_id"] = JSONValue();
+root.object["agent_id"].str = agent;
+root.object["agent_version"] = JSONValue();
+root.object["agent_version"].str = myversion;
+root.object["agent_plattform"] = JSONValue();
+root.object["agent_plattform"].str = plattform;
+string message = toJSON(&root);
+		writeln(message);
+send(message);
 		
 		return true;
 	}

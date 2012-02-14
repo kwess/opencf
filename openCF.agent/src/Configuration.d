@@ -18,7 +18,7 @@ class Configuration {
 		foreach(line; configArray) {
 			try {
 				string key = line[0];
-				string value = chop(line[1]);
+				string value = chomp(line[1]);
 				configMap[key] = value;
 			} catch (Exception e) {
 				writefln("Configuration.d, Constructor: Exception caught -> malformed line in config file, skipping line");

@@ -1,6 +1,7 @@
 import std.stdio;
 import std.file;
 import std.conv;
+import std.system;
 
 import Configuration;
 import Connection;
@@ -9,6 +10,8 @@ void main(string[] args) {
 	Configuration configuration = new Configuration("agent.cfg");
 	
 	configuration.printConfiguration();
+	
+	
 	
 	string hostname = configuration.get("hostname");
 	ushort port = to!short(configuration.get("port"));

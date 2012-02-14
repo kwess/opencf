@@ -20,6 +20,7 @@ public class Server implements Runnable {
 	private static final String	PROPERTIES_AGENTS_NEEDSCLIENTAUTH	= "de.openCF.server.connector.agent.needsClientAuth";
 	private static final String	PROPERTIES_AGENTS_POOLSIZE			= "de.openCF.server.connector.agent.poolSize";
 	private static final String	PROPERTIES_AGENTS_USE_SSL			= "de.openCF.server.connector.agents.useSSL";
+	private static final String	PROPERTIES_AGENTS_DEBUG				= "de.openCF.server.connector.agents.debug";
 
 	private Logger				logger								= Logger.getLogger(Server.class);
 	private Properties			properties							= new Properties();
@@ -39,12 +40,21 @@ public class Server implements Runnable {
 
 	@Override
 	public void run() {
+		Integer port = Integer.parseInt(this.properties.getProperty(PROPERTIES_AGENTS_PORT, "12345"));
+		Boolean needsClientAuth = Boolean.parseBoolean(this.properties.getProperty(PROPERTIES_AGENTS_NEEDSCLIENTAUTH, "false"));
+		Integer connectionPoolSize = Integer.parseInt(this.properties.getProperty(PROPERTIES_AGENTS_POOLSIZE, "1024"));
+		Boolean useSSL = Boolean.parseBoolean(this.properties.getProperty(PROPERTIES_AGENTS_USE_SSL, "false"));
+		Boolean debug = Boolean.parseBoolean(this.properties.getProperty(PROPERTIES_AGENTS_DEBUG, "false"));
+
+		AgentConnection agentConnection = new AgentConnection(debug);
+
 		Connector serverConnectorAgents = new Connector();
-		serverConnectorAgents.setPort(Integer.parseInt(this.properties.getProperty(PROPERTIES_AGENTS_PORT)));
-		serverConnectorAgents.setNeedsClientAuth(Boolean.parseBoolean(this.properties.getProperty(PROPERTIES_AGENTS_NEEDSCLIENTAUTH)));
-		serverConnectorAgents.setConnectionPoolSize(Integer.parseInt(this.properties.getProperty(PROPERTIES_AGENTS_POOLSIZE)));
-		serverConnectorAgents.setUseSSL(Boolean.parseBoolean(this.properties.getProperty(PROPERTIES_AGENTS_USE_SSL)));
-		serverConnectorAgents.setConnectionImplementation(new AgentConnection());
+
+		serverConnectorAgents.setPort(port);
+		serverConnectorAgents.setNeedsClientAuth(needsClientAuth);
+		serverConnectorAgents.setConnectionPoolSize(connectionPoolSize);
+		serverConnectorAgents.setUseSSL(useSSL);
+		serverConnectorAgents.setConnectionImplementation(agentConnection);
 
 		Executors.newSingleThreadExecutor().execute(serverConnectorAgents);
 	}

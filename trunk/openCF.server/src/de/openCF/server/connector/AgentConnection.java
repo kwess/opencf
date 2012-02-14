@@ -15,9 +15,15 @@ public class AgentConnection implements Connection {
 	private Logger			logger			= Logger.getLogger(AgentConnection.class);
 	private Socket			socket			= null;
 	private PacketHandler	packetHandler	= new AgentPacketHandler();
+	private boolean			debug			= false;
 
 	public AgentConnection() {
 		logger.trace("new");
+	}
+
+	public AgentConnection(boolean debug) {
+		logger.trace("new(boolean)");
+		this.debug = debug;
 	}
 
 	@Override
@@ -35,7 +41,8 @@ public class AgentConnection implements Connection {
 			try {
 				Packet packet = packetReader.readPacket();
 				logger.debug(packet.toString());
-				packetHandler.handlePacket(packet);
+				if (!debug)
+					packetHandler.handlePacket(packet);
 			} catch (IOException e) {
 				logger.error("error while reading from agent", e);
 				return;

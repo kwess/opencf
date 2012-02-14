@@ -24,6 +24,9 @@ public class PacketReader {
 		Packet packet = new Packet();
 
 		packet.setDataLengt(dataInputStream.readInt());
+		if (packet.getDataLengt() > 1024) {
+			throw new IOException("probalbly wrong packet size[" + packet.getDataLengt() + "] read");
+		}
 		byte[] rawData = new byte[packet.getDataLengt()];
 		dataInputStream.read(rawData, 0, packet.getDataLengt());
 		packet.setRawData(rawData);

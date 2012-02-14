@@ -14,11 +14,12 @@ import de.openCF.server.connector.Connector;
 
 public class Server implements Runnable {
 
-	public static final String	CONFIG_FILE	= "config/server.properties";
+	public static final String	CONFIG_FILE							= "config/server.properties";
 
 	private static final String	PROPERTIES_AGENTS_PORT				= "de.openCF.server.connector.agent.port";
 	private static final String	PROPERTIES_AGENTS_NEEDSCLIENTAUTH	= "de.openCF.server.connector.agent.needsClientAuth";
 	private static final String	PROPERTIES_AGENTS_POOLSIZE			= "de.openCF.server.connector.agent.poolSize";
+	private static final String	PROPERTIES_AGENTS_USE_SSL			= "de.openCF.server.connector.agents.useSSL";
 
 	private Logger				logger								= Logger.getLogger(Server.class);
 	private Properties			properties							= new Properties();
@@ -42,9 +43,10 @@ public class Server implements Runnable {
 		serverConnectorAgents.setPort(Integer.parseInt(this.properties.getProperty(PROPERTIES_AGENTS_PORT)));
 		serverConnectorAgents.setNeedsClientAuth(Boolean.parseBoolean(this.properties.getProperty(PROPERTIES_AGENTS_NEEDSCLIENTAUTH)));
 		serverConnectorAgents.setConnectionPoolSize(Integer.parseInt(this.properties.getProperty(PROPERTIES_AGENTS_POOLSIZE)));
+		serverConnectorAgents.setUseSSL(Boolean.parseBoolean(this.properties.getProperty(PROPERTIES_AGENTS_USE_SSL)));
 		serverConnectorAgents.setConnectionImplementation(new AgentConnection());
 
 		Executors.newSingleThreadExecutor().execute(serverConnectorAgents);
 	}
-	
+
 }

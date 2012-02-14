@@ -11,9 +11,9 @@ import javax.net.ssl.SSLSocket;
 
 import org.apache.log4j.Logger;
 
-public class ServerConnector implements Runnable {
+public class Connector implements Runnable {
 
-	private Logger					logger						= Logger.getLogger(ServerConnector.class);
+	private Logger					logger						= Logger.getLogger(Connector.class);
 	private SSLServerSocket			sslServerSocket				= null;
 	private SSLServerSocketFactory	sslServerSocketFactory		= null;
 	private ExecutorService			executorService				= null;
@@ -21,9 +21,9 @@ public class ServerConnector implements Runnable {
 	private int						port						= 41191;
 	private boolean					needsClientAuth				= false;
 	private int						connectionPoolSize			= 1024;
-	private ServerConnection		connectionImplementation	= null;
+	private Connection		connectionImplementation	= null;
 
-	public ServerConnector() {
+	public Connector() {
 		logger.trace("new");
 	}
 
@@ -66,7 +66,7 @@ public class ServerConnector implements Runnable {
 				logger.error("accept failed", e);
 				continue;
 			}
-			ServerConnection serverConnection = getConnectionImplementation();
+			Connection serverConnection = getConnectionImplementation();
 			serverConnection.setSocket(sslSocket);
 			executorService.execute(serverConnection);
 		}
@@ -97,11 +97,11 @@ public class ServerConnector implements Runnable {
 		this.connectionPoolSize = connectionPoolSize;
 	}
 
-	public ServerConnection getConnectionImplementation() {
+	public Connection getConnectionImplementation() {
 		return connectionImplementation;
 	}
 
-	public void setConnectionImplementation(ServerConnection connectionImplementation) {
+	public void setConnectionImplementation(Connection connectionImplementation) {
 		this.connectionImplementation = connectionImplementation;
 	}
 }

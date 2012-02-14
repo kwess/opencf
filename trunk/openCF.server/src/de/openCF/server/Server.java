@@ -9,8 +9,8 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 
-import de.openCF.server.connector.ServerConnectionAgent;
-import de.openCF.server.connector.ServerConnector;
+import de.openCF.server.connector.AgentConnection;
+import de.openCF.server.connector.Connector;
 
 public class Server implements Runnable {
 
@@ -38,11 +38,11 @@ public class Server implements Runnable {
 
 	@Override
 	public void run() {
-		ServerConnector serverConnectorAgents = new ServerConnector();
+		Connector serverConnectorAgents = new Connector();
 		serverConnectorAgents.setPort(Integer.parseInt(this.properties.getProperty(PROPERTIES_AGENTS_PORT)));
 		serverConnectorAgents.setNeedsClientAuth(Boolean.parseBoolean(this.properties.getProperty(PROPERTIES_AGENTS_NEEDSCLIENTAUTH)));
 		serverConnectorAgents.setConnectionPoolSize(Integer.parseInt(this.properties.getProperty(PROPERTIES_AGENTS_POOLSIZE)));
-		serverConnectorAgents.setConnectionImplementation(new ServerConnectionAgent());
+		serverConnectorAgents.setConnectionImplementation(new AgentConnection());
 
 		Executors.newSingleThreadExecutor().execute(serverConnectorAgents);
 	}

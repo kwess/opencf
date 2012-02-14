@@ -1,0 +1,14 @@
+#Beschreibung der Kommunikation der Komponenten
+
+= Introduction =
+
+Alle [Komponenten] kommunizieren über tcp/tls.
+Die Kommunikation Agent<->Server<->Konsolen/GUI erfolgt über JSON.
+Die Kommunikation Agent Repository erfolgt über HTTPs.
+
+
+= Details =
+
+Hier die Beschreibungen/API rein.
+
+== JSON Protokoll ==

@@ -6,12 +6,17 @@ import java.net.Socket;
 
 import org.apache.log4j.Logger;
 
-public class ServerConnectionAgent implements ServerConnection {
+import de.openCF.protocol.Packet;
+import de.openCF.protocol.PacketHandler;
+import de.openCF.protocol.PacketReader;
 
-	private Logger	logger	= Logger.getLogger(ServerConnectionAgent.class);
-	private Socket	socket	= null;
+public class AgentConnection implements Connection {
 
-	public ServerConnectionAgent() {
+	private Logger			logger			= Logger.getLogger(AgentConnection.class);
+	private Socket			socket			= null;
+	private PacketHandler	packetHandler	= new AgentPacketHandler();
+
+	public AgentConnection() {
 		logger.trace("new");
 	}
 
@@ -26,10 +31,11 @@ public class ServerConnectionAgent implements ServerConnection {
 			return;
 		}
 		while (socket.isConnected()) {
-			byte[] buffer = new byte[1024];
+			PacketReader packetReader = new PacketReader(inputStream);
 			try {
-				inputStream.read(buffer);
-				logger.debug(new String(buffer));
+				Packet packet = packetReader.readPacket();
+				logger.debug(packet.toString());
+				packetHandler.handlePacket(packet);
 			} catch (IOException e) {
 				logger.error("error while reading from agent", e);
 				return;

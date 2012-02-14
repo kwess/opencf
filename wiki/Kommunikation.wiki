@@ -134,6 +134,7 @@ Erwartete Antwort: keine
   return_code: CODE,
   message: MESSAGE
 }
+</code>
 || *Feld* || *Datentyp* || *Wert/Beschreibung* ||
 || PACKET_TYPE || Integer || 14 ||
 || REGISTRATION || Boolean || {true, false} true = Aktion ausgeführt, false = nicht erfolgreich - entsprechende Fehlermeldung in der Message - return gefuellt ||
@@ -150,6 +151,7 @@ Erwartete Antwort: keine
   status: STATUS,
   message: MESSAGE
 }
+</code>
 || *Feld* || *Datentyp* || *Wert/Beschreibung* ||
 || PACKET_TYPE || Integer || 20 ||
 || STATUS || String || {unknown, preparing, prepared, stated, paused, resumed, finished, stopped, start-failed, prepare-failed, pause-failed, resume-failed, stopped-failed, talking} ||

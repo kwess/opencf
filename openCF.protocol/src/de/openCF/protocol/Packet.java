@@ -40,11 +40,11 @@ public class Packet {
 	@Override
 	public String toString() {
 		String ret = new String("Packet\n");
-		ret += "++++++++++++++++++++++++++++++++++++++++++++++++++";
-		ret += " [dataLength] " + dataLengt;
-		ret += " [data]       " + data;
-		ret += " [rawData]    " + Arrays.toString(rawData);
-		ret += "--------------------------------------------------";
+		ret += "++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+		ret += " [dataLength] " + dataLengt + "\n";
+		ret += " [data]       " + data + "\n";
+		ret += " [rawData]    " + Arrays.toString(rawData) + "\n";
+		ret += "--------------------------------------------------\n";
 		return ret;
 	}
 

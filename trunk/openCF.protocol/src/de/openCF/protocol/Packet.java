@@ -39,7 +39,13 @@ public class Packet {
 
 	@Override
 	public String toString() {
-		return "Packet [dataLengt=" + dataLengt + ", rawData=" + Arrays.toString(rawData) + ", data=" + data + "]";
+		String ret = new String("Packet\n");
+		ret += "++++++++++++++++++++++++++++++++++++++++++++++++++";
+		ret += " [dataLength] " + dataLengt;
+		ret += " [data]       " + data;
+		ret += " [rawData]    " + Arrays.toString(rawData);
+		ret += "--------------------------------------------------";
+		return ret;
 	}
 
 	@Override

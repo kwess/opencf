@@ -12,3 +12,46 @@ Die Kommunikation Agent Repository erfolgt über HTTPs.
 Hier die Beschreibungen/API rein.
 
 == JSON Protokoll ==
+
+Generell gillt dieser Rumpf des JSON:
+<code language="js">
+{
+  type: PACKET_TYPE //Integer
+}
+</code>
+Dieser wird um die spezifischen properties erweitert.
+
+Der PACKET_TYPE muss eindeutig über den Kommunikationsscope sein.
+
+=== Agent - Server ===
+
+==== Agent Hello ====
+Sender: Agent
+<code language="js">
+{
+  agent_id: AGENT_ID, //String
+  agent_version: AGENT_VERSION, //String
+  agent_plattform: AGENT_PLATTFORM, //String
+}
+</code>
+|| *Feld* || *Datentyp* || *Wert/Beschreibung* ||
+|| PACKET_TYPE || Integer || 1 ||
+|| AGENT_ID || String || fqdn, falls der schon beim Server vergeben ist, wird ein bestehender Eintrag überschrieben ||
+|| AGENT_VERSION || String || Versionsstring des Agenten, egal was kommt - nur für Admins ||
+|| AGENT_PLATTFORM || String || {linux, unix, windows} ||
+
+
+==== Agent Hello Response ====
+Sender: Server
+<code language="js">
+{
+  successfull: REGISTRATION,
+  return_code: CODE,
+  message: MESSAGE
+}
+</code>
+|| *Feld* || *Datentyp* || *Wert/Beschreibung* ||
+|| PACKET_TYPE || Integer || 2 ||
+|| REGISTRATION || Boolean || {true, false} true = erfolgreich registriert, false = nicht erfolgreich - entsprechende Fehlermeldung in der Message - return gefuellt ||
+|| CODE || Integer || Fehlercode oder 0 ||
+|| MESSAGE || String || Fehlernachricht, oder "hallo" ||

@@ -1,0 +1,8 @@
+-od"bin"
+-of"bin\openCFagent.exe"
+
+-I"src"
+
+"src\Agent.d"
+"src\Configuration.d"
+"src\Connection.d"

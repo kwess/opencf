@@ -1,0 +1,10 @@
+#summary Komponenten von openCF, Zusammenspiel
+
+= Introduction =
+
+Hier wird der Aufbau des Projekts mit den Komponenten beschrieben.
+
+
+= Details =
+
+blub

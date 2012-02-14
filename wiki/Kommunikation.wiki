@@ -1,4 +1,5 @@
 #summary Beschreibung der Kommunikation der Komponenten
+#sidebar TableOfContents
 
 = Introduction =
 

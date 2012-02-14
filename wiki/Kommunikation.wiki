@@ -28,6 +28,8 @@ Der PACKET_TYPE muss eindeutig über den Kommunikationsscope sein.
 
 ==== Agent Hello ====
 Sender: Agent
+
+Erwartete Antwort: Agent Hello Response
 <code language="js">
 {
   agent_id: AGENT_ID, //String
@@ -44,6 +46,8 @@ Sender: Agent
 
 ==== Agent Hello Response ====
 Sender: Server
+
+Erwartete Antwort: keine
 <code language="js">
 {
   successfull: REGISTRATION,
@@ -56,3 +60,33 @@ Sender: Server
 || REGISTRATION || Boolean || {true, false} true = erfolgreich registriert, false = nicht erfolgreich - entsprechende Fehlermeldung in der Message - return gefuellt ||
 || CODE || Integer || Fehlercode oder 0 ||
 || MESSAGE || String || Fehlernachricht, oder "hallo" ||
+
+==== Agent Heartbeat ====
+Sender: Agent, Server?
+
+Erwartete Antwort: keine
+<code language="js">
+{
+  local_time: TIME
+}
+</code>
+|| *Feld* || *Datentyp* || *Wert/Beschreibung* ||
+|| PACKET_TYPE || Integer || 0 ||
+|| TIME || timestamp || Lokale Zeit des Agentensystems/Sendezeitpunkt des Heartbeats ||
+
+==== Automation Prepare ====
+Sender: Server
+
+Erwartete Antwort: Automation Prepare Response
+<code language="js">
+{
+  repository_url: URL,
+  automation_desctiptor: DESCRIPTOR,
+  automation_id: AUTOMATION_ID
+}
+</code>
+|| *Feld* || *Datentyp* || *Wert/Beschreibung* ||
+|| PACKET_TYPE || Integer || 11 ||
+|| URL || String || URL zum Automations Repository ||
+|| DESCRIOTOR || String || fq AutomationsDescriptor innerhalb des Repositories ||
+|| AUTOMATION_ID || Integer || Id, unter welcher die Automation hinterher referenziert werden kann ||

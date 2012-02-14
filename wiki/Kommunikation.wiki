@@ -101,6 +101,7 @@ Erwartete Antwort: keine
   return_code: CODE,
   message: MESSAGE
 }
+</code>
 || *Feld* || *Datentyp* || *Wert/Beschreibung* ||
 || PACKET_TYPE || Integer || 12 ||
 || REGISTRATION || Boolean || {true, false} true = erfolgreich den Job geladen, false = nicht erfolgreich - entsprechende Fehlermeldung in der Message - return gefuellt ||

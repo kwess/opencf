@@ -3,7 +3,7 @@
 = Introduction =
 
 Alle [Komponenten] kommunizieren über tcp/tls.
-Die Kommunikation Agent<->Server<->Konsolen/GUI erfolgt über JSON.
+Die Kommunikation Agent < - > Server < - > Konsolen/GUI erfolgt über JSON.
 Die Kommunikation Agent Repository erfolgt über HTTPs.
 
 

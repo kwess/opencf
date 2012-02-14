@@ -1,10 +1,13 @@
 package de.openCF.server.connector;
 
 import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
@@ -13,15 +16,16 @@ import org.apache.log4j.Logger;
 
 public class Connector implements Runnable {
 
-	private Logger					logger						= Logger.getLogger(Connector.class);
-	private SSLServerSocket			sslServerSocket				= null;
-	private SSLServerSocketFactory	sslServerSocketFactory		= null;
-	private ExecutorService			executorService				= null;
+	private Logger				logger						= Logger.getLogger(Connector.class);
+	private ServerSocket		serverSocket				= null;
+	private ServerSocketFactory	serverSocketFactory			= null;
+	private ExecutorService		executorService				= null;
 
-	private int						port						= 41191;
-	private boolean					needsClientAuth				= false;
-	private int						connectionPoolSize			= 1024;
-	private Connection		connectionImplementation	= null;
+	private int					port						= 41191;
+	private boolean				needsClientAuth				= false;
+	private boolean				useSSL						= false;
+	private int					connectionPoolSize			= 1024;
+	private Connection			connectionImplementation	= null;
 
 	public Connector() {
 		logger.trace("new");
@@ -32,34 +36,47 @@ public class Connector implements Runnable {
 		logger.trace("run");
 
 		logger.debug("using port: " + port);
+		logger.debug("use ssl: " + useSSL);
 		logger.debug("require clientAuth: " + needsClientAuth);
 		logger.debug("using connection pool size: " + connectionPoolSize);
 
 		executorService = Executors.newFixedThreadPool(this.connectionPoolSize);
 
-		sslServerSocketFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+		String[] supportedCipherSuites = null;
 
-		String[] supportedCipherSuites = sslServerSocketFactory.getSupportedCipherSuites();
+		if (useSSL) {
+			SSLServerSocketFactory sslServerSocketFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+			serverSocketFactory = sslServerSocketFactory;
 
-		logger.debug("supported ciphersuites: " + Arrays.toString(supportedCipherSuites));
+			supportedCipherSuites = sslServerSocketFactory.getSupportedCipherSuites();
 
+			logger.debug("supported ciphersuites: " + Arrays.toString(supportedCipherSuites));
+		} else {
+			serverSocketFactory = ServerSocketFactory.getDefault();
+		}
 
 		try {
-			sslServerSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket(port, this.connectionPoolSize);
-			sslServerSocket.setEnabledCipherSuites(supportedCipherSuites);
+			serverSocket = serverSocketFactory.createServerSocket(port, this.connectionPoolSize);
 			logger.info("server socket open");
 		} catch (IOException e) {
 			logger.error("cant open server socket", e);
 			return;
 		}
-		sslServerSocket.setNeedClientAuth(needsClientAuth);
 
-		while (!sslServerSocket.isClosed()) {
-			SSLSocket sslSocket = null;
+		if (useSSL) {
+			((SSLServerSocket) serverSocket).setNeedClientAuth(needsClientAuth);
+			((SSLServerSocket) serverSocket).setEnabledCipherSuites(supportedCipherSuites);
+		}
+
+		while (!serverSocket.isClosed()) {
+			Socket socket = null;
 			try {
-				sslSocket = (SSLSocket) sslServerSocket.accept();
-				sslSocket.startHandshake();
-				logger.debug("active ciphersuite: " + sslSocket.getSession().getCipherSuite());
+				socket = serverSocket.accept();
+				if (useSSL) {
+					SSLSocket sslSocket = (SSLSocket) socket;
+					sslSocket.startHandshake();
+					logger.debug("active ciphersuite: " + sslSocket.getSession().getCipherSuite());
+				}
 
 				logger.info("got new agent connection");
 			} catch (IOException e) {
@@ -67,10 +84,18 @@ public class Connector implements Runnable {
 				continue;
 			}
 			Connection serverConnection = getConnectionImplementation();
-			serverConnection.setSocket(sslSocket);
+			serverConnection.setSocket(socket);
 			executorService.execute(serverConnection);
 		}
 
+	}
+
+	public boolean isUseSSL() {
+		return useSSL;
+	}
+
+	public void setUseSSL(boolean useSSL) {
+		this.useSSL = useSSL;
 	}
 
 	public int getPort() {

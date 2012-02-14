@@ -22,7 +22,7 @@ public class AgentConnection implements Connection {
 
 	@Override
 	public void run() {
-		logger.trace("run");
+		logger.trace("run start");
 		InputStream inputStream = null;
 		try {
 			inputStream = socket.getInputStream();
@@ -41,6 +41,7 @@ public class AgentConnection implements Connection {
 				return;
 			}
 		}
+		logger.trace("run finished");
 	}
 
 	@Override

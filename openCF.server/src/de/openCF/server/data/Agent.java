@@ -6,20 +6,15 @@ import javax.persistence.Table;
 @Table(name = "openCF.server.data.Agent")
 public class Agent {
 
+	public enum PLATTFORM {
+		linux, unix, windows
+	};
+
 	@Id
-	private String	id		= null;
-	private String	version	= null;
-	private Server	server	= null;
-
-	public Agent(String id, String version) {
-		super();
-		this.id = id;
-		this.version = version;
-	}
-
-	public Agent() {
-		super();
-	}
+	private String		id			= null;
+	private String		version		= null;
+	private PLATTFORM	plattform	= null;
+	private Server		server		= null;
 
 	public String getId() {
 		return id;
@@ -37,54 +32,20 @@ public class Agent {
 		this.version = version;
 	}
 
+	public PLATTFORM getPlattform() {
+		return plattform;
+	}
+
+	public void setPlattform(PLATTFORM plattform) {
+		this.plattform = plattform;
+	}
+
 	public Server getServer() {
 		return server;
 	}
 
 	public void setServer(Server server) {
 		this.server = server;
-	}
-
-	@Override
-	public String toString() {
-		return "Agent [id=" + id + ", version=" + version + ", server=" + server + "]";
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((server == null) ? 0 : server.hashCode());
-		result = prime * result + ((version == null) ? 0 : version.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Agent other = (Agent) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (server == null) {
-			if (other.server != null)
-				return false;
-		} else if (!server.equals(other.server))
-			return false;
-		if (version == null) {
-			if (other.version != null)
-				return false;
-		} else if (!version.equals(other.version))
-			return false;
-		return true;
 	}
 
 }

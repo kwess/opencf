@@ -1,4 +1,4 @@
-#Beschreibung der Kommunikation der Komponenten
+#summary Beschreibung der Kommunikation der Komponenten
 
 = Introduction =
 

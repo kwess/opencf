@@ -17,6 +17,7 @@ public class Message {
 	private Automation			automation	= null;
 	@Enumerated(value = EnumType.STRING)
 	private AutomationStatus	status		= AutomationStatus.unknown;
+	private String				message		= null;
 
 	public Integer getId() {
 		return id;
@@ -40,6 +41,14 @@ public class Message {
 
 	public void setStatus(AutomationStatus status) {
 		this.status = status;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
 
 }

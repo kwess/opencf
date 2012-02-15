@@ -2,6 +2,7 @@ package de.openCF.server.connector;
 
 public abstract class AgentPacketType {
 
+	public static final int	INVALID						= -1;
 	public static final int	AGENT_HEARTBEAT				= 0;
 	public static final int	AGENT_HELLO					= 1;
 	public static final int	AGENT_HELLO_RESPONSE		= 2;

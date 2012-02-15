@@ -20,6 +20,9 @@ public class AgentPacketHandler implements PacketHandler {
 		String key = AgentPacketKeys.TYPE.key;
 		Integer type = (Integer) data.get(key);
 
+		if (type == null)
+			type = AgentPacketType.INVALID;
+
 		switch (type) {
 			case AgentPacketType.AGENT_HELLO:
 				logger.debug("agent hello");

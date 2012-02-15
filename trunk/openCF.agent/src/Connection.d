@@ -5,6 +5,8 @@ import std.stdio;
 import core.bitop;
 import std.json;
 
+import Protocol;
+
 class Connection {
 	private string hostname;
 	private ushort port;
@@ -28,21 +30,24 @@ class Connection {
 	
 	public bool sendHello(string agent, string myversion, string plattform) {
 		if(connected == false) {
+			writeln("Connection.d, sendHello(): connected == false --> unable to send hello");
 			return false;
 		}
 		
 
-JSONValue root;
-root.type = JSON_TYPE.OBJECT;
-root.object["agent_id"] = JSONValue();
-root.object["agent_id"].str = agent;
-root.object["agent_version"] = JSONValue();
-root.object["agent_version"].str = myversion;
-root.object["agent_plattform"] = JSONValue();
-root.object["agent_plattform"].str = plattform;
-string message = toJSON(&root);
-		writeln(message);
-send(message);
+		JSONValue json;
+		json.type = JSON_TYPE.OBJECT;
+		json.object[type] = JSONValue();
+		json.object[type].type = JSON_TYPE.INTEGER;
+		json.object[type].integer = 1;
+		json.object[agent_id] = JSONValue();
+		json.object[agent_id].str = agent;
+		json.object[agent_version] = JSONValue();
+		json.object[agent_version].str = myversion;
+		json.object[agent_plattform] = JSONValue();
+		json.object[agent_plattform].str = plattform;
+		string message = toJSON(&json);
+		send(message);
 		
 		return true;
 	}
@@ -54,11 +59,14 @@ send(message);
 		return true;
 	}
 	
-	private void send(string message) {
+	private bool send(string message) {
 		if(connected == false) {
-			return;
+			return false;
 		}
+		writefln("sending %s", message);
 		this.stream.write(bswap(message.length));
 		this.stream.writeString(message);
+		
+		return true;
 	}
 }

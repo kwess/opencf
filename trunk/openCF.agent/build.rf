@@ -6,3 +6,4 @@
 "src\Agent.d"
 "src\Configuration.d"
 "src\Connection.d"
+"src\Protocol.d"

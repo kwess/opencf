@@ -4,6 +4,8 @@
 -I"src"
 
 "src\Agent.d"
+"src\AutomationThread.d"
+"src\AutomationThreadManager.d"
 "src\Configuration.d"
 "src\Connection.d"
 "src\Protocol.d"

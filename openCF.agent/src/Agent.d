@@ -2,9 +2,12 @@ import std.stdio;
 import std.file;
 import std.conv;
 import std.system;
+import std.process;
 
 import Configuration;
 import Connection;
+import AutomationThreadManager;
+import AutomationThread;
 
 void main(string[] args) {
 	/* read configuration from agent.cfg */
@@ -28,4 +31,9 @@ void main(string[] args) {
 	
 	/* disconnect socket connection */
 	connection.disconnect();
-} 
+
+
+
+//	AutomationThreadManager manager = new AutomationThreadManager();
+//	manager.startNewAutomation();
+}

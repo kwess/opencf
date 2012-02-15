@@ -61,6 +61,11 @@ Erwartete Antwort: keine
 || CODE || Integer || Fehlercode oder 0 ||
 || MESSAGE || String || Fehlernachricht, oder "hallo" ||
 
+|| *Fehlercode* || *Beschreibung* ||
+|| 0 || Registrierung erfolgreich ||
+|| 1 || Erneute Registierung erfolgreich ||
+|| -1 || Registrierung fehlgeschlagen, Agent ist schon registriert und online ||
+
 ==== Agent Heartbeat ====
 Sender: Agent, Server?
 

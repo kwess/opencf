@@ -1,6 +1,7 @@
 package de.openCF.server.connector;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +12,7 @@ import de.openCF.protocol.Packet;
 import de.openCF.protocol.PacketHandler;
 import de.openCF.server.Data;
 import de.openCF.server.data.Agent;
+import de.openCF.server.data.Heartbeat;
 import de.openCF.server.persistence.Persistence;
 
 public class AgentPacketHandler implements PacketHandler {
@@ -88,6 +90,18 @@ public class AgentPacketHandler implements PacketHandler {
 	private void handleAgentHeartbeat(Map<String, Object> data) {
 		logger.trace("handleAgentHeartbeat");
 
+		String date = (String) data.get(AgentPacketKeys.AGENT_LOCAL_TIME);
+		Date agent_localtime = new Date(Integer.parseInt(date));
+
+		Heartbeat heartbeat = new Heartbeat();
+		heartbeat.setAgent_localtime(agent_localtime);
+		heartbeat.setAgent(this.agent);
+
+		Session session = Persistence.getSession();
+		session.beginTransaction();
+		session.save(heartbeat);
+		session.getTransaction().commit();
+
 		logger.trace("handleAgentHeartbeat finished");
 	}
 
@@ -113,6 +127,7 @@ public class AgentPacketHandler implements PacketHandler {
 			agent.setPlattform(Agent.Plattform.valueOf(plattform.toUpperCase()));
 			agent.setStatus(Agent.Status.ONLINE);
 			agent.setVersion(version);
+			agent.setUpdated(new Date());
 
 			this.agent = agent;
 			session.save(agent);
@@ -123,11 +138,12 @@ public class AgentPacketHandler implements PacketHandler {
 			response.put(AgentPacketKeys.SUCCESSFULL, true);
 			response.put(AgentPacketKeys.MESSAGE, "congratulations, youre registered!");
 		} else if (agent != null && agent.getStatus() == Agent.Status.OFFLINE) {
-			logger.info("agent [" + agent_id + "] was known, but is offline, changing status to online, updating prefs");
+			logger.info("agent [" + agent_id + "] was known since " + agent.getUpdated() + ", but is offline, changing status to online, updating prefs");
 
 			agent.setStatus(Agent.Status.ONLINE);
 			agent.setPlattform(Agent.Plattform.valueOf(plattform.toUpperCase()));
 			agent.setVersion(version);
+			agent.setUpdated(new Date());
 
 			this.agent = agent;
 			session.update(agent);
@@ -174,6 +190,7 @@ public class AgentPacketHandler implements PacketHandler {
 		session.beginTransaction();
 
 		agent.setStatus(Agent.Status.OFFLINE);
+		agent.setUpdated(new Date());
 		session.update(agent);
 
 		session.getTransaction().commit();

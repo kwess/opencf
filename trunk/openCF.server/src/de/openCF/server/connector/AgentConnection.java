@@ -16,7 +16,11 @@ public class AgentConnection implements Connection {
 
 	private Logger			logger			= Logger.getLogger(AgentConnection.class);
 	private Socket			socket			= null;
-	private PacketHandler	packetHandler	= new AgentPacketHandler();
+	private InputStream		inputStream		= null;
+	private OutputStream	outputStream	= null;
+	private PacketReader	packetReader	= null;
+	private PacketWriter	packetWriter	= null;
+	private PacketHandler	packetHandler	= new AgentPacketHandler(this);
 	private boolean			debug			= false;
 
 	public AgentConnection() {
@@ -32,9 +36,6 @@ public class AgentConnection implements Connection {
 	public void run() {
 		logger.trace("run start");
 
-		InputStream inputStream = null;
-		OutputStream outputStream = null;
-
 		try {
 			inputStream = socket.getInputStream();
 			outputStream = socket.getOutputStream();
@@ -43,8 +44,8 @@ public class AgentConnection implements Connection {
 			return;
 		}
 
-		PacketReader packetReader = new PacketReader(inputStream);
-		PacketWriter packetWriter = new PacketWriter(outputStream);
+		packetReader = new PacketReader(inputStream);
+		packetWriter = new PacketWriter(outputStream);
 
 		boolean continueWork = true;
 
@@ -56,9 +57,8 @@ public class AgentConnection implements Connection {
 					logger.warn("debug is enabled, discarding packet");
 					continue;
 				}
-				Packet response = packetHandler.handlePacket(packet);
-				if (response != null)
-					packetWriter.writePacket(response);
+				packetHandler.handlePacket(packet);
+
 			} catch (IOException e) {
 				logger.error("error while reading from agent");
 			} finally {
@@ -76,9 +76,10 @@ public class AgentConnection implements Connection {
 	}
 
 	@Override
-	public void forward(Packet packet) {
+	public void forward(Packet packet) throws IOException {
 		logger.trace("forward");
-
+		if (packet != null)
+			packetWriter.writePacket(packet);
 	}
 
 }

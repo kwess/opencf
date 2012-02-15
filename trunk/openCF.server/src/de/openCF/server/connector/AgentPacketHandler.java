@@ -1,5 +1,6 @@
 package de.openCF.server.connector;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,20 +9,26 @@ import org.hibernate.Session;
 
 import de.openCF.protocol.Packet;
 import de.openCF.protocol.PacketHandler;
+import de.openCF.server.Data;
 import de.openCF.server.data.Agent;
 import de.openCF.server.persistence.Persistence;
 
 public class AgentPacketHandler implements PacketHandler {
 
-	private static Logger	logger	= Logger.getLogger(AgentPacketHandler.class);
+	private static Logger	logger		= Logger.getLogger(AgentPacketHandler.class);
 
-	private Agent			agent	= null;
+	private Agent			agent		= null;
+
+	private Connection		connection	= null;
+
+	public AgentPacketHandler(Connection c) {
+		logger.trace("new(Connection)");
+		this.connection = c;
+	}
 
 	@Override
-	public Packet handlePacket(Packet packet) {
+	public void handlePacket(Packet packet) {
 		logger.trace("handlePacket");
-
-		Packet response = new Packet();
 
 		Map<String, Object> data = packet.getData();
 
@@ -34,7 +41,7 @@ public class AgentPacketHandler implements PacketHandler {
 		switch (type) {
 			case AgentPacketType.AGENT_HELLO:
 				logger.debug("agent hello");
-				response.setData(handleAgentHello(data));
+				handleAgentHello(data);
 				break;
 			case AgentPacketType.AGENT_HEARTBEAT:
 				logger.debug("agent heartbeat");
@@ -58,8 +65,6 @@ public class AgentPacketHandler implements PacketHandler {
 		}
 
 		logger.trace("handle packet finished");
-
-		return response;
 	}
 
 	private void handleAutomationStatus(Map<String, Object> data) {
@@ -86,7 +91,7 @@ public class AgentPacketHandler implements PacketHandler {
 		logger.trace("handleAgentHeartbeat finished");
 	}
 
-	private Map<String, Object> handleAgentHello(Map<String, Object> data) {
+	private void handleAgentHello(Map<String, Object> data) {
 		logger.trace("handleAgentHello");
 
 		Map<String, Object> response = new HashMap<String, Object>();
@@ -112,6 +117,8 @@ public class AgentPacketHandler implements PacketHandler {
 			this.agent = agent;
 			session.save(agent);
 
+			Data.addConnection(agent_id, connection);
+
 			response.put(AgentPacketKeys.RETURN_CODE, 0);
 			response.put(AgentPacketKeys.SUCCESSFULL, true);
 			response.put(AgentPacketKeys.MESSAGE, "congratulations, youre registered!");
@@ -124,6 +131,8 @@ public class AgentPacketHandler implements PacketHandler {
 
 			this.agent = agent;
 			session.update(agent);
+
+			Data.addConnection(agent_id, connection);
 
 			response.put(AgentPacketKeys.RETURN_CODE, 1);
 			response.put(AgentPacketKeys.SUCCESSFULL, true);
@@ -138,9 +147,16 @@ public class AgentPacketHandler implements PacketHandler {
 
 		session.getTransaction().commit();
 
-		logger.trace("handleAgentHello finished");
+		Packet p = new Packet();
+		p.setData(response);
 
-		return response;
+		try {
+			connection.forward(p);
+		} catch (IOException e) {
+			logger.error("cant forward agend hello response");
+		}
+
+		logger.trace("handleAgentHello finished");
 	}
 
 	@Override
@@ -161,6 +177,8 @@ public class AgentPacketHandler implements PacketHandler {
 		session.update(agent);
 
 		session.getTransaction().commit();
+
+		Data.removeConnection(agent.getId());
 
 		logger.trace("handleClose finished");
 	}

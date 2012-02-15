@@ -22,21 +22,23 @@ public class PacketWriter {
 	public int writePacket(Packet packet) throws IOException {
 		logger.trace("writePacket");
 
-		int sumBytes = 0;
-
-		generateRawData(packet);
+		int sumBytes = generateRawData(packet);
 
 		dataOutputStream.writeInt(packet.getDataLengt());
 		dataOutputStream.write(packet.getRawData());
 
+		sumBytes += 4;
+
 		logger.debug(packet);
 		logger.trace("writePacket finished");
-		logger.debug(sumBytes + " written");
+		logger.debug(sumBytes + " (bytes) written");
+
+		dataOutputStream.flush();
 
 		return sumBytes;
 	}
 
-	protected void generateRawData(Packet packet) {
+	protected int generateRawData(Packet packet) {
 		logger.trace("generateRawData");
 
 		JSONObject jsonObject = new JSONObject(packet.getData());
@@ -46,6 +48,8 @@ public class PacketWriter {
 		packet.setDataLengt(rawData.length);
 
 		logger.trace("generateRawData finished");
+
+		return rawData.length;
 	}
 
 }

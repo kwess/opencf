@@ -31,6 +31,7 @@ class Configuration {
 	 *
 	 */
 	public void printConfiguration() {
+		writeln("Configuration.d, printConfiguration()");
 		foreach(key; configMap.keys) {
 			writefln("%s - %s", key, configMap[key]);
 		}

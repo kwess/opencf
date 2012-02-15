@@ -51,12 +51,12 @@ public class Packet {
 			dump.append(Integer.toHexString(rawData[i]));
 		}
 		String ret = new String("\n");
-		ret += "------------------Packet----------------------\n";
+		ret += " -----------------Packet----------------------\n";
 		ret += " [dataLength] " + dataLengt + "\n";
 		ret += " [data]       " + data + "\n";
-		ret += "----------------------------------------------";
+		ret += " ---------------------------------------------";
 		ret += dump.toString() + "\n";
-		ret += "----------------------------------------------\n";
+		ret += " ---------------------------------------------\n";
 		return ret;
 	}
 

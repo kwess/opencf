@@ -154,6 +154,7 @@ Sender: Agent
 Erwartete Antwort: keine
 <code language="js">
 {
+  automation_id: AUTOMATION_ID,
   automation_status: STATUS,
   automation_message: MESSAGE
 }
@@ -161,5 +162,5 @@ Erwartete Antwort: keine
 || *Feld* || *Datentyp* || *Wert/Beschreibung* ||
 || PACKET_TYPE || Integer || 20 ||
 || STATUS || String || {unknown, preparing, prepared, stated, paused, resumed, finished, stopped, start-failed, prepare-failed, pause-failed, resume-failed, stopped-failed, talking} ||
-|| Message || String || Message, bei talking der Konsolenoutput ||
-|| MESSAGE || String || Fehlernachricht, oder "" ||
+|| MESSAGE || String || Message, bei talking der Konsolenoutput ||
+|| AUTOMATION_ID || Integer|| s.o. ||

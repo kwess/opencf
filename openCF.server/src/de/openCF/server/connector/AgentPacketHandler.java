@@ -12,7 +12,10 @@ import de.openCF.protocol.Packet;
 import de.openCF.protocol.PacketHandler;
 import de.openCF.server.Data;
 import de.openCF.server.data.Agent;
+import de.openCF.server.data.Automation;
+import de.openCF.server.data.AutomationStatus;
 import de.openCF.server.data.Heartbeat;
+import de.openCF.server.data.Message;
 import de.openCF.server.persistence.Persistence;
 
 public class AgentPacketHandler implements PacketHandler {
@@ -71,6 +74,37 @@ public class AgentPacketHandler implements PacketHandler {
 
 	private void handleAutomationStatus(Map<String, Object> data) {
 		logger.trace("handleAutomationStatus");
+
+		Integer id = Integer.parseInt((String) data.get(AgentPacketKeys.AUTOMATION_ID));
+		String status = (String) data.get(AgentPacketKeys.AUTOMATION_STATUS);
+		String message = (String) data.get(AgentPacketKeys.AUTOMATION_MESSAGE);
+
+		AutomationStatus automationStatus = AutomationStatus.valueOf(status.toLowerCase());
+
+		if (automationStatus == null) {
+			logger.warn("automation status not set");
+			return;
+		}
+
+		Session session = Persistence.getSession();
+		session.beginTransaction();
+
+		Automation automation = (Automation) session.get(Automation.class, id);
+
+		if (automation == null) {
+			logger.error("got statusupdate for not existing automation with id " + id);
+			session.getTransaction().commit();
+			return;
+		}
+
+		Message message2db = new Message();
+		message2db.setAutomation(automation);
+		message2db.setStatus(automationStatus);
+		message2db.setMessage(message);
+
+		session.save(message2db);
+
+		session.getTransaction().commit();
 
 		logger.trace("handleAutomationStatus finished");
 	}

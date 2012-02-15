@@ -1,9 +1,11 @@
 package de.openCF.server.data;
 
+import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Table(name = "openCF.server.data.Server")
+@Entity
+@Table(name = "Server")
 public class Server {
 
 	@Id

@@ -1,5 +1,8 @@
 package de.openCF.server.data;
 
+import java.util.Date;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -30,6 +33,8 @@ public class Agent {
 	private Status		status		= Status.OFFLINE;
 	@ManyToOne
 	private Server		server		= Data.getServer();
+	@Column(nullable = false)
+	private Date		updated		= null;
 
 	public String getId() {
 		return id;
@@ -69,6 +74,14 @@ public class Agent {
 
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+
+	public Date getUpdated() {
+		return updated;
+	}
+
+	public void setUpdated(Date updated) {
+		this.updated = updated;
 	}
 
 }

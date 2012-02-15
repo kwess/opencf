@@ -1,20 +1,35 @@
 package de.openCF.server.data;
 
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-@Table(name = "openCF.server.data.Agent")
+import de.openCF.server.Data;
+
+@Entity
+@Table(name = "Agent")
 public class Agent {
 
-	public enum PLATTFORM {
-		linux, unix, windows
+	public enum Plattform {
+		LINUX, UNIX, WINDOWS
+	};
+
+	public enum Status {
+		ONLINE, OFFLINE
 	};
 
 	@Id
 	private String		id			= null;
 	private String		version		= null;
-	private PLATTFORM	plattform	= null;
-	private Server		server		= null;
+	@Enumerated(value = EnumType.STRING)
+	private Plattform	plattform	= null;
+	@Enumerated(value = EnumType.STRING)
+	private Status		status		= Status.OFFLINE;
+	@ManyToOne
+	private Server		server		= Data.getServer();
 
 	public String getId() {
 		return id;
@@ -32,11 +47,11 @@ public class Agent {
 		this.version = version;
 	}
 
-	public PLATTFORM getPlattform() {
+	public Plattform getPlattform() {
 		return plattform;
 	}
 
-	public void setPlattform(PLATTFORM plattform) {
+	public void setPlattform(Plattform plattform) {
 		this.plattform = plattform;
 	}
 
@@ -46,6 +61,14 @@ public class Agent {
 
 	public void setServer(Server server) {
 		this.server = server;
+	}
+
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
 	}
 
 }

@@ -10,15 +10,17 @@ import de.openCF.server.data.Server;
 
 public abstract class Persistence {
 
-	private static Logger				logger			= Logger.getLogger(Persistence.class);
-	public static final Configuration	CONFIGURATION	= new Configuration();
+	private static Logger				logger	= Logger.getLogger(Persistence.class);
+	public static final Configuration	CONFIGURATION;
 	protected static SessionFactory		SESSION_FACTORY;
 
 	static {
+		CONFIGURATION = new Configuration();
+
 		logger.debug("adding " + Server.class);
-		CONFIGURATION.addClass(Server.class);
+		CONFIGURATION.addAnnotatedClass(Server.class);
 		logger.debug("adding " + Agent.class);
-		CONFIGURATION.addClass(Agent.class);
+		CONFIGURATION.addAnnotatedClass(Agent.class);
 
 		logger.debug("building session factory");
 		SESSION_FACTORY = CONFIGURATION.buildSessionFactory();

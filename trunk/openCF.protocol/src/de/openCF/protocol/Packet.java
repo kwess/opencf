@@ -39,12 +39,24 @@ public class Packet {
 
 	@Override
 	public String toString() {
-		String ret = new String("Packet\n");
-		ret += "++++++++++++++++++++++++++++++++++++++++++++++++++\n";
+		StringBuffer dump = new StringBuffer();
+		int bytes = 16;
+		for (int i = 0; i < dataLengt; i++) {
+			if (i % bytes == 0) {
+				dump.append('\n');
+				dump.append(String.format(" %04d:", (int) (i / bytes)));
+			}
+			if (i % 2 == 0)
+				dump.append(' ');
+			dump.append(Integer.toHexString(rawData[i]));
+		}
+		String ret = new String("\n");
+		ret += "------------------Packet----------------------\n";
 		ret += " [dataLength] " + dataLengt + "\n";
 		ret += " [data]       " + data + "\n";
-		ret += " [rawData]    " + Arrays.toString(rawData) + "\n";
-		ret += "--------------------------------------------------\n";
+		ret += "----------------------------------------------";
+		ret += dump.toString() + "\n";
+		ret += "----------------------------------------------\n";
 		return ret;
 	}
 

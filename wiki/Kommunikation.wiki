@@ -105,13 +105,23 @@ Erwartete Antwort: Automation Status
 <code language="js">
 {
   automation_id: AUTOMATION_ID,
-  automation_action: ACTION
+  automation_action: ACTION,
+  automation_parameter: {
+    timeout: TIMEOUT,
+    arguments: ARGUMENTS,
+    user: USER,
+    group: GROUP
+  }
 }
 </code>
 || *Feld* || *Datentyp* || *Wert/Beschreibung* ||
 || PACKET_TYPE || Integer || 13 ||
 || AUTOMATION_ID || Integer || s.o. ||
 || ACTION || String || {start, stop, pause, resume, clear} start: starten der zuvor preparierten Automation, stop: stoppen ein gerade Ausgeführten Automation, pause: pausieren der Automation, resume: wiederaufnehmen der Automation, clear: löschen einer noch nicht gestarteten Automation ||
+|| TIMEOUT || Integer || Timeout bis zum Abbruch der Automation in Sekunden. Überschreibt ggf. das default aus dem descriptor ||
+|| ARGUMENTS || String || Agrumente als String, werden der Automation beim Starten übergeben ||
+|| USER || String || User, unter welchem die Automation ausgeführt werden soll, überschreibt ggf. das default aus dem descriptor ||
+|| GROUP || String || Gruppe, unter welcher die Automation ausgeführt werden soll, überschreibt ggf. das default aus dem desriptor ||
 
 
 ==== Automation Status ====
@@ -130,3 +140,25 @@ Erwartete Antwort: keine
 || STATUS || String || {unknown, preparing, prepared, stated, paused, resumed, finished, stopped, start-failed, prepare-failed, pause-failed, resume-failed, stopped-failed, talking} ||
 || MESSAGE || String || Message, bei talking der Konsolenoutput ||
 || AUTOMATION_ID || Integer|| s.o. ||
+
+
+=== Controller - Server ===
+
+==== Automation Control ====
+Sender: Controller
+
+Erwartete Antwort: Automation Status (siehe Agent-Server:Automation Status)
+<code language="js">
+{
+  automation_action: ACTION,
+  automation_reason: REASON,
+  automation_descriptor: DESCRIPTOR,
+  automation_parameter: PARAMETER
+}
+</code>
+|| *Feld* || *Datentyp* || *Wert/Beschreibung* ||
+|| PACKET_TYPE || Integer || 30 ||
+|| ACTION || String || {start, stop, pause, resume, listen} ||
+|| REASON || String || Begründung der Aktion, fürs logging ||
+|| DESCRIPTOR || String || s.o. ||
+|| PARAMETER || String || s.o. ||

@@ -10,9 +10,9 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
+import de.openCF.protocol.Connection;
 import de.openCF.server.communication.Acceptor;
 import de.openCF.server.communication.AgentPacketHandler;
-import de.openCF.server.communication.Connection;
 import de.openCF.server.communication.ControllerPacketHandler;
 import de.openCF.server.persistence.Persistence;
 

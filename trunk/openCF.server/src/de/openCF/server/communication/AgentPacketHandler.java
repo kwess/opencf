@@ -7,8 +7,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
+import de.openCF.protocol.Connection;
 import de.openCF.protocol.Packet;
 import de.openCF.protocol.PacketHandler;
+import de.openCF.protocol.PacketKeys;
+import de.openCF.protocol.PacketType;
 import de.openCF.server.Data;
 import de.openCF.server.data.Agent;
 import de.openCF.server.data.Automation;

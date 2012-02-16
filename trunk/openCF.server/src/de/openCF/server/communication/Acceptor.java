@@ -14,6 +14,8 @@ import javax.net.ssl.SSLSocket;
 
 import org.apache.log4j.Logger;
 
+import de.openCF.protocol.Connection;
+
 public class Acceptor implements Runnable {
 
 	private Logger				logger						= Logger.getLogger(Acceptor.class);
@@ -79,7 +81,7 @@ public class Acceptor implements Runnable {
 					logger.debug("active ciphersuite: " + sslSocket.getSession().getCipherSuite());
 				}
 
-				logger.info("got new agent connection");
+				logger.info("got new connection: " + socket.getLocalPort() + " --> " + socket.getRemoteSocketAddress());
 			} catch (IOException e) {
 				logger.error("accept failed", e);
 				continue;

@@ -3,9 +3,9 @@ import std.socketstream;
 import std.stream;
 import std.stdio;
 import core.bitop;
-import std.json;
 import core.thread;
 import std.concurrency;
+import std.json;
 
 import Protocol;
 import SocketListener;
@@ -52,15 +52,15 @@ class Connection {
 		json.type = JSON_TYPE.OBJECT;
 		json.object[type] = JSONValue();
 		json.object[type].type = JSON_TYPE.INTEGER;
-		json.object[type].integer = 1;
+		json.object[type].integer = type_agenthello;
 		json.object[agent_id] = JSONValue();
 		json.object[agent_id].str = agent;
 		json.object[agent_version] = JSONValue();
 		json.object[agent_version].str = myversion;
 		json.object[agent_plattform] = JSONValue();
 		json.object[agent_plattform].str = plattform;
-		string message = toJSON(&json);
-		send(message);
+		Packet p = new Packet(json);
+		send(p);
 		
 		
 		
@@ -72,6 +72,8 @@ class Connection {
 		//this.socketListener.
 		this.socket.close();
 		
+		stdout.writeln("socket disconnected");
+		
 		return true;
 	}
 	
@@ -82,6 +84,17 @@ class Connection {
 		stdout.writefln("sending %s", message);
 		this.stream.write(bswap(message.length));
 		this.stream.writeString(message);
+		
+		return true;
+	}
+	
+	private bool send(Packet p) {
+		if(connected == false) {
+			return false;
+		}
+		stdout.writefln("sending %s", p.toString());
+		this.stream.write(bswap(p.toString().length));
+		this.stream.writeString(p.toString());
 		
 		return true;
 	}

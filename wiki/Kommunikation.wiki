@@ -83,7 +83,7 @@ Erwartete Antwort: keine
 ==== Automation Prepare ====
 Sender: Server
 
-Erwartete Antwort: Automation Prepare Response
+Erwartete Antwort: Automation Status
 <code language="js">
 {
   repository_url: URL,
@@ -97,28 +97,11 @@ Erwartete Antwort: Automation Prepare Response
 || DESCRIOTOR || String || fq AutomationsDescriptor innerhalb des Repositories ||
 || AUTOMATION_ID || Integer || Id, unter welcher die Automation hinterher referenziert werden kann ||
 
-==== Automation Prepare Response ====
-Sender: Agent
-
-Erwartete Antwort: keine
-<code language="js">
-{
-  successfull: REGISTRATION,
-  return_code: CODE,
-  message: MESSAGE
-}
-</code>
-|| *Feld* || *Datentyp* || *Wert/Beschreibung* ||
-|| PACKET_TYPE || Integer || 12 ||
-|| REGISTRATION || Boolean || {true, false} true = erfolgreich den Job geladen, false = nicht erfolgreich - entsprechende Fehlermeldung in der Message - return gefuellt ||
-|| CODE || Integer || Fehlercode oder 0 ||
-|| MESSAGE || String || Fehlernachricht, oder "" ||
-
 
 ==== Automation Control ====
 Sender: Server
 
-Erwartete Antwort: Automation Control Response
+Erwartete Antwort: Automation Status
 <code language="js">
 {
   automation_id: AUTOMATION_ID,
@@ -129,24 +112,6 @@ Erwartete Antwort: Automation Control Response
 || PACKET_TYPE || Integer || 13 ||
 || AUTOMATION_ID || Integer || s.o. ||
 || ACTION || String || {start, stop, pause, resume, clear} start: starten der zuvor preparierten Automation, stop: stoppen ein gerade Ausgeführten Automation, pause: pausieren der Automation, resume: wiederaufnehmen der Automation, clear: löschen einer noch nicht gestarteten Automation ||
-
-
-==== Automation Control Response ====
-Sender: Agent
-
-Erwartete Antwort: keine
-<code language="js">
-{
-  successfull: REGISTRATION,
-  return_code: CODE,
-  message: MESSAGE
-}
-</code>
-|| *Feld* || *Datentyp* || *Wert/Beschreibung* ||
-|| PACKET_TYPE || Integer || 14 ||
-|| REGISTRATION || Boolean || {true, false} true = Aktion ausgeführt, false = nicht erfolgreich - entsprechende Fehlermeldung in der Message - return gefuellt ||
-|| CODE || Integer || Fehlercode oder 0 ||
-|| MESSAGE || String || Fehlernachricht, oder "" ||
 
 
 ==== Automation Status ====

@@ -30,6 +30,7 @@ public class PacketWriter {
 		sumBytes += 4;
 
 		logger.debug(packet);
+		logger.trace(packet.dump());
 		logger.trace("writePacket finished");
 		logger.debug(sumBytes + " (bytes) written");
 

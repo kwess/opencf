@@ -37,9 +37,8 @@ public class Packet {
 		this.data = data;
 	}
 
-	@Override
-	public String toString() {
-		StringBuffer dump = new StringBuffer("dump:\n");
+	public String dump() {
+		StringBuffer dump = new StringBuffer();
 		int bytes = 16;
 		for (int i = 0; i < dataLengt; i++) {
 			if (i % bytes == 0) {
@@ -50,14 +49,25 @@ public class Packet {
 				dump.append(' ');
 			dump.append(Integer.toHexString(rawData[i]));
 		}
+		StringBuffer dataFormatted = new StringBuffer();
+		for (Map.Entry<String, Object> e : data.entrySet()) {
+			dataFormatted.append(String.format(" %20S = (%7s) %s\n", e.getKey(), e.getValue().getClass().getSimpleName(), e.getValue()));
+		}
 		String ret = new String("\n");
 		ret += " -----------------Packet----------------------\n";
-		ret += " [dataLength] " + dataLengt + "\n";
-		ret += " [data]       " + data + "\n";
-		ret += " ---------------------------------------------";
+		ret += " [dataLength]   " + dataLengt + "\n";
+		ret += " [dataElements] " + data.size() + "\n";
+		ret += " ---------------Parsed Data-------------------\n";
+		ret += dataFormatted.toString();
+		ret += " ---------------Hex Dump----------------------";
 		ret += dump.toString() + "\n";
-		ret += " ---------------------------------------------\n";
+		ret += " ---------------------------------------------";
 		return ret;
+	}
+
+	@Override
+	public String toString() {
+		return "Packet [dataLengt=" + dataLengt + ", data=" + data + "]";
 	}
 
 	@Override

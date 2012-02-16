@@ -39,6 +39,7 @@ public class PacketReader {
 		packet.setData(parseRawData(rawData));
 
 		logger.debug(packet);
+		logger.trace(packet.dump());
 		logger.trace("readPacket finished");
 
 		return packet;

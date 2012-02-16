@@ -64,7 +64,8 @@ Erwartete Antwort: keine
 || *Fehlercode* || *Beschreibung* ||
 || 0 || Registrierung erfolgreich ||
 || 1 || Erneute Registierung erfolgreich ||
-|| -1 || Registrierung fehlgeschlagen, Agent ist schon registriert und online ||
+|| -1 || Registrierung fehlgeschlagen, Agent ist schon an diesem Server registriert und online ||
+|| -2 || Registrierung fehlgeschlagen, Agent ist schon bei einem anderen Server registriert und online ||
 
 ==== Agent Heartbeat ====
 Sender: Agent, Server?

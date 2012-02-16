@@ -21,7 +21,7 @@ class Configuration {
 				string value = chomp(line[1]);
 				configMap[key] = value;
 			} catch (Exception e) {
-				writefln("Configuration.d, Constructor: Exception caught -> malformed line in config file, skipping line");
+				stdout.writefln("Configuration.d, Constructor: Exception caught -> malformed line in config file, skipping line");
 			}
 		}
 	}
@@ -31,9 +31,9 @@ class Configuration {
 	 *
 	 */
 	public void printConfiguration() {
-		writeln("Configuration.d, printConfiguration()");
+		stdout.writeln("Configuration.d, printConfiguration()");
 		foreach(key; configMap.keys) {
-			writefln("%s - %s", key, configMap[key]);
+			stdout.writefln("%s - %s", key, configMap[key]);
 		}
 	}
 	
@@ -49,7 +49,7 @@ class Configuration {
 		try {
 			value = configMap[key];
 		} catch (RangeError e) {
-			writefln("Configuration.d, get(string key): RangeError caught -> no key [%s] found", key);
+			stdout.writefln("Configuration.d, get(string key): RangeError caught -> no key [%s] found", key);
 			value = "";
 		}
 		return value;

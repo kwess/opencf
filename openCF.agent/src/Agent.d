@@ -3,13 +3,16 @@ import std.file;
 import std.conv;
 import std.system;
 import std.process;
+import core.thread;
+import std.concurrency;
+import std.stream;
 
 import Configuration;
 import Connection;
 import AutomationThreadManager;
 import AutomationThread;
 
-void main(string[] args) {
+void main() {
 	/* read configuration from agent.cfg */
 	Configuration configuration = new Configuration("agent.cfg");
 	configuration.printConfiguration();
@@ -26,14 +29,13 @@ void main(string[] args) {
 	string plattform = configuration.get("plattform");
 	connection.sendHello(agent, myversion, plattform);
 	
-	
-	
-	
-	/* disconnect socket connection */
-	connection.disconnect();
-
-
 
 //	AutomationThreadManager manager = new AutomationThreadManager();
 //	manager.startNewAutomation();
+
+	while(1) {
+		Thread.sleep(dur!("seconds")(1));
+		stdout.writeln("Endlosschleife - hier muss der reconnect rein");
+	}
+	stdout.writeln("ende");
 }

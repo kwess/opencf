@@ -9,3 +9,4 @@
 "src\Configuration.d"
 "src\Connection.d"
 "src\Protocol.d"
+"src\SocketListener.d"

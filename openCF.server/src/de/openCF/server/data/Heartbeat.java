@@ -3,6 +3,7 @@ package de.openCF.server.data;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -12,6 +13,7 @@ import javax.persistence.Table;
 public class Heartbeat {
 
 	@Id
+	@GeneratedValue
 	private Integer	id				= null;
 	@ManyToOne(optional = false)
 	private Agent	agent			= null;

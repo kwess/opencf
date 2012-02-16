@@ -28,10 +28,14 @@ class Connection {
 	public bool connect() {
 		this.socket = new TcpSocket(new InternetAddress(this.hostname, this.port));
 		this.stream = new SocketStream(socket);
-		this.socketListener = new SocketListener(this.stream);
+		this.socketListener = new SocketListener(this.stream, thisTid);
 		this.socketListener.start();
 		
-		Thread.sleep(dur!("seconds")(5));
+		receive(
+			(bool b) {
+				stdout.writeln("received: ", b);
+			}
+		);
 		
 		this.connected = true;
 		return true;

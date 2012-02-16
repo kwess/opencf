@@ -4,15 +4,23 @@ import std.stream;
 import std.stdio;
 import core.bitop;
 import std.json;
+import core.thread;
+import std.concurrency;
 
 import Protocol;
+import SocketListener;
 
 class Connection {
 	private string hostname;
 	private ushort port;
-	private TcpSocket socket;
-	private Stream stream;
+	private static Stream stream;
 	private bool connected;
+	private Socket socket;
+	private Thread socketListener;
+	private Tid listenThread;
+	
+	private immutable int READ = 0;
+	private immutable int WRITE = 1;
 	
 	this(string hostname, ushort port) {
 		this.hostname = hostname;
@@ -23,6 +31,10 @@ class Connection {
 	public bool connect() {
 		this.socket = new TcpSocket(new InternetAddress(this.hostname, this.port));
 		this.stream = new SocketStream(socket);
+		this.socketListener = new SocketListener(this.stream);
+		this.socketListener.start();
+		
+		Thread.sleep(dur!("seconds")(5));
 		
 		this.connected = true;
 		return true;
@@ -30,9 +42,10 @@ class Connection {
 	
 	public bool sendHello(string agent, string myversion, string plattform) {
 		if(connected == false) {
-			writeln("Connection.d, sendHello(): connected == false --> unable to send hello");
+			stdout.writeln("Connection.d, sendHello(): connected == false --> unable to send hello");
 			return false;
 		}
+		
 		
 
 		JSONValue json;
@@ -49,12 +62,15 @@ class Connection {
 		string message = toJSON(&json);
 		send(message);
 		
+		
+		
 		return true;
 	}
 	
 	public bool disconnect() {
 		this.connected = false;
-		socket.close();
+		//this.socketListener.
+		this.socket.close();
 		
 		return true;
 	}
@@ -63,10 +79,14 @@ class Connection {
 		if(connected == false) {
 			return false;
 		}
-		writefln("sending %s", message);
+		stdout.writefln("sending %s", message);
 		this.stream.write(bswap(message.length));
 		this.stream.writeString(message);
 		
 		return true;
+	}
+	
+	public bool isConnected() {
+		return this.connected;
 	}
 }

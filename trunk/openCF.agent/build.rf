@@ -10,3 +10,4 @@
 "src\Connection.d"
 "src\Protocol.d"
 "src\SocketListener.d"
+"src\SocketWriter.d"

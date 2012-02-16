@@ -9,6 +9,7 @@ import std.json;
 
 import Protocol;
 import SocketListener;
+import SocketWriter;
 
 class Connection {
 	private string hostname;
@@ -17,7 +18,7 @@ class Connection {
 	private bool connected;
 	private Socket socket;
 	private Thread socketListener;
-	private Tid listenThread;
+	private SocketWriter socketWriter;
 	
 	this(string hostname, ushort port) {
 		this.hostname = hostname;
@@ -28,16 +29,25 @@ class Connection {
 	public bool connect() {
 		this.socket = new TcpSocket(new InternetAddress(this.hostname, this.port));
 		this.stream = new SocketStream(socket);
+		
 		this.socketListener = new SocketListener(this.stream, thisTid);
 		this.socketListener.start();
-		
+		bool listeningOK;
 		receive(
 			(bool b) {
-				stdout.writeln("socket now listening: ", b);
-				this.connected = b;
+				listeningOK = b;
 			}
 		);
 		
+		bool writingOK;
+		this.socketWriter = new SocketWriter(this.stream, thisTid);
+		this.socketWriter.start();
+		receive(
+			(bool b) {
+				writingOK = b;
+			}
+		);
+		this.connected = listeningOK && writingOK;
 		return this.connected;
 	}
 	
@@ -61,7 +71,7 @@ class Connection {
 		json.object[agent_plattform] = JSONValue();
 		json.object[agent_plattform].str = plattform;
 		Packet p = new Packet(json);
-		send(p);
+		this.socketWriter.send(p);
 		
 		
 		
@@ -74,28 +84,6 @@ class Connection {
 		this.socket.close();
 		
 		stdout.writeln("socket disconnected");
-		
-		return true;
-	}
-	
-	private bool send(string message) {
-		if(connected == false) {
-			return false;
-		}
-		stdout.writefln("sending %s", message);
-		this.stream.write(bswap(message.length));
-		this.stream.writeString(message);
-		
-		return true;
-	}
-	
-	private bool send(Packet p) {
-		if(connected == false) {
-			return false;
-		}
-		stdout.writefln("sending %s", p.toString());
-		this.stream.write(bswap(p.toString().length));
-		this.stream.writeString(p.toString());
 		
 		return true;
 	}

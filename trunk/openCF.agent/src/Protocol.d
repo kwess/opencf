@@ -8,7 +8,12 @@ immutable string agent_id = "agent_id";
 immutable string agent_version = "agent_version";
 immutable string agent_plattform = "agent_plattform";
 immutable string type = "type";
+immutable string successfull = "successfull";
+immutable string return_code = "return_code";
+immutable string message = "message";
+immutable string local_time = "local_time";
 
+immutable int type_heartbeat = 0;
 immutable int type_agenthello = 1;
 immutable int type_agenthelloresponse = 2;
 

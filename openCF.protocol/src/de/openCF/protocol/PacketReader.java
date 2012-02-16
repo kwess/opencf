@@ -3,14 +3,8 @@ package de.openCF.protocol;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
 public class PacketReader {
 
@@ -29,41 +23,20 @@ public class PacketReader {
 
 		Packet packet = new Packet();
 
-		packet.setDataLengt(dataInputStream.readInt());
-		if (packet.getDataLengt() > 1024) {
-			throw new IOException("probalbly wrong packet size[" + packet.getDataLengt() + "] read");
+		int length = dataInputStream.readInt();
+		if (length > 1024) {
+			throw new IOException("probalbly wrong packet size[" + length + "] read");
 		}
-		byte[] rawData = new byte[packet.getDataLengt()];
-		dataInputStream.read(rawData, 0, packet.getDataLengt());
+		byte[] rawData = new byte[length];
+		dataInputStream.read(rawData, 0, length);
 		packet.setRawData(rawData);
-		packet.setData(parseRawData(rawData));
+		packet.setData(PacketHelper.parseRawData(rawData));
 
 		logger.debug(packet);
 		logger.trace(packet.dump());
 		logger.trace("readPacket finished");
 
 		return packet;
-	}
-
-	protected Map<String, Object> parseRawData(byte[] rawData) throws IOException {
-		logger.trace("parseRawData");
-
-		Map<String, Object> map = new HashMap<String, Object>();
-		String data = new String(rawData, Charset.forName("utf8"));
-
-		JSONTokener jsonTokener = new JSONTokener(data);
-		try {
-			JSONObject jsonObject = new JSONObject(jsonTokener);
-			for (String id : JSONObject.getNames(jsonObject)) {
-				map.put(id, jsonObject.get(id));
-			}
-		} catch (JSONException e) {
-			throw new IOException(e.getMessage());
-		}
-
-		logger.trace("parseRawDataFinished");
-
-		return map;
 	}
 
 }

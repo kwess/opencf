@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.apache.log4j.Logger;
-import org.json.JSONObject;
 
 public class PacketWriter {
 
@@ -22,7 +21,7 @@ public class PacketWriter {
 	public int writePacket(Packet packet) throws IOException {
 		logger.trace("writePacket");
 
-		int sumBytes = generateRawData(packet);
+		int sumBytes = packet.getRawData().length;
 
 		dataOutputStream.writeInt(packet.getDataLengt());
 		dataOutputStream.write(packet.getRawData());
@@ -37,20 +36,6 @@ public class PacketWriter {
 		dataOutputStream.flush();
 
 		return sumBytes;
-	}
-
-	protected int generateRawData(Packet packet) {
-		logger.trace("generateRawData");
-
-		JSONObject jsonObject = new JSONObject(packet.getData());
-
-		byte[] rawData = jsonObject.toString().getBytes();
-		packet.setRawData(rawData);
-		packet.setDataLengt(rawData.length);
-
-		logger.trace("generateRawData finished");
-
-		return rawData.length;
 	}
 
 }

@@ -17,16 +17,13 @@ public class Packet {
 		return dataLengt;
 	}
 
-	public void setDataLengt(int dataLengt) {
-		this.dataLengt = dataLengt;
-	}
-
 	public byte[] getRawData() {
 		return rawData;
 	}
 
 	public void setRawData(byte[] rawData) {
 		this.rawData = rawData;
+		this.dataLengt = rawData.length;
 	}
 
 	public Map<String, Object> getData() {
@@ -35,6 +32,8 @@ public class Packet {
 
 	public void setData(Map<String, Object> data) {
 		this.data = data;
+		this.rawData = PacketHelper.generateRawData(data);
+		this.dataLengt = this.rawData.length;
 	}
 
 	public String dump() {
@@ -62,7 +61,7 @@ public class Packet {
 		ret += " ---------------Hex Dump----------------------";
 		ret += dump.toString() + "\n";
 		ret += " ---------------------------------------------";
-		return ret;
+		return ret + "\n";
 	}
 
 	@Override

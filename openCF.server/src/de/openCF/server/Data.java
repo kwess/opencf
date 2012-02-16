@@ -7,8 +7,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import de.openCF.server.connector.AutomationStatusListener;
-import de.openCF.server.connector.Connection;
+import de.openCF.server.communication.AutomationStatusListener;
+import de.openCF.server.communication.Connection;
 import de.openCF.server.data.AutomationStatus;
 import de.openCF.server.data.Server;
 
@@ -71,14 +71,15 @@ public class Data {
 		return false;
 	}
 
-	public static void notifyAutomationStatusListener(Integer aid, AutomationStatus status) {
+	public static void notifyAutomationStatusListener(Integer aid, AutomationStatus status, String message) {
 		logger.trace("notifyAutomationStatusListener");
 		logger.debug("Automation ID: " + aid);
 		logger.debug("Automation Status: " + status);
+		logger.debug("Automation Message: " + message);
 		List<AutomationStatusListener> list = Data.automationStatusListener.get(aid);
 		for (AutomationStatusListener l : list) {
 			logger.debug("notify " + l);
-			l.statusChanged(aid, status);
+			l.statusChanged(aid, status, message);
 		}
 	}
 }

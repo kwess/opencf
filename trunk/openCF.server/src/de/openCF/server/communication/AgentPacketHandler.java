@@ -135,6 +135,7 @@ public class AgentPacketHandler implements PacketHandler {
 		logger.trace("handleAgentHello");
 
 		Map<String, Object> response = new HashMap<String, Object>();
+		response.put(PacketKeys.TYPE, PacketType.AGENT_HELLO_RESPONSE);
 
 		String agent_id = (String) data.get(PacketKeys.AGENT_ID);
 		String plattform = (String) data.get(PacketKeys.AGENT_PLATTFORM);

@@ -1,4 +1,5 @@
 import std.stdio;
+import std.conv;
 import std.stream;
 import core.thread;
 import core.bitop;
@@ -22,13 +23,16 @@ class SocketWriter : Thread {
 		stdout.writeln("SocketWriter ready to send data");
 		std.concurrency.send(connectionTid, true);
 		while(this.isRunning) {
+			//TODO hier warten über events
+			Thread.sleep(dur!("seconds")(5));
 			JSONValue json;
 			json.type = JSON_TYPE.OBJECT;
 			json.object[type] = JSONValue();
 			json.object[type].type = JSON_TYPE.INTEGER;
 			json.object[type].integer = type_heartbeat;
 			json.object[local_time] = JSONValue();
-			json.object[local_time].str = Clock.currTime(UTC()).toString();
+			json.object[local_time].type = JSON_TYPE.STRING;
+			json.object[local_time].str = text(core.stdc.time.time(null));
 			Packet p = new Packet(json);
 			send(p);
 			

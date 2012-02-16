@@ -115,8 +115,8 @@ public class AgentPacketHandler implements PacketHandler {
 	private void handleAgentHeartbeat(Map<String, Object> data) {
 		logger.trace("handleAgentHeartbeat");
 
-		String date = (String) data.get(PacketKeys.AGENT_LOCAL_TIME);
-		Date agent_localtime = new Date(Integer.parseInt(date));
+		Long date = (Long) data.get(PacketKeys.AGENT_LOCAL_TIME);
+		Date agent_localtime = new Date(date);
 
 		Heartbeat heartbeat = new Heartbeat();
 		heartbeat.setAgent_localtime(agent_localtime);

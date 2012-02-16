@@ -26,10 +26,11 @@ public class Controller implements Runnable {
 	@Override
 	public void run() {
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		Connection c = null;
 
 		try {
 			Socket socket = new Socket("localhost", 6789);
-			Connection c = new Connection();
+			c = new Connection();
 			c.setSocket(socket);
 			c.setPacketHandler(new ControllerPacketHandler());
 		} catch (UnknownHostException e1) {
@@ -45,6 +46,9 @@ public class Controller implements Runnable {
 			try {
 				String line = in.readLine();
 
+				if (line == "")
+					continue;
+
 				JSONTokener tokener = new JSONTokener(line);
 				JSONObject object = new JSONObject(tokener);
 
@@ -55,6 +59,7 @@ public class Controller implements Runnable {
 
 				System.out.println(p.dump());
 
+				c.forward(p);
 			} catch (IOException e) {
 				System.err.println("failed reading line");
 			} catch (JSONException e) {

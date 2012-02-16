@@ -23,6 +23,7 @@ public class AgentPacketHandler implements PacketHandler {
 
 	private Agent			agent		= null;
 	private Connection		connection	= null;
+	private boolean			registered	= false;
 
 	public AgentPacketHandler(Connection c) {
 		logger.trace("new(Connection)");
@@ -40,6 +41,11 @@ public class AgentPacketHandler implements PacketHandler {
 
 		if (type == null)
 			type = AgentPacketType.INVALID;
+
+		if (!registered && type != AgentPacketType.AGENT_HELLO) {
+			logger.warn("got unexpected Packet from unregistered Agent, discarding");
+			return;
+		}
 
 		switch (type) {
 			case AgentPacketType.AGENT_HELLO:
@@ -156,6 +162,8 @@ public class AgentPacketHandler implements PacketHandler {
 			response.put(AgentPacketKeys.RETURN_CODE, 0);
 			response.put(AgentPacketKeys.SUCCESSFULL, true);
 			response.put(AgentPacketKeys.MESSAGE, "congratulations, youre registered!");
+
+			registered = true;
 		} else if (agent != null && agent.getStatus() == Agent.Status.OFFLINE) {
 			logger.info("agent [" + agent_id + "] was known since " + agent.getUpdated() + ", but is offline, changing status to online, updating prefs");
 
@@ -172,18 +180,24 @@ public class AgentPacketHandler implements PacketHandler {
 			response.put(AgentPacketKeys.RETURN_CODE, 1);
 			response.put(AgentPacketKeys.SUCCESSFULL, true);
 			response.put(AgentPacketKeys.MESSAGE, "hello back again :)");
+
+			registered = true;
 		} else if (agent != null && agent.getStatus() == Agent.Status.ONLINE && Data.getConnection(agent_id) != null) {
 			logger.warn("agent [" + agent_id + "] already registered, rejecting request");
 
 			response.put(AgentPacketKeys.RETURN_CODE, -1);
 			response.put(AgentPacketKeys.SUCCESSFULL, false);
 			response.put(AgentPacketKeys.MESSAGE, "agent_id already registered and online");
+
+			registered = false;
 		} else {
 			logger.warn("agent [" + agent_id + "] is alredy connected to server " + agent.getServer().getId() + ", rejecting request");
 
 			response.put(AgentPacketKeys.RETURN_CODE, -2);
 			response.put(AgentPacketKeys.SUCCESSFULL, false);
 			response.put(AgentPacketKeys.MESSAGE, "agent_id already registered to " + agent.getServer().getId() + " and online");
+
+			registered = false;
 		}
 
 		session.getTransaction().commit();
@@ -217,6 +231,8 @@ public class AgentPacketHandler implements PacketHandler {
 		session.getTransaction().commit();
 
 		Data.removeConnection(agent.getId());
+
+		registered = false;
 
 		logger.trace("handleClose finished");
 	}

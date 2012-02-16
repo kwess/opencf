@@ -10,8 +10,9 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
-import de.openCF.server.connector.AgentConnection;
-import de.openCF.server.connector.Connector;
+import de.openCF.server.connector.AgentPacketHandler;
+import de.openCF.server.connector.Connection;
+import de.openCF.server.connector.Acceptor;
 import de.openCF.server.persistence.Persistence;
 
 public class Server implements Runnable {
@@ -62,16 +63,17 @@ public class Server implements Runnable {
 		Boolean useSSL = Boolean.parseBoolean(this.properties.getProperty(PROPERTIES_AGENTS_USE_SSL, "false"));
 		Boolean debug = Boolean.parseBoolean(this.properties.getProperty(PROPERTIES_AGENTS_DEBUG, "false"));
 
-		AgentConnection agentConnection = new AgentConnection(debug);
+		Connection agentConnection = new Connection(debug);
+		agentConnection.setPacketHandler(new AgentPacketHandler(agentConnection));
 
-		Connector serverConnectorAgents = new Connector();
+		Acceptor acceptorAgents = new Acceptor();
 
-		serverConnectorAgents.setPort(port);
-		serverConnectorAgents.setNeedsClientAuth(needsClientAuth);
-		serverConnectorAgents.setConnectionPoolSize(connectionPoolSize);
-		serverConnectorAgents.setUseSSL(useSSL);
-		serverConnectorAgents.setConnectionImplementation(agentConnection);
+		acceptorAgents.setPort(port);
+		acceptorAgents.setNeedsClientAuth(needsClientAuth);
+		acceptorAgents.setConnectionPoolSize(connectionPoolSize);
+		acceptorAgents.setUseSSL(useSSL);
+		acceptorAgents.setConnectionImplementation(agentConnection);
 
-		Executors.newSingleThreadExecutor().execute(serverConnectorAgents);
+		Executors.newSingleThreadExecutor().execute(acceptorAgents);
 	}
 }

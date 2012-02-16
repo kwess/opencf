@@ -39,7 +39,7 @@ public class Packet {
 
 	@Override
 	public String toString() {
-		StringBuffer dump = new StringBuffer();
+		StringBuffer dump = new StringBuffer("dump:\n");
 		int bytes = 16;
 		for (int i = 0; i < dataLengt; i++) {
 			if (i % bytes == 0) {

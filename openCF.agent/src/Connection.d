@@ -19,9 +19,6 @@ class Connection {
 	private Thread socketListener;
 	private Tid listenThread;
 	
-	private immutable int READ = 0;
-	private immutable int WRITE = 1;
-	
 	this(string hostname, ushort port) {
 		this.hostname = hostname;
 		this.port = port;

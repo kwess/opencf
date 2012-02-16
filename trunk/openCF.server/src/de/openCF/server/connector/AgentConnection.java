@@ -22,6 +22,7 @@ public class AgentConnection implements Connection {
 	private PacketWriter	packetWriter	= null;
 	private PacketHandler	packetHandler	= new AgentPacketHandler(this);
 	private boolean			debug			= false;
+	private boolean			running			= true;
 
 	public AgentConnection() {
 		logger.trace("new");
@@ -47,10 +48,8 @@ public class AgentConnection implements Connection {
 		packetReader = new PacketReader(inputStream);
 		packetWriter = new PacketWriter(outputStream);
 
-		boolean continueWork = true;
-
-		while (continueWork) {
-			continueWork = socket.isConnected();
+		while (running) {
+			running = socket.isConnected();
 			try {
 				Packet packet = packetReader.readPacket();
 				if (debug) {
@@ -63,7 +62,7 @@ public class AgentConnection implements Connection {
 				logger.error("error while reading from agent");
 			} finally {
 				packetHandler.handleClose();
-				continueWork = false;
+				running = false;
 			}
 		}
 		logger.trace("run finished");
@@ -76,10 +75,15 @@ public class AgentConnection implements Connection {
 	}
 
 	@Override
-	public void forward(Packet packet) throws IOException {
+	public void forward(Packet packet) {
 		logger.trace("forward");
 		if (packet != null)
-			packetWriter.writePacket(packet);
+			try {
+				packetWriter.writePacket(packet);
+			} catch (IOException e) {
+				logger.error("cant forward Packet");
+				running = false;
+			}
 	}
 
 }

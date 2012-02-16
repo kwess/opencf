@@ -2,18 +2,23 @@ import std.stdio;
 import std.stream;
 import core.thread;
 import core.bitop;
+import std.concurrency;
 
 import Protocol;
 
 class SocketListener : Thread {
 	private Stream stream;
-	this(Stream stream) {
+	private Tid connectionTid;
+	
+	this(Stream stream, Tid tid) {
 		super(&run);
 		this.stream = stream;
+		this.connectionTid = tid;
 	}
 	
 	private void run() {
 		stdout.writeln("start listening");
+		send(connectionTid, true);
 		while (!stream.eof()) {
 			int n = 0;
 			stream.read(n);

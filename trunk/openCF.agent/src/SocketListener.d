@@ -20,12 +20,14 @@ class SocketListener : Thread {
 			stdout.writeln(bswap(n), " byte kommen im naechsten block");
 			string datastring = cast(string) stream.readString(bswap(n));
 			stdout.writeln(datastring, " gelesen");
-			//stdout.writeln("data: ", datastring);
-//			switch() {
-//				case type_agenthelloresponse:
-//					stdout.writeln("type_agenthelloresponse bekommen");
-//			}
+			Packet p = new Packet(datastring);
 			
+			switch(p.getType) {
+				case type_agenthelloresponse:
+					break;
+				default:
+					
+			}
 		}
 		stdout.writeln("stop listening");
 	}

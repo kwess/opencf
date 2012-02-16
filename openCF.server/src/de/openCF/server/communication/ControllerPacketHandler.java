@@ -9,6 +9,7 @@ import de.openCF.protocol.Packet;
 import de.openCF.protocol.PacketHandler;
 import de.openCF.protocol.PacketKeys;
 import de.openCF.protocol.PacketType;
+import de.openCF.server.Data;
 
 public class ControllerPacketHandler implements PacketHandler {
 
@@ -55,6 +56,12 @@ public class ControllerPacketHandler implements PacketHandler {
 		logger.debug("descriptor: " + descriptor);
 		logger.debug("parameter: " + parameter);
 
+		for (String s : agent_ids) {
+			Packet p = new Packet();
+			p.setData(data);
+			logger.debug("forewarding to " + s + ": " + p);
+			Data.getConnection(s).forward(p);
+		}
 	}
 
 	@Override

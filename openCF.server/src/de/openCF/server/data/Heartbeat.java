@@ -14,7 +14,7 @@ public class Heartbeat {
 
 	@Id
 	@GeneratedValue
-	private Integer	id				= null;
+	private Integer	id				= 1;
 	@ManyToOne(optional = false)
 	private Agent	agent			= null;
 	private Date	agent_localtime	= null;

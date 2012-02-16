@@ -89,7 +89,6 @@ Erwartete Antwort: Automation Status
 {
   repository_url: URL,
   automation_desctiptor: DESCRIPTOR,
-  automation_id: AUTOMATION_ID
   automation_id: AUTOMATION_ID,
   automation_action: ACTION,
   automation_parameter: {

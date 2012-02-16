@@ -33,12 +33,12 @@ class Connection {
 		
 		receive(
 			(bool b) {
-				stdout.writeln("received: ", b);
+				stdout.writeln("socket now listening: ", b);
+				this.connected = b;
 			}
 		);
 		
-		this.connected = true;
-		return true;
+		return this.connected;
 	}
 	
 	public bool sendHello(string agent, string myversion, string plattform) {

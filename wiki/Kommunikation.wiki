@@ -150,6 +150,7 @@ Sender: Controller
 Erwartete Antwort: Automation Status (siehe Agent-Server:Automation Status)
 <code language="js">
 {
+  agent_id: [AGENT],
   automation_action: ACTION,
   automation_reason: REASON,
   automation_descriptor: DESCRIPTOR,
@@ -157,6 +158,7 @@ Erwartete Antwort: Automation Status (siehe Agent-Server:Automation Status)
 }
 </code>
 || *Feld* || *Datentyp* || *Wert/Beschreibung* ||
+|| AGENT || String || Liste von Agent Ids ||
 || PACKET_TYPE || Integer || 30 ||
 || ACTION || String || {start, stop, pause, resume, listen} ||
 || REASON || String || Begründung der Aktion, fürs logging ||

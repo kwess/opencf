@@ -63,7 +63,6 @@ public class Connection implements Runnable {
 
 			} catch (IOException e) {
 				logger.error("error while reading from socket: " + e.getMessage());
-			} finally {
 				packetHandler.handleClose();
 				running = false;
 			}

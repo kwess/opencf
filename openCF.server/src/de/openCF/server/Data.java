@@ -7,8 +7,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import de.openCF.protocol.Connection;
 import de.openCF.server.communication.AutomationStatusListener;
-import de.openCF.server.communication.Connection;
 import de.openCF.server.data.AutomationStatus;
 import de.openCF.server.data.Server;
 

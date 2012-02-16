@@ -15,6 +15,7 @@ import de.openCF.server.data.Automation;
 import de.openCF.server.data.AutomationStatus;
 import de.openCF.server.data.Heartbeat;
 import de.openCF.server.data.Message;
+import de.openCF.server.data.Server;
 import de.openCF.server.persistence.Persistence;
 
 public class AgentPacketHandler implements PacketHandler {
@@ -116,7 +117,7 @@ public class AgentPacketHandler implements PacketHandler {
 		logger.trace("handleAgentHeartbeat");
 
 		String date = (String) data.get(PacketKeys.AGENT_LOCAL_TIME);
-		Date agent_localtime = new Date(Long.parseLong(date));
+		Date agent_localtime = new Date(Long.parseLong(date) * 1000);
 
 		Heartbeat heartbeat = new Heartbeat();
 		heartbeat.setAgent_localtime(agent_localtime);
@@ -140,9 +141,18 @@ public class AgentPacketHandler implements PacketHandler {
 		String version = (String) data.get(PacketKeys.AGENT_VERSION);
 
 		Session session = Persistence.getSession();
-		Agent agent = (Agent) session.get(Agent.class, agent_id);
-
 		session.beginTransaction();
+
+		Agent agent = (Agent) session.get(Agent.class, agent_id);
+		Server server = Data.getServer();
+
+		boolean agentOnline = false;
+		boolean agentConnectedHere = Data.getConnection(agent_id) == null ? false : true;
+		boolean agentConnectedToDifferendServer = false;
+		if (agent != null) {
+			agentOnline = agent.getStatus() == Agent.Status.OFFLINE ? false : true;
+			agentConnectedToDifferendServer = server.getId().equals(agent.getServer().getId()) ? false : true;
+		}
 
 		if (agent == null) {
 			logger.info("agent [" + agent_id + "] unknown, creating new");
@@ -164,12 +174,13 @@ public class AgentPacketHandler implements PacketHandler {
 			response.put(PacketKeys.MESSAGE, "congratulations, youre registered!");
 
 			registered = true;
-		} else if (agent != null && agent.getStatus() == Agent.Status.OFFLINE) {
+		} else if (!agentOnline || (agentOnline && agentConnectedHere) || (agentOnline && !agentConnectedToDifferendServer)) {
 			logger.info("agent [" + agent_id + "] was known since " + agent.getUpdated() + ", but is offline, changing status to online, updating prefs");
 
 			agent.setStatus(Agent.Status.ONLINE);
 			agent.setPlattform(Agent.Plattform.valueOf(plattform.toUpperCase()));
 			agent.setVersion(version);
+			agent.setServer(server);
 			agent.setUpdated(new Date());
 
 			this.agent = agent;
@@ -182,7 +193,7 @@ public class AgentPacketHandler implements PacketHandler {
 			response.put(PacketKeys.MESSAGE, "hello back again :)");
 
 			registered = true;
-		} else if (agent != null && agent.getStatus() == Agent.Status.ONLINE && Data.getConnection(agent_id) != null) {
+		} else if (agentOnline && agentConnectedHere) {
 			logger.warn("agent [" + agent_id + "] already registered, rejecting request");
 
 			response.put(PacketKeys.RETURN_CODE, -1);

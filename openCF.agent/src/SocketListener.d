@@ -17,7 +17,7 @@ class SocketListener : Thread {
 	}
 	
 	private void run() {
-		stdout.writeln("start listening");
+		stdout.writeln("SocketListener ready to receive data");
 		send(connectionTid, true);
 		while (!stream.eof()) {
 			int n = 0;

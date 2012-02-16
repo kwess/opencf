@@ -187,7 +187,7 @@ public class AgentPacketHandler implements PacketHandler {
 
 			response.put(PacketKeys.RETURN_CODE, -1);
 			response.put(PacketKeys.SUCCESSFULL, false);
-			response.put(PacketKeys.MESSAGE, "agent_id already registered and online");
+			response.put(PacketKeys.MESSAGE, "agent [" + agent_id + "] already registered and online");
 
 			registered = false;
 		} else {
@@ -195,7 +195,7 @@ public class AgentPacketHandler implements PacketHandler {
 
 			response.put(PacketKeys.RETURN_CODE, -2);
 			response.put(PacketKeys.SUCCESSFULL, false);
-			response.put(PacketKeys.MESSAGE, "agent_id already registered to " + agent.getServer().getId() + " and online");
+			response.put(PacketKeys.MESSAGE, "agent [" + agent_id + "] already registered to " + agent.getServer().getId() + " and online");
 
 			registered = false;
 		}

@@ -9,6 +9,7 @@ import std.stream;
 import std.xml;
 import std.array;
 import std.string;
+import std.algorithm;
 
 import Configuration;
 import Connection;
@@ -17,15 +18,38 @@ import AutomationThread;
 
 void main() {
 	
-//			string datastring = "<a><message>congratulations, youre registered!</message><type>2</type><return_code>0</return_code><successfull>true</successfull></a>";
+//			string datastring = "<a><message>congratulations, youre registered!</message><type>2</type><return_code>0</return_code><successfull>true</successfull><ebene1><ebene2a>2a</ebene2a><ebene2b>2b</ebene2b></ebene1></a>";
 //			auto xml = new DocumentParser(datastring);
-//	
+//			auto doc = new Document(datastring);
+//			check(datastring);
+	
+//			xml.onEndTag["a"] = (in Element e) {
+//				stdout.writeln(e.texts.length, " is length");
+//				string text = e.text;
+//			};
 //			xml.onEndTag["type"] = (in Element e) {
 //				writeln("Elem: ", e.text);
 //			};
 //			
 //			xml.parse();
 //			stdout.writeln(xml);
+//			
+//			string[string] elementArray;
+//			foreach(element; doc.elements) {
+//				string key = element.tag.name;
+//				string value;
+//				if(element.elements.length == 0) {
+//					value = element.text;
+//				}
+//				else {
+//					foreach(element2; element.elements) {
+//						value ~= element2.tag.name;
+//						value ~= element2.text;
+//					}
+//				}
+//				stdout.writeln("key: ", key);
+//				stdout.writeln("value: ", value);
+//			}
 //			
 //			return;
 

@@ -96,10 +96,12 @@ class Connection {
 		receive(
 			(bool ok) {
 				helloOK = ok;
+				stdout.writeln("helloOK: ", helloOK);
+//				std.concurrency.send(this.socketWriter.getTid(), helloOK);
 			}
 		);
 		
-		return true;
+		return helloOK;
 	}
 	
 	public bool disconnect() {

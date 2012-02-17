@@ -59,7 +59,7 @@ public class ControllerPacketHandler implements PacketHandler {
 		for (String s : agent_ids) {
 			Packet p = new Packet();
 			p.setData(data);
-			logger.debug("forewarding to " + s + ": " + p);
+			logger.info("forewarding to " + s + ": " + p);
 			Data.getConnection(s).forward(p);
 		}
 	}

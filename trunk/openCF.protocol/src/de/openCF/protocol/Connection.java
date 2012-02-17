@@ -44,7 +44,7 @@ public class Connection implements Runnable {
 			inputStream = socket.getInputStream();
 			outputStream = socket.getOutputStream();
 		} catch (IOException e) {
-			logger.error("cant get stream from socket", e);
+			logger.error("cant get stream from socket: " + e.getMessage());
 			return;
 		}
 

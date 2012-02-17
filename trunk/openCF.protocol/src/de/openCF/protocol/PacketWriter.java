@@ -16,18 +16,21 @@ public class PacketWriter {
 
 	public PacketWriter(OutputStream outputStream) {
 		super();
-		logger.trace("new");
+		logger.trace("new(OutputStream)");
 		this.dataOutputStream = new DataOutputStream(outputStream);
 	}
 
 	public int writePacket(Packet packet, Encoding encoding) throws IOException {
 		logger.trace("writePacket(Packet, Encoding)");
 
+		logger.trace("generating raw data");
 		packet.setRawData(PacketHelper.generateRawData(packet.getData(), encoding));
 
 		int sumBytes = packet.getDataLengt();
 
+		logger.trace("writing length to stream");
 		dataOutputStream.writeInt(packet.getDataLengt());
+		logger.trace("writing data to stream");
 		dataOutputStream.write(packet.getRawData());
 
 		sumBytes += 4;
@@ -37,6 +40,7 @@ public class PacketWriter {
 		logger.trace("writePacket finished");
 		logger.debug(sumBytes + " (bytes) written");
 
+		logger.trace("flushing stream");
 		dataOutputStream.flush();
 
 		return sumBytes;

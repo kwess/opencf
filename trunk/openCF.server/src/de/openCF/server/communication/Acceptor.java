@@ -48,6 +48,7 @@ public class Acceptor implements Runnable {
 		String[] supportedCipherSuites = null;
 
 		if (useSSL) {
+			logger.debug("creating ssl session factory");
 			SSLServerSocketFactory sslServerSocketFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
 			serverSocketFactory = sslServerSocketFactory;
 
@@ -59,6 +60,7 @@ public class Acceptor implements Runnable {
 		}
 
 		try {
+			logger.debug("creating session factory");
 			serverSocket = serverSocketFactory.createServerSocket(port, this.connectionPoolSize);
 			logger.info("server socket open");
 		} catch (IOException e) {
@@ -74,9 +76,11 @@ public class Acceptor implements Runnable {
 		while (!serverSocket.isClosed()) {
 			Socket socket = null;
 			try {
+				logger.info("waiting for new incomming connection");
 				socket = serverSocket.accept();
 				if (useSSL) {
 					SSLSocket sslSocket = (SSLSocket) socket;
+					logger.info("starting ssl handshake");
 					sslSocket.startHandshake();
 					logger.debug("active ciphersuite: " + sslSocket.getSession().getCipherSuite());
 				}
@@ -86,8 +90,10 @@ public class Acceptor implements Runnable {
 				logger.error("accept failed", e);
 				continue;
 			}
+
 			Connection serverConnection = getConnectionImplementation();
 			serverConnection.setSocket(socket);
+
 			executorService.execute(serverConnection);
 		}
 

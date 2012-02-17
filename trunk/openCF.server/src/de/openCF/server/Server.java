@@ -19,32 +19,35 @@ import de.openCF.server.persistence.Persistence;
 
 public class Server implements Runnable {
 
-	public static final String							CONFIG_FILE								= "config/server.properties";
+	public static final String	CONFIG_FILE								= "config/server.properties";
 
-	private static final String							PROPERTIES_SERVER_ID					= "openCF.server.name";
+	private static final String	PROPERTIES_SERVER_ID					= "openCF.server.name";
 
-	private static final String							PROPERTIES_AGENTS_PORT					= "openCF.server.acceptor.agent.port";
-	private static final String							PROPERTIES_AGENTS_NEEDSCLIENTAUTH		= "openCF.server.acceptor.agent.needsClientAuth";
-	private static final String							PROPERTIES_AGENTS_POOLSIZE				= "openCF.server.acceptor.agent.poolSize";
-	private static final String							PROPERTIES_AGENTS_USE_SSL				= "openCF.server.acceptor.agents.useSSL";
-	private static final String							PROPERTIES_AGENTS_DEBUG					= "openCF.server.acceptor.agents.debug";
+	private static final String	PROPERTIES_AGENTS_PORT					= "openCF.server.acceptor.agent.port";
+	private static final String	PROPERTIES_AGENTS_NEEDSCLIENTAUTH		= "openCF.server.acceptor.agent.needsClientAuth";
+	private static final String	PROPERTIES_AGENTS_POOLSIZE				= "openCF.server.acceptor.agent.poolSize";
+	private static final String	PROPERTIES_AGENTS_USE_SSL				= "openCF.server.acceptor.agents.useSSL";
+	private static final String	PROPERTIES_AGENTS_DEBUG					= "openCF.server.acceptor.agents.debug";
 
-	private static final String							PROPERTIES_CONTROLLER_PORT				= "openCF.server.acceptor.controller.port";
-	private static final String							PROPERTIES_CONTROLLER_NEEDSCLIENTAUTH	= "openCF.server.acceptor.controller.needsClientAuth";
-	private static final String							PROPERTIES_CONTROLLER_POOLSIZE			= "openCF.server.acceptor.controller.poolSize";
-	private static final String							PROPERTIES_CONTROLLER_USE_SSL			= "openCF.server.acceptor.controller.useSSL";
-	private static final String							PROPERTIES_CONTROLLER_DEBUG				= "openCF.server.acceptor.controller.debug";
+	private static final String	PROPERTIES_CONTROLLER_PORT				= "openCF.server.acceptor.controller.port";
+	private static final String	PROPERTIES_CONTROLLER_NEEDSCLIENTAUTH	= "openCF.server.acceptor.controller.needsClientAuth";
+	private static final String	PROPERTIES_CONTROLLER_POOLSIZE			= "openCF.server.acceptor.controller.poolSize";
+	private static final String	PROPERTIES_CONTROLLER_USE_SSL			= "openCF.server.acceptor.controller.useSSL";
+	private static final String	PROPERTIES_CONTROLLER_DEBUG				= "openCF.server.acceptor.controller.debug";
 
-	private Logger										logger									= Logger.getLogger(Server.class);
-	private Properties									properties								= new Properties();
-
-	public static final de.openCF.server.data.Server	server									= null;
+	private Logger				logger									= Logger.getLogger(Server.class);
+	private Properties			properties								= new Properties();
 
 	public Server() {
+		logger.trace("new");
+
+		logger.debug("open config_file: " + CONFIG_FILE);
 		File file = new File(CONFIG_FILE);
 		FileInputStream fileInputStream;
 		try {
+			logger.trace("reading from config_file");
 			fileInputStream = new FileInputStream(file);
+			logger.trace("loading config_file into properties");
 			this.properties.load(fileInputStream);
 		} catch (FileNotFoundException e) {
 			logger.error("config file not found", e);
@@ -55,6 +58,8 @@ public class Server implements Runnable {
 
 	@Override
 	public void run() {
+		logger.trace("run");
+
 		String server_id = this.properties.getProperty(PROPERTIES_SERVER_ID);
 		de.openCF.server.data.Server server = new de.openCF.server.data.Server();
 		server.setId(server_id);
@@ -98,7 +103,15 @@ public class Server implements Runnable {
 		acceptorControllers.setUseSSL(controllerUseSSL);
 		acceptorControllers.setConnectionImplementation(controllerConnection);
 
+		logger.info("starting acceptor for agents");
 		Executors.newSingleThreadExecutor().execute(acceptorAgents);
+		logger.info("starting acceptor for controllers");
 		Executors.newSingleThreadExecutor().execute(acceptorControllers);
+
+		logger.trace("run finished");
+	}
+
+	public static void main(String[] args) {
+		Executors.newSingleThreadExecutor().execute(new Server());
 	}
 }

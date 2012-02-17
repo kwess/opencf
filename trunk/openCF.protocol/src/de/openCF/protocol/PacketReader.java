@@ -10,11 +10,13 @@ public class PacketReader {
 
 	private static Logger	logger			= Logger.getLogger(PacketReader.class);
 
+	public static final int	MAX_PACKET_SIZE	= 2048;
+
 	private DataInputStream	dataInputStream	= null;
 
 	public PacketReader(InputStream inputStream) {
 		super();
-		logger.trace("new");
+		logger.trace("new(InputStream)");
 		this.dataInputStream = new DataInputStream(inputStream);
 	}
 
@@ -23,12 +25,16 @@ public class PacketReader {
 
 		Packet packet = new Packet();
 
+		logger.trace("reading length from stream");
 		int length = dataInputStream.readInt();
-		if (length > 1024) {
+		if (length > MAX_PACKET_SIZE) {
 			throw new IOException("probalbly wrong packet size[" + length + "] read");
 		}
 		byte[] rawData = new byte[length];
+
+		logger.trace("reading data form stream");
 		dataInputStream.read(rawData, 0, length);
+
 		packet.setRawData(rawData);
 		packet.setData(PacketHelper.parseRawData(rawData));
 

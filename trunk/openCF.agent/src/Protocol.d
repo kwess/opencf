@@ -55,71 +55,22 @@ class Packet {
 		return toJSON(&json);
 	}
 	
+	public string getXMLString() {
+		return xml.toString();
+	}
+	
 	public string toString() {
 //		return toJSON(&json);
 		return this.data;
 	}
 	
 	public int getType() {
-//		stdout.writeln(json.object["message"].str);
-//		return cast(int) json.object[Protocol.type].integer;
-		auto xml = new DocumentParser(this.data);
 		int type;
 		xml.onEndTag["type"] = (in Element e) {
 			string text = e.text;
-			type = parse!int(text);//writeln("Elem: ", e.text);
+			type = parse!int(text);
 		};
+		xml.parse();
 		return type;
 	}
-}
-
-//TODO DAS HIER IST EINE HILFSMETHODE WEGEN BUG http://d.puremagic.com/issues/show_bug.cgi?id=7323
-JSONValue toJsonValue(T)(T a) {
-	JSONValue val;
-	static if(is(T == JSONValue)) {
-		val = a;
-	} else static if(__traits(compiles, val = a.makeJsonValue())) {
-		val = a.makeJsonValue();
-	} else static if(isIntegral!(T)) {
-		val.type = JSON_TYPE.INTEGER;
-		val.integer = to!long(a);
-	} else static if(isFloatingPoint!(T)) {
-		val.type = JSON_TYPE.FLOAT;
-		val.floating = to!real(a);
-		static assert(0);
-	} else static if(is(T == void*)) {
-		val.type = JSON_TYPE.NULL;
-	} else static if(is(T == bool)) {
-		if(a == true)
-			val.type = JSON_TYPE.TRUE;
-		if(a == false)
-			val.type = JSON_TYPE.FALSE;
-	} else static if(isSomeString!(T)) {
-		val.type = JSON_TYPE.STRING;
-		val.str = to!string(a);
-	} else static if(isAssociativeArray!(T)) {
-		val.type = JSON_TYPE.OBJECT;
-		foreach(k, v; a) {
-			val.object[to!string(k)] = toJsonValue(v);
-		}
-	} else static if(isArray!(T)) {
-		val.type = JSON_TYPE.ARRAY;
-		val.array.length = a.length;
-		foreach(i, v; a) {
-			val.array[i] = toJsonValue(v);
-		}
-	} else static if(is(T == struct)) {
-		val.type = JSON_TYPE.OBJECT;
-
-		foreach(i, member; a.tupleof) {
-			string name = a.tupleof[i].stringof[2..$];
-			static if(a.tupleof[i].stringof[2] != '_')
-				val.object[name] = toJsonValue(member);
-		}
-	} else { /* our catch all is to just do strings */
-		val.type = JSON_TYPE.STRING;
-		val.str = to!string(a);
-	}
-
-	return val;
 }

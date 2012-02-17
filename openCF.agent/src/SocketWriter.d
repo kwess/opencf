@@ -22,19 +22,24 @@ class SocketWriter : Thread {
 	private void run() {
 		stdout.writeln("SocketWriter ready to send data");
 		std.concurrency.send(connectionTid, true);
+		std.concurrency.receive(
+			(bool go){
+				// when this message is received, the heartbeat thread can start running
+			}
+		);
 		while(this.isRunning) {
 			//TODO hier warten über events
-			Thread.sleep(dur!("seconds")(5));
-			JSONValue json;
-			json.type = JSON_TYPE.OBJECT;
-			json.object[type] = JSONValue();
-			json.object[type].type = JSON_TYPE.INTEGER;
-			json.object[type].integer = type_heartbeat;
-			json.object[local_time] = JSONValue();
-			json.object[local_time].type = JSON_TYPE.STRING;
-			json.object[local_time].str = text(core.stdc.time.time(null));
-			Packet p = new Packet(json);
-			send(p);
+//			Thread.sleep(dur!("seconds")(5));
+//			JSONValue json;
+//			json.type = JSON_TYPE.OBJECT;
+//			json.object[type] = JSONValue();
+//			json.object[type].type = JSON_TYPE.INTEGER;
+//			json.object[type].integer = type_heartbeat;
+//			json.object[local_time] = JSONValue();
+//			json.object[local_time].type = JSON_TYPE.STRING;
+//			json.object[local_time].str = text(core.stdc.time.time(null));
+//			Packet p = new Packet(json);
+//			send(p);
 			
 			Thread.sleep(dur!("seconds")(1));
 		}

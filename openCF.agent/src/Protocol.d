@@ -3,6 +3,8 @@ import std.json;
 import core.bitop;
 import std.traits;
 import std.conv;
+import std.stdio;
+import std.xml;
 
 immutable string agent_id = "agent_id";
 immutable string agent_version = "agent_version";
@@ -19,14 +21,22 @@ immutable int type_agenthelloresponse = 2;
 
 class Packet {
 	private int size;
+	private string data;
+	private DocumentParser xml;
 	private JSONValue json;
 	
 	this(JSONValue json) {
 		this.json = json;
 	}
 	
+	this(DocumentParser xml) {
+		this.xml = xml;
+	}
+	
 	this(string data) {
-		this.json = toJsonValue(data);
+//		this.json = parseJSON(data);
+//		this.xml = new DocumentParser(data);
+		this.data = data;
 	}
 	
 	public int getSize() {
@@ -46,11 +56,20 @@ class Packet {
 	}
 	
 	public string toString() {
-		return toJSON(&json);
+//		return toJSON(&json);
+		return this.data;
 	}
 	
 	public int getType() {
-		return cast(int) json.object[Protocol.type].integer;
+//		stdout.writeln(json.object["message"].str);
+//		return cast(int) json.object[Protocol.type].integer;
+		auto xml = new DocumentParser(this.data);
+		int type;
+		xml.onEndTag["type"] = (in Element e) {
+			string text = e.text;
+			type = parse!int(text);//writeln("Elem: ", e.text);
+		};
+		return type;
 	}
 }
 

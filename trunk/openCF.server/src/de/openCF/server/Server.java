@@ -94,7 +94,8 @@ public class Server implements Runnable {
 		Boolean controllerDebug = Boolean.parseBoolean(this.properties.getProperty(PROPERTIES_CONTROLLER_DEBUG, "false"));
 
 		Connection controllerConnection = new Connection(controllerDebug);
-		controllerConnection.setPacketHandler(new ControllerPacketHandler());
+		ControllerPacketHandler controllerPacketHandler = new ControllerPacketHandler(controllerConnection);
+		controllerConnection.setPacketHandler(controllerPacketHandler);
 
 		Acceptor acceptorControllers = new Acceptor();
 		acceptorControllers.setPort(controllerPort);

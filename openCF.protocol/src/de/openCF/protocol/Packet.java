@@ -48,7 +48,8 @@ public class Packet {
 		}
 		StringBuffer dataFormatted = new StringBuffer();
 		for (Map.Entry<String, Object> e : data.entrySet()) {
-			dataFormatted.append(String.format(" %20S = (%7s) %s\n", e.getKey(), e.getValue().getClass().getSimpleName(), e.getValue()));
+			String clazz = e.getValue().getClass().getSimpleName();
+			dataFormatted.append(String.format(" %15S = (%7s) %s\n", e.getKey(), clazz, e.getValue()));
 		}
 		String ret = new String("\n");
 		ret += " -----------------Packet----------------------\n";

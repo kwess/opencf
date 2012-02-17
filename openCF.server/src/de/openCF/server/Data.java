@@ -44,6 +44,10 @@ public class Data {
 		return Data.server;
 	}
 
+	public static boolean isAgenOnline(String aid) {
+		return connections.containsKey(aid);
+	}
+
 	public static boolean addAutomationStatusListerner(Integer aid, AutomationStatusListener listener) {
 		logger.trace("addAutomationStatusListener(Integer, AutomationStatusListener)");
 		List<AutomationStatusListener> list = Data.automationStatusListener.get(aid);

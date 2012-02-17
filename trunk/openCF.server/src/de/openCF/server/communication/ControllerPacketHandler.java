@@ -89,8 +89,6 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 					logger.info("starting new automation");
 					Automation automation = new Automation();
 					session.save(automation);
-					Data.addAutomationStatusListerner(automation.getId(), this);
-					Data.getConnection(s).forward(p);
 					automation_ids = new ArrayList<Integer>();
 					automation_ids.add(automation.getId());
 				}
@@ -99,13 +97,12 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 					continue;
 
 				for (Integer id : automation_ids) {
-					if (automationAction == AutomationAction.listen) {
-						logger.info("listening");
-						Data.addAutomationStatusListerner(id, this);
-					} else {
+					if (automationAction != AutomationAction.listen) {
 						logger.info("forward command");
 						Data.getConnection(s).forward(p);
 					}
+
+					Data.addAutomationStatusListerner(id, this);
 				}
 			} else {
 				statusChanged(0, AutomationStatus.start_failed, "Agent not online");
@@ -118,6 +115,8 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 	@Override
 	public void handleClose() {
 		logger.trace("handleClose");
+
+		Data.removeAutomationStatusListener(this);
 	}
 
 	@Override

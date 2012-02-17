@@ -48,6 +48,12 @@ public class Data {
 		return connections.containsKey(aid);
 	}
 
+	public static void removeAutomationStatusListener(AutomationStatusListener listener) {
+		for (Map.Entry<Integer, List<AutomationStatusListener>> e : automationStatusListener.entrySet()) {
+			e.getValue().remove(listener);
+		}
+	}
+
 	public static boolean addAutomationStatusListerner(Integer aid, AutomationStatusListener listener) {
 		logger.trace("addAutomationStatusListener(Integer, AutomationStatusListener)");
 		List<AutomationStatusListener> list = Data.automationStatusListener.get(aid);

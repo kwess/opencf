@@ -89,23 +89,14 @@ public abstract class PacketHelper {
 		return rawData;
 	}
 
-	public static Map<String, Object> parseRawData(byte[] rawData, Encoding encoding) throws IOException {
+	public static Map<String, Object> parseRawData(byte[] rawData) throws IOException {
 		Map<String, Object> map = null;
 		String data = new String(rawData, Charset.forName("utf8"));
 		JSONObject result = null;
 
+		JSONTokener jsonTokener = new JSONTokener(data);
 		try {
-			switch (encoding) {
-				case XML:
-					result = XML.toJSONObject(data);
-					break;
-				case JSON:
-				default:
-					JSONTokener jsonTokener = new JSONTokener(data);
-					result = new JSONObject(jsonTokener);
-					break;
-			}
-
+			result = new JSONObject(jsonTokener);
 			map = PacketHelper.toMap(result);
 		} catch (JSONException e) {
 			throw new IOException(e.getMessage());

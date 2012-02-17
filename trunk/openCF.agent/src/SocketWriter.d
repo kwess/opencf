@@ -24,10 +24,14 @@ class SocketWriter : Thread {
 		std.concurrency.send(connectionTid, true);
 		std.concurrency.receive(
 			(bool go){
-				// when this message is received, the heartbeat thread can start running
+				stdout.writeln("socketwriter go: ", go);
+				if(go == false) {
+					return;
+				}
 			}
 		);
 		while(this.isRunning) {
+			stdout.writeln("running");
 			//TODO hier warten über events
 //			Thread.sleep(dur!("seconds")(5));
 //			JSONValue json;
@@ -47,19 +51,19 @@ class SocketWriter : Thread {
 	}
 	
 	
-	
-	public bool send(string message) {
-		stdout.writefln("sending %s", message);
-		this.stream.write(bswap(message.length));
-		this.stream.writeString(message);
-		
-		return true;
-	}
+//	
+//	public bool send(string message) {
+//		stdout.writefln("sending %s", message);
+//		this.stream.write(bswap(message.length));
+//		this.stream.writeString(message);
+//		
+//		return true;
+//	}
 	
 	public bool send(Packet p) {
-		string text = p.getJsonString();
+		string text = p.toString();
 		stdout.writefln("sending %s", text);
-		this.stream.write(bswap(text.length));
+		this.stream.write(p.getSize());
 		this.stream.writeString(text);
 		
 		return true;

@@ -5,6 +5,7 @@ import std.traits;
 import std.conv;
 import std.stdio;
 import std.xml;
+import std.string;
 
 immutable string agent_id = "agent_id";
 immutable string agent_version = "agent_version";
@@ -20,31 +21,19 @@ immutable int type_agenthello = 1;
 immutable int type_agenthelloresponse = 2;
 
 class Packet {
-	private int size;
-	private string data;
-	private DocumentParser xml;
+	private string xmlString;
 	private JSONValue json;
 	
 	this(JSONValue json) {
 		this.json = json;
 	}
 	
-	this(DocumentParser xml) {
-		this.xml = xml;
-	}
-	
-	this(string data) {
-//		this.json = parseJSON(data);
-//		this.xml = new DocumentParser(data);
-		this.data = data;
+	this(string xmlString) {
+		this.xmlString = text("<dummy>", xmlString, "</dummy>");
 	}
 	
 	public int getSize() {
-		return size;
-	}
-	
-	public void setSize(int size) {
-		this.size = size;
+		return bswap(toString().length);
 	}
 	
 	public JSONValue getJson() {
@@ -55,22 +44,34 @@ class Packet {
 		return toJSON(&json);
 	}
 	
-	public string getXMLString() {
-		return xml.toString();
+	public string getXmlString() {
+		return xmlString;
 	}
 	
 	public string toString() {
-//		return toJSON(&json);
-		return this.data;
+		string text;
+		if(xmlString != null && xmlString.length > 0) {
+			return getXmlString();
+		}
+		else {
+			return getJsonString();
+		}
 	}
 	
 	public int getType() {
-		int type;
-		xml.onEndTag["type"] = (in Element e) {
-			string text = e.text;
-			type = parse!int(text);
-		};
-		xml.parse();
-		return type;
+		
+		if(xmlString != null && xmlString.length > 0) {
+			auto doc = new Document(xmlString);
+			foreach(element; doc.elements) {
+				if(element.tag.name.icmp(type) == 0) {
+					string typeString = element.text;
+					return parse!int(typeString);
+				}
+			}
+		}
+		else {
+			return cast(int) json.object[type].integer;
+		}
+		return -1;
 	}
 }

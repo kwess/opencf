@@ -5,6 +5,7 @@ import core.bitop;
 import std.concurrency;
 import std.xml;
 import std.conv;
+import std.string;
 
 import Protocol;
 
@@ -26,9 +27,8 @@ class SocketListener : Thread {
 			stream.read(n);
 			stdout.writeln(bswap(n), " byte kommen im naechsten block");
 			string datastring = cast(string) stream.readString(bswap(n));
-			stdout.writeln(datastring, " gelesen");
-			auto xml = new DocumentParser(text("<a>", datastring, "</a>"));
-			Packet p = new Packet(xml);
+			stdout.writeln("gelesen: ", datastring);
+			Packet p = new Packet(datastring);
 			
 			switch(p.getType()) {
 				case type_agenthelloresponse:
@@ -42,9 +42,15 @@ class SocketListener : Thread {
 	}
 	
 	private void handleAgentHelloResponse(Tid connectionTid, Packet p) {
-		stdout.writeln("handleAgentHelloResponse function");//, p.getJson.object[successfull]);
-//		//send(connectionTid, p.getJson.object[successfull]);
-//		bool success = p.getJson.object[successfull];
-//		send(connectionTid, true);
+		stdout.writeln("handleAgentHelloResponse function");
+		bool success;
+		auto doc = new Document(p.getXmlString());
+			foreach(element; doc.elements) {
+				if(element.tag.name.icmp(successfull) == 0) {
+					string successfullString = element.text;
+					success = parse!bool(successfullString);
+				}
+			}
+		send(connectionTid, success);
 	}
 }

@@ -11,8 +11,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.json.XML;
+import org.json.XMLTokener;
 
 public abstract class PacketHelper {
+
+	public enum Encoding {
+		JSON, XML
+	}
+
 	public static Map<String, Object> toMap(JSONObject object) throws JSONException {
 		Map<String, Object> map = new HashMap<String, Object>();
 
@@ -47,19 +54,48 @@ public abstract class PacketHelper {
 		return list;
 	}
 
-	public static byte[] generateRawData(Map<String, Object> data) {
+	public static byte[] generateRawData(Map<String, Object> data, Encoding encoding) throws IOException {
 		JSONObject jsonObject = new JSONObject(data);
 
-		byte[] rawData = jsonObject.toString().getBytes();
+		String dataString = null;
+
+		switch (encoding) {
+			case XML:
+				try {
+					dataString = XML.toString(jsonObject);
+				} catch (JSONException e) {
+					throw new IOException("failed transforming json to xml", e);
+				}
+				break;
+			case JSON:
+			default:
+				dataString = jsonObject.toString();
+				break;
+		}
+
+		byte[] rawData = dataString.getBytes();
 
 		return rawData;
 	}
 
-	public static Map<String, Object> parseRawData(byte[] rawData) throws IOException {
+	public static Map<String, Object> parseRawData(byte[] rawData, Encoding encoding) throws IOException {
 		Map<String, Object> map = null;
 		String data = new String(rawData, Charset.forName("utf8"));
 
-		JSONTokener jsonTokener = new JSONTokener(data);
+		JSONTokener jsonTokener = null;
+		switch (encoding) {
+			case XML:
+				jsonTokener = new XMLTokener(data);
+				break;
+			case JSON:
+			default:
+				jsonTokener = new JSONTokener(data);
+				break;
+		}
+
+		System.err.println(encoding);
+		System.err.println(jsonTokener);
+
 		try {
 			map = PacketHelper.toMap(new JSONObject(jsonTokener));
 		} catch (JSONException e) {

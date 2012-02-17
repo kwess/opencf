@@ -32,8 +32,6 @@ public class Packet {
 
 	public void setData(Map<String, Object> data) {
 		this.data = data;
-		this.rawData = PacketHelper.generateRawData(data);
-		this.dataLengt = this.rawData.length;
 	}
 
 	public String dump() {

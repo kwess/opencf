@@ -6,6 +6,8 @@ import java.io.OutputStream;
 
 import org.apache.log4j.Logger;
 
+import de.openCF.protocol.PacketHelper.Encoding;
+
 public class PacketWriter {
 
 	private static Logger		logger				= Logger.getLogger(PacketWriter.class);
@@ -18,10 +20,12 @@ public class PacketWriter {
 		this.dataOutputStream = new DataOutputStream(outputStream);
 	}
 
-	public int writePacket(Packet packet) throws IOException {
-		logger.trace("writePacket");
+	public int writePacket(Packet packet, Encoding encoding) throws IOException {
+		logger.trace("writePacket(Packet, Encoding)");
 
-		int sumBytes = packet.getRawData().length;
+		packet.setRawData(PacketHelper.generateRawData(packet.getData(), encoding));
+
+		int sumBytes = packet.getDataLengt();
 
 		dataOutputStream.writeInt(packet.getDataLengt());
 		dataOutputStream.write(packet.getRawData());
@@ -36,6 +40,11 @@ public class PacketWriter {
 		dataOutputStream.flush();
 
 		return sumBytes;
+	}
+
+	public int writePacket(Packet packet) throws IOException {
+		logger.trace("writePacket(Packet)");
+		return writePacket(packet, Encoding.JSON);
 	}
 
 }

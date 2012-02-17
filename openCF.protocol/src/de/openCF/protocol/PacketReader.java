@@ -6,6 +6,8 @@ import java.io.InputStream;
 
 import org.apache.log4j.Logger;
 
+import de.openCF.protocol.PacketHelper.Encoding;
+
 public class PacketReader {
 
 	private static Logger	logger			= Logger.getLogger(PacketReader.class);
@@ -18,8 +20,8 @@ public class PacketReader {
 		this.dataInputStream = new DataInputStream(inputStream);
 	}
 
-	public Packet readPacket() throws IOException {
-		logger.trace("readPacket");
+	public Packet readPacket(Encoding encoding) throws IOException {
+		logger.trace("readPacket(Encoding)");
 
 		Packet packet = new Packet();
 
@@ -30,13 +32,19 @@ public class PacketReader {
 		byte[] rawData = new byte[length];
 		dataInputStream.read(rawData, 0, length);
 		packet.setRawData(rawData);
-		packet.setData(PacketHelper.parseRawData(rawData));
+		packet.setData(PacketHelper.parseRawData(rawData, encoding));
 
 		logger.debug(packet);
 		logger.trace(packet.dump());
 		logger.trace("readPacket finished");
 
 		return packet;
+	}
+
+	public Packet readPacket() throws IOException {
+		logger.trace("readPacke");
+		return readPacket(Encoding.JSON);
+
 	}
 
 }

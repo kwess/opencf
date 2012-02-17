@@ -7,6 +7,8 @@ import java.net.Socket;
 
 import org.apache.log4j.Logger;
 
+import de.openCF.protocol.PacketHelper.Encoding;
+
 public class Connection implements Runnable {
 
 	private Logger			logger			= Logger.getLogger(Connection.class);
@@ -16,6 +18,7 @@ public class Connection implements Runnable {
 	private PacketReader	packetReader	= null;
 	private PacketWriter	packetWriter	= null;
 	private PacketHandler	packetHandler	= new DefaultPacketHandler();
+	private Encoding		encoding		= Encoding.JSON;
 	private boolean			debug			= false;
 	private boolean			running			= true;
 
@@ -34,6 +37,7 @@ public class Connection implements Runnable {
 
 		logger.debug("debug: " + debug);
 		logger.debug("using PacketHandler: " + packetHandler.toString());
+		logger.debug("using encoding: " + encoding);
 
 		try {
 			inputStream = socket.getInputStream();
@@ -49,7 +53,7 @@ public class Connection implements Runnable {
 		while (running) {
 			running = socket.isConnected();
 			try {
-				Packet packet = packetReader.readPacket();
+				Packet packet = packetReader.readPacket(encoding);
 				if (debug) {
 					logger.warn("debug is enabled, discarding packet");
 					continue;
@@ -74,11 +78,23 @@ public class Connection implements Runnable {
 		logger.trace("forward");
 		if (packet != null)
 			try {
-				packetWriter.writePacket(packet);
+				packetWriter.writePacket(packet, encoding);
 			} catch (IOException e) {
-				logger.error("cant forward Packet");
+				logger.error("cant forward Packet: " + e.getMessage());
 				running = false;
 			}
+	}
+
+	public Encoding getEncoding() {
+		return encoding;
+	}
+
+	public void setEncoding(Encoding encoding) {
+		this.encoding = encoding;
+	}
+
+	public boolean isDebug() {
+		return debug;
 	}
 
 	public void setPacketHandler(PacketHandler handler) {

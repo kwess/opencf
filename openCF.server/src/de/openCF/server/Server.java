@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
 import de.openCF.protocol.Connection;
+import de.openCF.protocol.PacketHelper.Encoding;
 import de.openCF.server.communication.Acceptor;
 import de.openCF.server.communication.AgentPacketHandler;
 import de.openCF.server.communication.ControllerPacketHandler;
@@ -72,6 +73,7 @@ public class Server implements Runnable {
 
 		Connection agentConnection = new Connection(agentDebug);
 		agentConnection.setPacketHandler(new AgentPacketHandler(agentConnection));
+		agentConnection.setEncoding(Encoding.XML);
 
 		Acceptor acceptorAgents = new Acceptor();
 		acceptorAgents.setPort(agentPort);

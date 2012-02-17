@@ -43,15 +43,9 @@ class Connection {
 			}
 		);
 		
-		bool writingOK;
 		this.socketWriter = new SocketWriter(this.stream, thisTid);
-		this.socketWriter.start();
-		receive(
-			(bool b) {
-				writingOK = b;
-			}
-		);
-		this.connected = listeningOK && writingOK;
+		
+		this.connected = listeningOK;
 		return this.connected;
 	}
 	
@@ -96,10 +90,12 @@ class Connection {
 		receive(
 			(bool ok) {
 				helloOK = ok;
-				stdout.writeln("helloOK: ", helloOK);
-//				std.concurrency.send(this.socketWriter.getTid(), helloOK);
 			}
 		);
+		
+		if(helloOK) {
+			this.socketWriter.start();
+		}
 		
 		return helloOK;
 	}

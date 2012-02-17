@@ -37,7 +37,8 @@ public class Connection implements Runnable {
 
 		logger.debug("debug: " + debug);
 		logger.debug("using PacketHandler: " + packetHandler.toString());
-		logger.debug("using encoding: " + encoding);
+		logger.debug("using encoding outgoing: " + encoding);
+		logger.debug("using encoding incoming: " + Encoding.JSON);
 
 		try {
 			inputStream = socket.getInputStream();
@@ -53,7 +54,7 @@ public class Connection implements Runnable {
 		while (running) {
 			running = socket.isConnected();
 			try {
-				Packet packet = packetReader.readPacket(encoding);
+				Packet packet = packetReader.readPacket();
 				if (debug) {
 					logger.warn("debug is enabled, discarding packet");
 					continue;

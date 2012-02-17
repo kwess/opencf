@@ -138,6 +138,7 @@ Erwartete Antwort: Automation Status (siehe Agent-Server:Automation Status)
 <code language="js">
 {
   agent_id: [AGENT],
+  automation_id: [ID],
   automation_action: ACTION,
   automation_reason: REASON,
   automation_descriptor: DESCRIPTOR,
@@ -146,8 +147,26 @@ Erwartete Antwort: Automation Status (siehe Agent-Server:Automation Status)
 </code>
 || *Feld* || *Datentyp* || *Wert/Beschreibung* ||
 || AGENT || String || Liste von Agent Ids ||
-|| PACKET_TYPE || Integer || 30 ||
+|| PACKET_TYPE || Integer || 13 ||
 || ACTION || String || {start, stop, pause, resume, listen} ||
+|| ID || Integer || Liste von Automationsis||
 || REASON || String || Begründung der Aktion, fürs logging ||
 || DESCRIPTOR || String || s.o. ||
 || PARAMETER || String || s.o. ||
+
+
+==== Automation Query ====
+Sender: Controller
+
+Erwartete Antwort: Automation Query Request
+<code language="js">
+{
+  automation_query: QUERY
+  automation_query_parameter : {
+    ...
+  }
+}
+</code>
+|| *Feld* || *Datentyp* || *Wert/Beschreibung* ||
+|| PACKET_TYPE || Integer || 30 ||
+|| QUERY || String || {agents, servers, automations} ||

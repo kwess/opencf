@@ -36,15 +36,19 @@ public class AgentPacketHandler implements PacketHandler {
 
 	@Override
 	public void handlePacket(Packet packet) {
-		logger.trace("handlePacket");
+		logger.trace("handlePacket(Packet)");
 
 		Map<String, Object> data = packet.getData();
 
 		String key = PacketKeys.TYPE;
 		Integer type = (Integer) data.get(key);
 
-		if (type == null)
+		if (type == null) {
+			logger.debug("type is null, setting type to invalid");
 			type = PacketType.INVALID;
+		}
+
+		logger.debug("is registered: " + registered);
 
 		if (!registered && type != PacketType.AGENT_HELLO) {
 			logger.warn("got unexpected Packet from unregistered Agent, discarding");
@@ -73,7 +77,7 @@ public class AgentPacketHandler implements PacketHandler {
 	}
 
 	private void handleAutomationStatus(Map<String, Object> data) {
-		logger.trace("handleAutomationStatus");
+		logger.trace("handleAutomationStatus(Map)");
 
 		Integer id = Integer.parseInt((String) data.get(PacketKeys.AUTOMATION_ID));
 		String status = (String) data.get(PacketKeys.AUTOMATION_STATUS);
@@ -117,7 +121,7 @@ public class AgentPacketHandler implements PacketHandler {
 	}
 
 	private void handleAgentHeartbeat(Map<String, Object> data) {
-		logger.trace("handleAgentHeartbeat");
+		logger.trace("handleAgentHeartbeat(Map)");
 
 		String date = (String) data.get(PacketKeys.AGENT_LOCAL_TIME);
 		Date agent_localtime = new Date(Long.parseLong(date) * 1000);
@@ -135,7 +139,7 @@ public class AgentPacketHandler implements PacketHandler {
 	}
 
 	private void handleAgentHello(Map<String, Object> data) {
-		logger.trace("handleAgentHello");
+		logger.trace("handleAgentHello(Map)");
 
 		Map<String, Object> response = new HashMap<String, Object>();
 		response.put(PacketKeys.TYPE, PacketType.AGENT_HELLO_RESPONSE);
@@ -229,10 +233,9 @@ public class AgentPacketHandler implements PacketHandler {
 	public void handleClose() {
 		logger.trace("handleClose");
 
-		if (agent == null) {
+		if (agent == null || !registered) {
 			logger.warn("connection closed before agent registerd");
 			// nothing to do...
-			logger.trace("handleClose finished");
 			return;
 		}
 
@@ -246,6 +249,12 @@ public class AgentPacketHandler implements PacketHandler {
 		session.getTransaction().commit();
 
 		Data.removeConnection(agent.getId());
+
+		String id = "?";
+		if (registered)
+			id = agent.getId();
+
+		logger.info("agent [" + id + "] closed connection");
 
 		registered = false;
 

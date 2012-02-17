@@ -20,22 +20,22 @@ public class Data {
 	private static Map<Integer, List<AutomationStatusListener>>	automationStatusListener	= new HashMap<Integer, List<AutomationStatusListener>>();
 
 	public static Connection addConnection(String key, Connection connection) {
-		logger.trace("addConnection");
+		logger.trace("addConnection(String, Connection)");
 		return connections.put(key, connection);
 	}
 
 	public static Connection getConnection(String key) {
-		logger.trace("getConnection");
+		logger.trace("getConnection(String)");
 		return connections.get(key);
 	}
 
 	public static Connection removeConnection(String key) {
-		logger.trace("removeConnection");
+		logger.trace("removeConnection(String)");
 		return connections.remove(key);
 	}
 
 	public static void setServer(Server server) {
-		logger.trace("setServer");
+		logger.trace("setServer(Server)");
 		Data.server = server;
 	}
 
@@ -45,9 +45,10 @@ public class Data {
 	}
 
 	public static boolean addAutomationStatusListerner(Integer aid, AutomationStatusListener listener) {
-		logger.trace("addAutomationStatusListener");
+		logger.trace("addAutomationStatusListener(Integer, AutomationStatusListener)");
 		List<AutomationStatusListener> list = Data.automationStatusListener.get(aid);
 		if (list == null) {
+			logger.debug("creating new listener-list for listeners of automation " + aid);
 			list = new ArrayList<AutomationStatusListener>();
 			Data.automationStatusListener.put(aid, list);
 		}
@@ -55,17 +56,19 @@ public class Data {
 	}
 
 	public static boolean removeAutomationStatusListener(Integer aid, AutomationStatusListener listener) {
-		logger.trace("removeAutomationStatusListener");
+		logger.trace("removeAutomationStatusListener(Integer, AutomationStatusListener)");
 		if (!Data.automationStatusListener.containsKey(aid))
 			return false;
 		boolean ret = Data.automationStatusListener.get(aid).remove(listener);
-		if (Data.automationStatusListener.isEmpty())
+		if (Data.automationStatusListener.isEmpty()) {
+			logger.debug("no more registered listeners, removing list for " + aid);
 			Data.automationStatusListener.remove(aid);
+		}
 		return ret;
 	}
 
 	public static boolean removeAllAutomationStatusListener(Integer aid) {
-		logger.trace("removeAllAutomationStatusListener");
+		logger.trace("removeAllAutomationStatusListener(Integer)");
 		if (Data.automationStatusListener.containsKey(aid))
 			return Data.automationStatusListener.remove(aid) != null ? true : false;
 		return false;

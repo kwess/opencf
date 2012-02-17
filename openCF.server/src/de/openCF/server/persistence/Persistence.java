@@ -7,9 +7,9 @@ import org.hibernate.cfg.Configuration;
 
 import de.openCF.server.data.Agent;
 import de.openCF.server.data.Automation;
-import de.openCF.server.data.Message;
 import de.openCF.server.data.AutomationStatus;
 import de.openCF.server.data.Heartbeat;
+import de.openCF.server.data.Message;
 import de.openCF.server.data.Server;
 
 public abstract class Persistence {
@@ -20,6 +20,8 @@ public abstract class Persistence {
 	protected static Session			session;
 
 	static {
+		logger.trace("static");
+
 		CONFIGURATION = new Configuration();
 
 		CONFIGURATION.addAnnotatedClass(Server.class);
@@ -29,14 +31,16 @@ public abstract class Persistence {
 		CONFIGURATION.addAnnotatedClass(Message.class);
 		CONFIGURATION.addAnnotatedClass(AutomationStatus.class);
 
-		logger.debug("building session factory");
+		logger.info("building session factory");
 		SESSION_FACTORY = CONFIGURATION.buildSessionFactory();
 	}
 
 	public static Session getSession() {
 		logger.trace("getSession");
-		if (session == null || !session.isConnected())
+		if (session == null || !session.isConnected()) {
+			logger.info("open fresh session");
 			session = SESSION_FACTORY.openSession();
+		}
 		return session;
 	}
 

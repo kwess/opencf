@@ -57,9 +57,10 @@ class SocketWriter : Thread {
 	}
 	
 	public bool send(Packet p) {
-		stdout.writefln("sending %s", p.toString());
-		this.stream.write(bswap(p.toString().length));
-		this.stream.writeString(p.toString());
+		string text = p.getJsonString();
+		stdout.writefln("sending %s", text);
+		this.stream.write(bswap(text.length));
+		this.stream.writeString(text);
 		
 		return true;
 	}

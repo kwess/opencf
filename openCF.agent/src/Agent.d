@@ -17,18 +17,32 @@ import AutomationThread;
 
 void main() {
 	
-	
+//			string datastring = "<a><message>congratulations, youre registered!</message><type>2</type><return_code>0</return_code><successfull>true</successfull></a>";
+//			auto xml = new DocumentParser(datastring);
+//	
+//			xml.onEndTag["type"] = (in Element e) {
+//				writeln("Elem: ", e.text);
+//			};
+//			
+//			xml.parse();
+//			stdout.writeln(xml);
+//			
+//			return;
 
-//	auto s = "<Test>What &amp; Up</Test>";
+//	auto s = "<a><Test>What &amp; Up</Test><bla>j</bla></a>";
 //	check(s);
 //	auto xml = new DocumentParser(s);
 //
 //	xml.onEndTag["Test"] = (in Element e) {
 //		writeln("Elem: ", e.text);
 //	};
+//	xml.onEndTag["bla"] = (in Element e) {
+//		writeln("blaElem: ", e.text);
+//	};
 //	xml.parse();
 //	
 //	writeln(xml);
+//	return;
 //	
 //	Element[] elements;
 //	elements.insertInPlace(0, new Element("type","1"));

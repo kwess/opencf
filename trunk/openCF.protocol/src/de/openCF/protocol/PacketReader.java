@@ -32,7 +32,7 @@ public class PacketReader {
 		}
 		byte[] rawData = new byte[length];
 
-		logger.trace("reading data form stream");
+		logger.trace("reading data " + length + "(bytes) form stream");
 		dataInputStream.read(rawData, 0, length);
 
 		packet.setRawData(rawData);

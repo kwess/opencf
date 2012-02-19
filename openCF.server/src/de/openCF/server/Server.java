@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.ByteOrder;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 
@@ -19,24 +20,25 @@ import de.openCF.server.persistence.Persistence;
 
 public class Server implements Runnable {
 
-	public static final String	CONFIG_FILE								= "config/server.properties";
+	public static final String	CONFIG_FILE					= "config/server.properties";
 
-	private static final String	PROPERTIES_SERVER_ID					= "openCF.server.name";
+	private static final String	SERVER_ID					= "openCF.server.name";
 
-	private static final String	PROPERTIES_AGENTS_PORT					= "openCF.server.acceptor.agent.port";
-	private static final String	PROPERTIES_AGENTS_NEEDSCLIENTAUTH		= "openCF.server.acceptor.agent.needsClientAuth";
-	private static final String	PROPERTIES_AGENTS_POOLSIZE				= "openCF.server.acceptor.agent.poolSize";
-	private static final String	PROPERTIES_AGENTS_USE_SSL				= "openCF.server.acceptor.agents.useSSL";
-	private static final String	PROPERTIES_AGENTS_DEBUG					= "openCF.server.acceptor.agents.debug";
+	private static final String	AGENT_PORT					= "openCF.server.acceptor.agent.port";
+	private static final String	AGENT_NEEDSCLIENTAUTH		= "openCF.server.acceptor.agent.needsClientAuth";
+	private static final String	AGENT_POOLSIZE				= "openCF.server.acceptor.agent.poolSize";
+	private static final String	AGENT_USE_SSL				= "openCF.server.acceptor.agent.useSSL";
+	private static final String	AGENT_DEBUG					= "openCF.server.acceptor.agent.debug";
+	private static final String	AGENT_PROTOCOL_ENCODING		= "openCF.server.acceptor.agent.protocol.encoding";
 
-	private static final String	PROPERTIES_CONTROLLER_PORT				= "openCF.server.acceptor.controller.port";
-	private static final String	PROPERTIES_CONTROLLER_NEEDSCLIENTAUTH	= "openCF.server.acceptor.controller.needsClientAuth";
-	private static final String	PROPERTIES_CONTROLLER_POOLSIZE			= "openCF.server.acceptor.controller.poolSize";
-	private static final String	PROPERTIES_CONTROLLER_USE_SSL			= "openCF.server.acceptor.controller.useSSL";
-	private static final String	PROPERTIES_CONTROLLER_DEBUG				= "openCF.server.acceptor.controller.debug";
+	private static final String	CONTROLLER_PORT				= "openCF.server.acceptor.controller.port";
+	private static final String	CONTROLLER_NEEDSCLIENTAUTH	= "openCF.server.acceptor.controller.needsClientAuth";
+	private static final String	CONTROLLER_POOLSIZE			= "openCF.server.acceptor.controller.poolSize";
+	private static final String	CONTROLLER_USE_SSL			= "openCF.server.acceptor.controller.useSSL";
+	private static final String	CONTROLLER_DEBUG			= "openCF.server.acceptor.controller.debug";
 
-	private Logger				logger									= Logger.getLogger(Server.class);
-	private Properties			properties								= new Properties();
+	private Logger				logger						= Logger.getLogger(Server.class);
+	private Properties			properties					= new Properties();
 
 	public Server() {
 		logger.trace("new");
@@ -60,7 +62,11 @@ public class Server implements Runnable {
 	public void run() {
 		logger.trace("run");
 
-		String server_id = this.properties.getProperty(PROPERTIES_SERVER_ID);
+		ByteOrder byteOrder = ByteOrder.nativeOrder();
+
+		logger.debug("native byte order: " + byteOrder);
+
+		String server_id = this.properties.getProperty(SERVER_ID);
 		de.openCF.server.data.Server server = new de.openCF.server.data.Server();
 		server.setId(server_id);
 		Data.setServer(server);
@@ -70,15 +76,16 @@ public class Server implements Runnable {
 		session.saveOrUpdate(server);
 		session.getTransaction().commit();
 
-		Integer agentPort = Integer.parseInt(this.properties.getProperty(PROPERTIES_AGENTS_PORT, "12345"));
-		Boolean agentNeedsClientAuth = Boolean.parseBoolean(this.properties.getProperty(PROPERTIES_AGENTS_NEEDSCLIENTAUTH, "false"));
-		Integer agentConnectionPoolSize = Integer.parseInt(this.properties.getProperty(PROPERTIES_AGENTS_POOLSIZE, "1024"));
-		Boolean agentUseSSL = Boolean.parseBoolean(this.properties.getProperty(PROPERTIES_AGENTS_USE_SSL, "false"));
-		Boolean agentDebug = Boolean.parseBoolean(this.properties.getProperty(PROPERTIES_AGENTS_DEBUG, "false"));
+		Integer agentPort = Integer.parseInt(this.properties.getProperty(AGENT_PORT, "12345"));
+		Boolean agentNeedsClientAuth = Boolean.parseBoolean(this.properties.getProperty(AGENT_NEEDSCLIENTAUTH, "false"));
+		Integer agentConnectionPoolSize = Integer.parseInt(this.properties.getProperty(AGENT_POOLSIZE, "1024"));
+		Boolean agentUseSSL = Boolean.parseBoolean(this.properties.getProperty(AGENT_USE_SSL, "false"));
+		Boolean agentDebug = Boolean.parseBoolean(this.properties.getProperty(AGENT_DEBUG, "false"));
+		Encoding agentEncoding = Encoding.valueOf(this.properties.getProperty(AGENT_PROTOCOL_ENCODING));
 
 		Connection agentConnection = new Connection(agentDebug);
 		agentConnection.setPacketHandler(new AgentPacketHandler(agentConnection));
-		agentConnection.setEncoding(Encoding.XML);
+		agentConnection.setEncoding(agentEncoding);
 
 		Acceptor acceptorAgents = new Acceptor();
 		acceptorAgents.setPort(agentPort);
@@ -87,11 +94,11 @@ public class Server implements Runnable {
 		acceptorAgents.setUseSSL(agentUseSSL);
 		acceptorAgents.setConnectionImplementation(agentConnection);
 
-		Integer controllerPort = Integer.parseInt(this.properties.getProperty(PROPERTIES_CONTROLLER_PORT, "12346"));
-		Boolean controllerNeedsClientAuth = Boolean.parseBoolean(this.properties.getProperty(PROPERTIES_CONTROLLER_NEEDSCLIENTAUTH, "false"));
-		Integer controllerConnectionPoolSize = Integer.parseInt(this.properties.getProperty(PROPERTIES_CONTROLLER_POOLSIZE, "1024"));
-		Boolean controllerUseSSL = Boolean.parseBoolean(this.properties.getProperty(PROPERTIES_CONTROLLER_USE_SSL, "false"));
-		Boolean controllerDebug = Boolean.parseBoolean(this.properties.getProperty(PROPERTIES_CONTROLLER_DEBUG, "false"));
+		Integer controllerPort = Integer.parseInt(this.properties.getProperty(CONTROLLER_PORT, "12346"));
+		Boolean controllerNeedsClientAuth = Boolean.parseBoolean(this.properties.getProperty(CONTROLLER_NEEDSCLIENTAUTH, "false"));
+		Integer controllerConnectionPoolSize = Integer.parseInt(this.properties.getProperty(CONTROLLER_POOLSIZE, "1024"));
+		Boolean controllerUseSSL = Boolean.parseBoolean(this.properties.getProperty(CONTROLLER_USE_SSL, "false"));
+		Boolean controllerDebug = Boolean.parseBoolean(this.properties.getProperty(CONTROLLER_DEBUG, "false"));
 
 		Connection controllerConnection = new Connection(controllerDebug);
 		ControllerPacketHandler controllerPacketHandler = new ControllerPacketHandler(controllerConnection);

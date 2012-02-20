@@ -128,10 +128,6 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 	@Override
 	public void statusChanged(Integer id, AutomationStatus status, String Message) {
 		logger.trace("statusChanged(Integer, AutomationStatus, String)");
-		if (AutomationStatus.isEndState(status)) {
-			logger.debug("removing this listener for automation: " + id);
-			Data.removeAutomationStatusListener(id, this);
-		}
 
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put(PacketKeys.TYPE, PacketType.AUTOMATION_STATUS);
@@ -144,5 +140,4 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 
 		connection.forward(p);
 	}
-
 }

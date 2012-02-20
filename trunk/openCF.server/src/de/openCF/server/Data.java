@@ -19,42 +19,42 @@ public class Data {
 	private static Map<String, Connection>						connections					= new HashMap<String, Connection>();
 	private static Map<Integer, List<AutomationStatusListener>>	automationStatusListener	= new HashMap<Integer, List<AutomationStatusListener>>();
 
-	public static Connection addConnection(String key, Connection connection) {
+	public synchronized static Connection addConnection(String key, Connection connection) {
 		logger.trace("addConnection(String, Connection)");
 		return connections.put(key, connection);
 	}
 
-	public static Connection getConnection(String key) {
+	public synchronized static Connection getConnection(String key) {
 		logger.trace("getConnection(String)");
 		return connections.get(key);
 	}
 
-	public static Connection removeConnection(String key) {
+	public synchronized static Connection removeConnection(String key) {
 		logger.trace("removeConnection(String)");
 		return connections.remove(key);
 	}
 
-	public static void setServer(Server server) {
+	public synchronized static void setServer(Server server) {
 		logger.trace("setServer(Server)");
 		Data.server = server;
 	}
 
-	public static Server getServer() {
+	public synchronized static Server getServer() {
 		logger.trace("getServer");
 		return Data.server;
 	}
 
-	public static boolean isAgenOnline(String aid) {
+	public synchronized static boolean isAgenOnline(String aid) {
 		return connections.containsKey(aid);
 	}
 
-	public static void removeAutomationStatusListener(AutomationStatusListener listener) {
+	public synchronized static void removeAutomationStatusListener(AutomationStatusListener listener) {
 		for (Map.Entry<Integer, List<AutomationStatusListener>> e : automationStatusListener.entrySet()) {
 			e.getValue().remove(listener);
 		}
 	}
 
-	public static boolean addAutomationStatusListerner(Integer aid, AutomationStatusListener listener) {
+	public synchronized static boolean addAutomationStatusListerner(Integer aid, AutomationStatusListener listener) {
 		logger.trace("addAutomationStatusListener(Integer, AutomationStatusListener)");
 		List<AutomationStatusListener> list = Data.automationStatusListener.get(aid);
 		if (list == null) {
@@ -65,7 +65,7 @@ public class Data {
 		return list.add(listener);
 	}
 
-	public static boolean removeAutomationStatusListener(Integer aid, AutomationStatusListener listener) {
+	public synchronized static boolean removeAutomationStatusListener(Integer aid, AutomationStatusListener listener) {
 		logger.trace("removeAutomationStatusListener(Integer, AutomationStatusListener)");
 		if (!Data.automationStatusListener.containsKey(aid))
 			return false;
@@ -77,14 +77,14 @@ public class Data {
 		return ret;
 	}
 
-	public static boolean removeAllAutomationStatusListener(Integer aid) {
+	public synchronized static boolean removeAllAutomationStatusListener(Integer aid) {
 		logger.trace("removeAllAutomationStatusListener(Integer)");
 		if (Data.automationStatusListener.containsKey(aid))
 			return Data.automationStatusListener.remove(aid) != null ? true : false;
 		return false;
 	}
 
-	public static void notifyAutomationStatusListener(Integer aid, AutomationStatus status, String message) {
+	public synchronized static void notifyAutomationStatusListener(Integer aid, AutomationStatus status, String message) {
 		logger.trace("notifyAutomationStatusListener");
 		logger.debug("Automation ID: " + aid);
 		logger.debug("Automation Status: " + status);

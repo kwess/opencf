@@ -79,7 +79,7 @@ public class AgentPacketHandler implements PacketHandler {
 	private void handleAutomationStatus(Map<String, Object> data) {
 		logger.trace("handleAutomationStatus(Map)");
 
-		Integer id = Integer.parseInt((String) data.get(PacketKeys.AUTOMATION_ID));
+		Integer id = (Integer) data.get(PacketKeys.AUTOMATION_ID);
 		String status = (String) data.get(PacketKeys.AUTOMATION_STATUS);
 		String message = (String) data.get(PacketKeys.AUTOMATION_MESSAGE);
 
@@ -116,6 +116,11 @@ public class AgentPacketHandler implements PacketHandler {
 		session.getTransaction().commit();
 
 		Data.notifyAutomationStatusListener(id, automationStatus, message);
+
+		if (AutomationStatus.isEndState(automationStatus)) {
+			logger.debug("removing this listener for automation: " + id);
+			Data.removeAllAutomationStatusListener(id);
+		}
 
 		logger.trace("handleAutomationStatus finished");
 	}

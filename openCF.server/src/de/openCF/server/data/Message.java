@@ -3,6 +3,7 @@ package de.openCF.server.data;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -12,6 +13,7 @@ import javax.persistence.Table;
 public class Message {
 
 	@Id
+	@GeneratedValue
 	private Integer				id			= null;
 	@ManyToOne
 	private Automation			automation	= null;

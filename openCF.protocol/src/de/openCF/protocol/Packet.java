@@ -49,7 +49,7 @@ public class Packet {
 		StringBuffer dataFormatted = new StringBuffer();
 		for (Map.Entry<String, Object> e : data.entrySet()) {
 			String clazz = e.getValue().getClass().getSimpleName();
-			dataFormatted.append(String.format(" %15S = (%7s) %s\n", e.getKey(), clazz, e.getValue()));
+			dataFormatted.append(String.format(" %18S = (%7s) %s\n", e.getKey(), clazz, e.getValue()));
 		}
 		String ret = new String("\n");
 		ret += " -----------------Packet----------------------\n";

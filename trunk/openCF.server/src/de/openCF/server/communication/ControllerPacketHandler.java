@@ -91,6 +91,7 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 					session.save(automation);
 					automation_ids = new ArrayList<Integer>();
 					automation_ids.add(automation.getId());
+					data.put(PacketKeys.AUTOMATION_ID, automation.getId());
 				}
 
 				if (automation_ids == null)

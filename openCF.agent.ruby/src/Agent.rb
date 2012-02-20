@@ -1,6 +1,6 @@
 require('socket')
 require('json')
-require('protocol')
+require('src/protocol')
 
 class Agent
   
@@ -33,15 +33,21 @@ class Agent
   
   
   def read()
-    puts "read"
     loop {
-      puts "reading"
       response = @socket.read(4).unpack('N')
       #bytes = [response].pack('N')
       puts "#{response[0]} zu lesen"
-      puts JSON.parse(@socket.read(response[0]))
-      sleep(2)
+      json = JSON.parse(@socket.read(response[0]))
+      puts "gelesen #{json}"
+      
+      handlePacket(json)
     }
+  end
+  
+  
+  def handlePacket(json)
+     typ = json[Protocol::Keys::TYPE]
+     puts "typ: #{typ}"
   end
   
   

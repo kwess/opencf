@@ -41,9 +41,9 @@ void main() {
 //	AutomationThreadManager manager = new AutomationThreadManager();
 //	manager.startNewAutomation();
 
-	stdout.writeln("Endlosschleife - hier muss der reconnect rein");
+	Logger.myDebug("Endlosschleife - hier muss der reconnect rein");
 	while(1) {
 		Thread.sleep(dur!("seconds")(1));
 	}
-	stdout.writeln("ende");
+	Logger.myDebug("main zuende");
 }

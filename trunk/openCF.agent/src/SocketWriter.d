@@ -26,12 +26,12 @@ class SocketWriter : Thread {
 		while(this.isRunning) {
 			JSONValue json;
 			json.type = JSON_TYPE.OBJECT;
-			json.object[type] = JSONValue();
-			json.object[type].type = JSON_TYPE.INTEGER;
-			json.object[type].integer = type_heartbeat;
-			json.object[local_time] = JSONValue();
-			json.object[local_time].type = JSON_TYPE.STRING;
-			json.object[local_time].str = text(core.stdc.time.time(null));
+			json.object[Packet.Keys.TYPE] = JSONValue();
+			json.object[Packet.Keys.TYPE].type = JSON_TYPE.INTEGER;
+			json.object[Packet.Keys.TYPE].integer = Packet.Type.HEARTBEAT;
+			json.object[Packet.Keys.LOCAL_TIME] = JSONValue();
+			json.object[Packet.Keys.LOCAL_TIME].type = JSON_TYPE.STRING;
+			json.object[Packet.Keys.LOCAL_TIME].str = text(core.stdc.time.time(null));
 			Packet p = new Packet(json);
 			send(p);
 			

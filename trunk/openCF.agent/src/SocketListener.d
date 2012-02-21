@@ -32,7 +32,7 @@ class SocketListener : Thread {
 			Packet p = new Packet(datastring);
 			
 			switch(p.getType()) {
-				case type_agenthelloresponse:
+				case Packet.Type.AGENT_HELLO_RESPONSE:
 					handleAgentHelloResponse(connectionTid, p);
 					break;
 				default:
@@ -47,7 +47,7 @@ class SocketListener : Thread {
 		bool success;
 		auto doc = new Document(p.getXmlString());
 			foreach(element; doc.elements) {
-				if(element.tag.name.icmp(successfull) == 0) {
+				if(element.tag.name.icmp(Packet.Keys.TYPE) == 0) {
 					string successfullString = element.text;
 					success = parse!bool(successfullString);
 				}

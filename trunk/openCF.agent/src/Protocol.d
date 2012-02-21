@@ -7,20 +7,26 @@ import std.stdio;
 import std.xml;
 import std.string;
 
-immutable string agent_id = "agent_id";
-immutable string agent_version = "agent_version";
-immutable string agent_plattform = "agent_plattform";
-immutable string type = "type";
-immutable string successfull = "successfull";
-immutable string return_code = "return_code";
-immutable string message = "message";
-immutable string local_time = "local_time";
-
-immutable int type_heartbeat = 0;
-immutable int type_agenthello = 1;
-immutable int type_agenthelloresponse = 2;
-
 class Packet {
+	
+	public enum Type : int {
+		INVALID               = -1,
+		HEARTBEAT		      = 0,
+		AGENT_HELLO           = 1,
+		AGENT_HELLO_RESPONSE  = 2
+	}
+	
+	public enum Keys : string {
+		AGENT_ID = "agent_id",
+		AGENT_VERSION = "agent_version",
+		AGENT_PLATTFORM = "agent_plattform",
+		TYPE = "type",
+		SUCCESSFULL = "successfull",
+		RETURN_CODE = "return_code",
+		MESSAGE = "message",
+		LOCAL_TIME = "local_time"
+	}
+	
 	private string xmlString;
 	private JSONValue json;
 	
@@ -29,6 +35,7 @@ class Packet {
 	}
 	
 	this(string xmlString) {
+		// enclose the xml-text in a dummy-tag, otherwise an xml exception will occur
 		this.xmlString = text("<dummy>", xmlString, "</dummy>");
 	}
 	
@@ -63,15 +70,15 @@ class Packet {
 		if(xmlString != null && xmlString.length > 0) {
 			auto doc = new Document(xmlString);
 			foreach(element; doc.elements) {
-				if(element.tag.name.icmp(type) == 0) {
+				if(element.tag.name.icmp(Keys.TYPE) == 0) {
 					string typeString = element.text;
 					return parse!int(typeString);
 				}
 			}
 		}
 		else {
-			return cast(int) json.object[type].integer;
+			return cast(int) json.object[Keys.TYPE].integer;
 		}
-		return -1;
+		return Type.INVALID;
 	}
 }

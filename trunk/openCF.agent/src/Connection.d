@@ -58,15 +58,15 @@ class Connection {
 
 		JSONValue json;
 		json.type = JSON_TYPE.OBJECT;
-		json.object[type] = JSONValue();
-		json.object[type].type = JSON_TYPE.INTEGER;
-		json.object[type].integer = type_agenthello;
-		json.object[agent_id] = JSONValue();
-		json.object[agent_id].str = agent;
-		json.object[agent_version] = JSONValue();
-		json.object[agent_version].str = myversion;
-		json.object[agent_plattform] = JSONValue();
-		json.object[agent_plattform].str = plattform;
+		json.object[Packet.Keys.TYPE] = JSONValue();
+		json.object[Packet.Keys.TYPE].type = JSON_TYPE.INTEGER;
+		json.object[Packet.Keys.TYPE].integer = Packet.Type.AGENT_HELLO;
+		json.object[Packet.Keys.AGENT_ID] = JSONValue();
+		json.object[Packet.Keys.AGENT_ID].str = agent;
+		json.object[Packet.Keys.AGENT_VERSION] = JSONValue();
+		json.object[Packet.Keys.AGENT_VERSION].str = myversion;
+		json.object[Packet.Keys.AGENT_PLATTFORM] = JSONValue();
+		json.object[Packet.Keys.AGENT_PLATTFORM].str = plattform;
 		
 		Packet p = new Packet(json);
 		this.socketWriter.send(p);

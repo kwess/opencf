@@ -14,6 +14,7 @@ import std.conv;
 import Protocol;
 import SocketListener;
 import SocketWriter;
+import util.Logger;
 
 class Connection {
 	private string hostname;
@@ -51,7 +52,7 @@ class Connection {
 	
 	public bool sendHello(string agent, string myversion, string plattform) {
 		if(connected == false) {
-			stdout.writeln("Connection.d, sendHello(): connected == false --> unable to send hello");
+			Logger.myError(__FILE__ ~ __LINE__ ~ ": connected == false --> unable to send hello");
 			return false;
 		}
 
@@ -69,22 +70,6 @@ class Connection {
 		
 		Packet p = new Packet(json);
 		this.socketWriter.send(p);
-		
-		
-//			Element[] elements;
-//			elements.insertInPlace(0, new Element(type,text(type_agenthello)));
-//			elements.insertInPlace(0, new Element(agent_id,text(" ", agent)));
-//			elements.insertInPlace(0, new Element(agent_version,text("v", myversion)));
-//			elements.insertInPlace(0, new Element(agent_plattform,plattform));
-//			string s2;
-//			foreach(e; elements) {
-//				s2 ~= e.toString();
-//			}
-//			auto doc = new Document(s2);
-//			stdout.writeln("doc:", doc);
-//			
-//			Packet p = new Packet(s2);
-//			this.socketWriter.send(p);
 		
 		bool helloOK = false;
 		receive(
@@ -105,7 +90,7 @@ class Connection {
 		//this.socketListener.
 		this.socket.close();
 		
-		stdout.writeln("socket disconnected");
+		Logger.myInfo(__FILE__ ~ __LINE__ ~ "socket disconnected");
 		
 		return true;
 	}

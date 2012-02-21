@@ -8,6 +8,7 @@
 "src\AutomationThreadManager.d"
 "src\Configuration.d"
 "src\Connection.d"
+"src\Logger.d"
 "src\Protocol.d"
 "src\SocketListener.d"
 "src\SocketWriter.d"

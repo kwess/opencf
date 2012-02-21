@@ -2,6 +2,9 @@ import std.file;
 import std.stdio;
 import std.string;
 import core.exception;
+import std.ascii;
+
+import util.Logger;
 
 /****
  * Configuration class
@@ -21,7 +24,7 @@ class Configuration {
 				string value = chomp(line[1]);
 				configMap[key] = value;
 			} catch (Exception e) {
-				stdout.writefln("Configuration.d, Constructor: Exception caught -> malformed line in config file, skipping line");
+				Logger.myError(__FILE__ ~ __LINE__ ~ ": Exception caught -> malformed line in config file, skipping line");
 			}
 		}
 	}
@@ -30,11 +33,12 @@ class Configuration {
 	 * prints the configuration key-value pairs
 	 *
 	 */
-	public void printConfiguration() {
-		stdout.writeln("Configuration.d, printConfiguration()");
+	public string toString() {
+		string result;
 		foreach(key; configMap.keys) {
-			stdout.writefln("%s - %s", key, configMap[key]);
+			result ~= key ~ " - " ~  configMap[key] ~ "\n";
 		}
+		return result;
 	}
 	
     /****
@@ -49,7 +53,7 @@ class Configuration {
 		try {
 			value = configMap[key];
 		} catch (RangeError e) {
-			stdout.writefln("Configuration.d, get(string key): RangeError caught -> no key [%s] found", key);
+			Logger.myError(__FILE__ ~ __LINE__ ~ ": RangeError caught -> no key [" ~ key ~ "] found");
 			value = "";
 		}
 		return value;

@@ -8,6 +8,7 @@ import std.json;
 import std.datetime;
 
 import Protocol;
+import util.Logger;
 
 class SocketWriter : Thread {
 	private Stream stream;
@@ -17,11 +18,11 @@ class SocketWriter : Thread {
 		super(&run);
 		this.stream = stream;
 		this.connectionTid = tid;
-		stdout.writeln("SocketWriter ready to send data");
+		Logger.myInfo(__FILE__ ~ __LINE__ ~ ": SocketWriter ready to send data");
 	}
 	
 	private void run() {
-		stdout.writeln("SocketWriter starting to heartbeat");
+		Logger.myInfo(__FILE__ ~ __LINE__ ~ ": SocketWriter starting to heartbeat");
 		while(this.isRunning) {
 			JSONValue json;
 			json.type = JSON_TYPE.OBJECT;
@@ -36,12 +37,12 @@ class SocketWriter : Thread {
 			
 			Thread.sleep(dur!("seconds")(1));
 		}
-		stdout.writeln("writer ending");
+		Logger.myInfo(__FILE__ ~ __LINE__ ~ ": SocketWriter Thread (plus heartbeat) ended");
 	}
 	
 	public bool send(Packet p) {
 		string text = p.toString();
-		stdout.writefln("sending %s", text);
+		Logger.myDebug(__FILE__ ~ __LINE__ ~ ": sending " ~ text);
 		this.stream.write(p.getSize());
 		this.stream.writeString(text);
 		

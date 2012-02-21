@@ -8,6 +8,7 @@ import std.conv;
 import std.string;
 
 import Protocol;
+import util.Logger;
 
 class SocketListener : Thread {
 	private Stream stream;
@@ -20,14 +21,14 @@ class SocketListener : Thread {
 	}
 	
 	private void run() {
-		stdout.writeln("SocketListener ready to receive data");
+		Logger.myInfo(__FILE__ ~ __LINE__ ~ ": SocketListener ready to receive data");
 		send(connectionTid, true);
 		while (!stream.eof()) {
 			int n = 0;
 			stream.read(n);
-			stdout.writeln(bswap(n), " byte kommen im naechsten block");
+			Logger.myDebug(__FILE__ ~ __LINE__ ~ ": " ~ new string(bswap(n)) ~ " byte kommen im naechsten block");
 			string datastring = cast(string) stream.readString(bswap(n));
-			stdout.writeln("gelesen: ", datastring);
+			Logger.myDebug(__FILE__ ~ __LINE__ ~ ": gelesen: " ~ datastring);
 			Packet p = new Packet(datastring);
 			
 			switch(p.getType()) {
@@ -38,11 +39,11 @@ class SocketListener : Thread {
 					
 			}
 		}
-		stdout.writeln("stop listening");
+		Logger.myInfo(__FILE__ ~ __LINE__ ~ ": SocketListener thread ended");
 	}
 	
 	private void handleAgentHelloResponse(Tid connectionTid, Packet p) {
-		stdout.writeln("handleAgentHelloResponse function");
+		Logger.myDebug(__FILE__ ~ __LINE__ ~ ": handleAgentHelloResponse function");
 		bool success;
 		auto doc = new Document(p.getXmlString());
 			foreach(element; doc.elements) {

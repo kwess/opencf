@@ -15,72 +15,15 @@ import Configuration;
 import Connection;
 import AutomationThreadManager;
 import AutomationThread;
+import util.Logger;
 
 void main() {
-	
-//			string datastring = "<a><message>congratulations, youre registered!</message><type>2</type><return_code>0</return_code><successfull>true</successfull><ebene1><ebene2a>2a</ebene2a><ebene2b>2b</ebene2b></ebene1></a>";
-//			auto xml = new DocumentParser(datastring);
-//			auto doc = new Document(datastring);
-//			check(datastring);
-	
-//			xml.onEndTag["a"] = (in Element e) {
-//				stdout.writeln(e.texts.length, " is length");
-//				string text = e.text;
-//			};
-//			xml.onEndTag["type"] = (in Element e) {
-//				writeln("Elem: ", e.text);
-//			};
-//			
-//			xml.parse();
-//			stdout.writeln(xml);
-//			
-//			string[string] elementArray;
-//			foreach(element; doc.elements) {
-//				string key = element.tag.name;
-//				string value;
-//				if(element.elements.length == 0) {
-//					value = element.text;
-//				}
-//				else {
-//					foreach(element2; element.elements) {
-//						value ~= element2.tag.name;
-//						value ~= element2.text;
-//					}
-//				}
-//				stdout.writeln("key: ", key);
-//				stdout.writeln("value: ", value);
-//			}
-//			
-//			return;
-
-//	auto s = "<a><Test>What &amp; Up</Test><bla>j</bla></a>";
-//	check(s);
-//	auto xml = new DocumentParser(s);
-//
-//	xml.onEndTag["Test"] = (in Element e) {
-//		writeln("Elem: ", e.text);
-//	};
-//	xml.onEndTag["bla"] = (in Element e) {
-//		writeln("blaElem: ", e.text);
-//	};
-//	xml.parse();
-//	
-//	writeln(xml);
-//	return;
-//	
-//	Element[] elements;
-//	elements.insertInPlace(0, new Element("type","1"));
-//	elements.insertInPlace(0, new Element("message","2"));
-//	string s2;
-//	foreach(e; elements) {
-//		s2 ~= e.toString();
-//	}
-//	auto doc = new Document(s2);
-//	writeln(doc);
+	/* setup logging level */
+	Logger.level = Logger.Level.DEBUG;
 	    
 	/* read configuration from agent.cfg */
 	Configuration configuration = new Configuration("agent.cfg");
-	configuration.printConfiguration();
+	Logger.myDebug("agent.cfg configuration:\n" ~ configuration.toString());
 	
 	/* setup socket connection */
 	string hostname = configuration.get("hostname");

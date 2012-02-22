@@ -17,6 +17,7 @@ module Protocol
     AGENT_ID            = "agent_id"
     AGENT_VERSION       = "agent_version"
     AGENT_PLATTFORM     = "agent_plattform"
+    AGENT_ENCODING      = "agent_encoding"
     AUTOMATION_STATUS   = "automation_status"
     AUTOMATION_ACTION   = "automation_action"
     AUTOMATION_ID       = "automation_id"
@@ -41,6 +42,7 @@ module Protocol
     agent_hello[Protocol::Keys::AGENT_ID] = id
     agent_hello[Protocol::Keys::AGENT_VERSION] = version
     agent_hello[Protocol::Keys::AGENT_PLATTFORM] = plattform
+    agent_hello[Protocol::Keys::AGENT_ENCODING] = "JSON"
     return agent_hello
   end
   

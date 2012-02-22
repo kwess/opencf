@@ -150,7 +150,7 @@ agent.connect
 thread = Thread.new{agent.read()}
 
 
-agent.send(Protocol::agent_hello("test", "r_v1", "windows"))
+agent.send(Protocol::agent_hello("test2", "r_v1", "windows"))
   
 
 thread.join()

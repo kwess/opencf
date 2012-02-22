@@ -80,6 +80,7 @@ public class Connection implements Runnable {
 		logger.trace("forward");
 		if (packet != null)
 			try {
+				logger.debug("forwarding packet as " + encoding);
 				packetWriter.writePacket(packet, encoding);
 			} catch (IOException e) {
 				logger.error("cant forward Packet: " + e.getMessage());
@@ -92,6 +93,10 @@ public class Connection implements Runnable {
 	}
 
 	public void setEncoding(Encoding encoding) {
+		logger.trace("setEncoding");
+		if (this.encoding.equals(encoding))
+			return;
+		logger.debug("encoding changed to " + encoding);
 		this.encoding = encoding;
 	}
 
@@ -100,7 +105,12 @@ public class Connection implements Runnable {
 	}
 
 	public void setPacketHandler(PacketHandler handler) {
-		this.packetHandler = handler;
+		logger.trace("setPacketHandler");
+		logger.debug("packet handler changed to " + handler);
+		if (debug)
+			logger.warn("debug is enabled, PacketHandler will remain default");
+		else
+			this.packetHandler = handler;
 	}
 
 }

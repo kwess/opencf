@@ -36,6 +36,7 @@ public class Connection implements Runnable {
 		logger.trace("run start");
 
 		logger.debug("debug: " + debug);
+		logger.debug("running: " + running);
 		logger.debug("using PacketHandler: " + packetHandler.toString());
 		logger.debug("using encoding outgoing: " + encoding);
 		logger.debug("using encoding incoming: " + Encoding.JSON);

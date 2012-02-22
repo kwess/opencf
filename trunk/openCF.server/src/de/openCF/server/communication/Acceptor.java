@@ -15,19 +15,20 @@ import javax.net.ssl.SSLSocket;
 import org.apache.log4j.Logger;
 
 import de.openCF.protocol.Connection;
+import de.openCF.protocol.ConnectionFactory;
 
 public class Acceptor implements Runnable {
 
-	private Logger				logger						= Logger.getLogger(Acceptor.class);
-	private ServerSocket		serverSocket				= null;
-	private ServerSocketFactory	serverSocketFactory			= null;
-	private ExecutorService		executorService				= null;
+	private Logger				logger				= Logger.getLogger(Acceptor.class);
+	private ServerSocket		serverSocket		= null;
+	private ServerSocketFactory	serverSocketFactory	= null;
+	private ExecutorService		executorService		= null;
 
-	private int					port						= 41191;
-	private boolean				needsClientAuth				= false;
-	private boolean				useSSL						= false;
-	private int					connectionPoolSize			= 1024;
-	private Connection			connectionImplementation	= null;
+	private int					port				= 41191;
+	private boolean				needsClientAuth		= false;
+	private boolean				useSSL				= false;
+	private int					connectionPoolSize	= 1024;
+	private ConnectionFactory	connectionFactory	= null;
 
 	public Acceptor() {
 		logger.trace("new");
@@ -41,7 +42,6 @@ public class Acceptor implements Runnable {
 		logger.debug("use ssl: " + useSSL);
 		logger.debug("require clientAuth: " + needsClientAuth);
 		logger.debug("using connection pool size: " + connectionPoolSize);
-		logger.debug("using connectionImplementation: " + connectionImplementation.toString());
 
 		executorService = Executors.newFixedThreadPool(this.connectionPoolSize);
 
@@ -91,7 +91,7 @@ public class Acceptor implements Runnable {
 				continue;
 			}
 
-			Connection serverConnection = getConnectionImplementation();
+			Connection serverConnection = this.connectionFactory.createConnection();
 			serverConnection.setSocket(socket);
 
 			executorService.execute(serverConnection);
@@ -131,11 +131,7 @@ public class Acceptor implements Runnable {
 		this.connectionPoolSize = connectionPoolSize;
 	}
 
-	public Connection getConnectionImplementation() {
-		return connectionImplementation;
-	}
-
-	public void setConnectionImplementation(Connection connectionImplementation) {
-		this.connectionImplementation = connectionImplementation;
+	public void setConnectionFactory(ConnectionFactory connectionFactory) {
+		this.connectionFactory = connectionFactory;
 	}
 }

@@ -42,6 +42,7 @@ public class Acceptor implements Runnable {
 		logger.debug("use ssl: " + useSSL);
 		logger.debug("require clientAuth: " + needsClientAuth);
 		logger.debug("using connection pool size: " + connectionPoolSize);
+		logger.debug("using connection factory: " + connectionFactory.getClass());
 
 		executorService = Executors.newFixedThreadPool(this.connectionPoolSize);
 

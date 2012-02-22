@@ -33,6 +33,7 @@ Erwartete Antwort: Agent Hello Response
 <code language="js">
 {
   agent_id: AGENT_ID, //String
+  agent_encoding: ENCODING //String (optional)
   agent_version: AGENT_VERSION, //String
   agent_plattform: AGENT_PLATTFORM, //String
 }
@@ -42,6 +43,7 @@ Erwartete Antwort: Agent Hello Response
 || AGENT_ID || String || fqdn, falls der schon beim Server vergeben ist, wird ein bestehender Eintrag überschrieben ||
 || AGENT_VERSION || String || Versionsstring des Agenten, egal was kommt - nur für Admins ||
 || AGENT_PLATTFORM || String || {linux, unix, windows} ||
+|| ENCODING || String || Optional, setzt das Antwortformat {JSON, XML} ||
 
 
 ==== Agent Hello Response ====

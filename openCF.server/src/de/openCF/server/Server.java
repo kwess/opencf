@@ -11,11 +11,10 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
-import de.openCF.protocol.Connection;
 import de.openCF.protocol.PacketHelper.Encoding;
 import de.openCF.server.communication.Acceptor;
-import de.openCF.server.communication.AgentPacketHandler;
-import de.openCF.server.communication.ControllerPacketHandler;
+import de.openCF.server.communication.AgentConnectionFactory;
+import de.openCF.server.communication.ControllerConnectionFactory;
 import de.openCF.server.persistence.Persistence;
 
 public class Server implements Runnable {
@@ -83,16 +82,12 @@ public class Server implements Runnable {
 		Boolean agentDebug = Boolean.parseBoolean(this.properties.getProperty(AGENT_DEBUG, "false"));
 		Encoding agentEncoding = Encoding.valueOf(this.properties.getProperty(AGENT_PROTOCOL_ENCODING));
 
-		Connection agentConnection = new Connection(agentDebug);
-		agentConnection.setPacketHandler(new AgentPacketHandler(agentConnection));
-		agentConnection.setEncoding(agentEncoding);
-
 		Acceptor acceptorAgents = new Acceptor();
 		acceptorAgents.setPort(agentPort);
 		acceptorAgents.setNeedsClientAuth(agentNeedsClientAuth);
 		acceptorAgents.setConnectionPoolSize(agentConnectionPoolSize);
 		acceptorAgents.setUseSSL(agentUseSSL);
-		acceptorAgents.setConnectionImplementation(agentConnection);
+		acceptorAgents.setConnectionFactory(new AgentConnectionFactory(agentDebug, agentEncoding));
 
 		Integer controllerPort = Integer.parseInt(this.properties.getProperty(CONTROLLER_PORT, "12346"));
 		Boolean controllerNeedsClientAuth = Boolean.parseBoolean(this.properties.getProperty(CONTROLLER_NEEDSCLIENTAUTH, "false"));
@@ -100,16 +95,12 @@ public class Server implements Runnable {
 		Boolean controllerUseSSL = Boolean.parseBoolean(this.properties.getProperty(CONTROLLER_USE_SSL, "false"));
 		Boolean controllerDebug = Boolean.parseBoolean(this.properties.getProperty(CONTROLLER_DEBUG, "false"));
 
-		Connection controllerConnection = new Connection(controllerDebug);
-		ControllerPacketHandler controllerPacketHandler = new ControllerPacketHandler(controllerConnection);
-		controllerConnection.setPacketHandler(controllerPacketHandler);
-
 		Acceptor acceptorControllers = new Acceptor();
 		acceptorControllers.setPort(controllerPort);
 		acceptorControllers.setNeedsClientAuth(controllerNeedsClientAuth);
 		acceptorControllers.setConnectionPoolSize(controllerConnectionPoolSize);
 		acceptorControllers.setUseSSL(controllerUseSSL);
-		acceptorControllers.setConnectionImplementation(controllerConnection);
+		acceptorControllers.setConnectionFactory(new ControllerConnectionFactory(controllerDebug));
 
 		logger.info("starting acceptor for agents");
 		Executors.newSingleThreadExecutor().execute(acceptorAgents);

@@ -6,6 +6,7 @@ public abstract class PacketKeys {
 	public static final String	AGENT_ID				= "agent_id";
 	public static final String	AGENT_VERSION			= "agent_version";
 	public static final String	AGENT_PLATTFORM			= "agent_plattform";
+	public static final String	AGENT_ENCODING			= "agent_encoding";
 	public static final String	SUCCESSFULL				= "successfull";
 	public static final String	RETURN_CODE				= "return_code";
 	public static final String	MESSAGE					= "message";

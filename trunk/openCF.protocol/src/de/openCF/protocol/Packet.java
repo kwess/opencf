@@ -59,8 +59,10 @@ public class Packet {
 		ret += dataFormatted.toString();
 		ret += " ---------------Hex Dump----------------------";
 		ret += dump.toString() + "\n";
-		ret += " ---------------------------------------------";
-		return ret + "\n";
+		ret += " -------------Encoded Data--------------------\n";
+		ret += " " + new String(rawData).replace("\n", "\\n") + "\n";
+		ret += " ---------------------------------------------\n";
+		return ret;
 	}
 
 	@Override

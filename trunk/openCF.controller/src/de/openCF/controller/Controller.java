@@ -15,6 +15,7 @@ import org.json.JSONTokener;
 import de.openCF.protocol.Connection;
 import de.openCF.protocol.Packet;
 import de.openCF.protocol.PacketHelper;
+import de.openCF.protocol.PacketHelper.Encoding;
 
 public class Controller implements Runnable {
 
@@ -32,6 +33,7 @@ public class Controller implements Runnable {
 			Socket socket = new Socket("localhost", 6789);
 			c = new Connection();
 			c.setSocket(socket);
+			c.setEncoding(Encoding.JSON);
 			Executors.newSingleThreadExecutor().execute(c);
 		} catch (UnknownHostException e1) {
 			System.err.println(e1.getMessage());

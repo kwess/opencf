@@ -20,29 +20,35 @@ class Logger {
 	
 	
 	private this() {
-		
+		stdout.writeln("new logger");
 	}
 	
-	private static Logger getInstance() {
-		if(loggerInsance is null) {
-			loggerInsance = new Logger();
-		}
-		return loggerInsance;
-	}
+public static Logger getInstance() {
+  if(loggerInsance is null) {
+   loggerInsance = new Logger();
+   
+  }
+  return loggerInsance;
+ }
 	
 	public static void myInfo(string message) {
+		stdout.writeln("-> info");
 		if(getInstance().level >= Level.INFO) {
-			stdout.writeln(message);
+			stdout.writeln("INFO  " ~ message);
 		}
+		stdout.writeln("<- info");
 	}
 	
 	public static void myDebug(string message) {
-		if(getInstance().level >= Level.DEBUG) {
-			stdout.writeln(message);
+		stdout.writeln("-> debug");
+		if(getInstance().level >= Level.DEBUG) { 
+			stdout.writeln("DEBUG " ~ message);
 		}
+		stdout.writeln("<- debug");
 	}
 	
 	public static void myError(string message) {
-		stderr.writeln(message);
+		stdout.writeln("error");
+		stderr.writeln("ERROR " ~ message); 
 	}
 }

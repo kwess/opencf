@@ -10,6 +10,7 @@ import org.hibernate.Session;
 import de.openCF.protocol.Connection;
 import de.openCF.protocol.Packet;
 import de.openCF.protocol.PacketHandler;
+import de.openCF.protocol.PacketHelper.Encoding;
 import de.openCF.protocol.PacketKeys;
 import de.openCF.protocol.PacketType;
 import de.openCF.server.Data;
@@ -152,6 +153,13 @@ public class AgentPacketHandler implements PacketHandler {
 		String agent_id = (String) data.get(PacketKeys.AGENT_ID);
 		String plattform = (String) data.get(PacketKeys.AGENT_PLATTFORM);
 		String version = (String) data.get(PacketKeys.AGENT_VERSION);
+		String encoding = (String) data.get(PacketKeys.AGENT_ENCODING);
+
+		if (encoding != null && !"".equals(encoding)) {
+			Encoding e = Encoding.valueOf(encoding);
+			logger.info("agent requested encoding change from " + connection.getEncoding() + " to " + e);
+			connection.setEncoding(e);
+		}
 
 		Session session = Persistence.getSession();
 		session.beginTransaction();
@@ -162,6 +170,7 @@ public class AgentPacketHandler implements PacketHandler {
 		boolean agentOnline = false;
 		boolean agentConnectedHere = Data.getConnection(agent_id) == null ? false : true;
 		boolean agentConnectedToDifferendServer = false;
+
 		if (agent != null) {
 			agentOnline = agent.getStatus() == Agent.Status.OFFLINE ? false : true;
 			agentConnectedToDifferendServer = server.getId().equals(agent.getServer().getId()) ? false : true;
@@ -184,7 +193,7 @@ public class AgentPacketHandler implements PacketHandler {
 
 			response.put(PacketKeys.RETURN_CODE, 0);
 			response.put(PacketKeys.SUCCESSFULL, true);
-			response.put(PacketKeys.MESSAGE, "congratulations, youre registered!");
+			response.put(PacketKeys.MESSAGE, "congratulations " + agent_id + ", youre registered!");
 
 			registered = true;
 		} else if (!agentOnline || (agentOnline && agentConnectedHere) || (agentOnline && !agentConnectedToDifferendServer)) {
@@ -203,7 +212,7 @@ public class AgentPacketHandler implements PacketHandler {
 
 			response.put(PacketKeys.RETURN_CODE, 1);
 			response.put(PacketKeys.SUCCESSFULL, true);
-			response.put(PacketKeys.MESSAGE, "hello back again :)");
+			response.put(PacketKeys.MESSAGE, "hello back again " + agent_id + " :)");
 
 			registered = true;
 		} else if (agentOnline && agentConnectedHere) {

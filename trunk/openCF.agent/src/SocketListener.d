@@ -60,5 +60,10 @@ class SocketListener : Thread {
 	
 	private void handleAutomationControl(Packet p) {
 		//TODO
+		Logger.myDebug("handleAutomationControl function", __FILE__, __LINE__);
+		auto doc = new Document(p.getXmlString());
+		foreach(element; doc.elements) {
+			Logger.myDebug(element.tag.name);
+		}
 	}
 }

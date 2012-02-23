@@ -6,7 +6,7 @@ module Protocol
     AGENT_HELLO_RESPONSE  = 2
     AGENT_HEARTBEAT       = 0
     AUTOMATION_CONTROL    = 13
-    AUTOMATION_STATUS   = 20
+    AUTOMATION_STATUS     = 20
   end
   
   module Keys
@@ -22,6 +22,7 @@ module Protocol
     AUTOMATION_ACTION   = "automation_action"
     AUTOMATION_ID       = "automation_id"
     AUTOMATION_MESSAGE  = "automation_message"
+    LOCAL_TIME          = "local_time"
   end
   
   module Action
@@ -34,6 +35,14 @@ module Protocol
     STOPED    = "stoped"
     FINISHED  = "finished"
     TALKING   = "talking"
+  end
+  
+  def Protocol.htonl(h)
+    return [h].pack("N")
+  end
+  
+  def Protocol.ntohl(n)
+    return n.unpack("N")[0]
   end
   
   def Protocol.agent_hello(id, version, plattform)
@@ -53,6 +62,13 @@ module Protocol
     automation_status[Protocol::Keys::AUTOMATION_ID] = id
     automation_status[Protocol::Keys::AUTOMATION_STATUS] = status
     return automation_status
+  end
+  
+  def Protocol.heartbeat
+    heartbeat_val = Hash.new
+    heartbeat_val[Protocol::Keys::TYPE] = Protocol::Type::AGENT_HEARTBEAT
+    heartbeat_val[Protocol::Keys::LOCAL_TIME] = "#{Time.now.to_i}"
+    return heartbeat_val
   end
   
 end

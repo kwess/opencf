@@ -16,6 +16,8 @@ import de.openCF.protocol.Connection;
 import de.openCF.protocol.Packet;
 import de.openCF.protocol.PacketHelper;
 import de.openCF.protocol.PacketHelper.Encoding;
+import de.openCF.protocol.PacketReader;
+import de.openCF.protocol.PacketWriter;
 
 public class Controller implements Runnable {
 
@@ -32,6 +34,8 @@ public class Controller implements Runnable {
 		try {
 			Socket socket = new Socket("localhost", 6789);
 			c = new Connection();
+			c.setReader(new PacketReader());
+			c.setWriter(new PacketWriter());
 			c.setSocket(socket);
 			c.setEncoding(Encoding.JSON);
 			Executors.newSingleThreadExecutor().execute(c);

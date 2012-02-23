@@ -116,10 +116,12 @@ public class Connection implements Runnable {
 	}
 
 	public void setReader(Reader reader) {
+		logger.trace("setReader(Reader)");
 		this.packetReader = reader;
 	}
 
 	public void setWriter(Writer writer) {
+		logger.trace("setWriter(Writer)");
 		this.packetWriter = writer;
 	}
 

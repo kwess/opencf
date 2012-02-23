@@ -10,8 +10,13 @@ import util.Logger;
 
 class AutomationThread : Thread {
 	
-	this() {
+	private Tid managerTid;
+	private int automationID;
+	
+	this(Tid tid, int automationID) {
 		super(&run);
+		this.managerTid = tid;
+		this.automationID = automationID;
 	}
 	
 	private void run() {
@@ -27,4 +32,8 @@ class AutomationThread : Thread {
 		
 
 	} 
+	
+	public int getAutomationID() {
+		return this.automationID;
+	}
 } 

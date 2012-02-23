@@ -52,7 +52,7 @@ class Connection {
 	
 	public bool sendHello(string agent, string myversion, string plattform) {
 		if(connected == false) {
-			Logger.myError(__FILE__ ~ __LINE__ ~ ": connected == false --> unable to send hello");
+			Logger.myError("connected == false --> unable to send hello", __FILE__, __LINE__);
 			return false;
 		}
 
@@ -90,7 +90,7 @@ class Connection {
 		//this.socketListener.
 		this.socket.close();
 		
-		Logger.myInfo(__FILE__ ~ __LINE__ ~ "socket disconnected");
+		Logger.myInfo("socket disconnected", __FILE__, __LINE__);
 		
 		return true;
 	}

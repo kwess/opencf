@@ -13,10 +13,8 @@ public class Connection implements Runnable {
 
 	private Logger			logger			= Logger.getLogger(Connection.class);
 	private Socket			socket			= null;
-	private InputStream		inputStream		= null;
-	private OutputStream	outputStream	= null;
-	private PacketReader	packetReader	= null;
-	private PacketWriter	packetWriter	= null;
+	private Reader			packetReader	= null;
+	private Writer			packetWriter	= null;
 	private PacketHandler	packetHandler	= new DefaultPacketHandler();
 	private Encoding		encoding		= Encoding.JSON;
 	private boolean			debug			= false;
@@ -35,22 +33,27 @@ public class Connection implements Runnable {
 	public void run() {
 		logger.trace("run start");
 
-		logger.debug("debug: " + debug);
-		logger.debug("running: " + running);
-		logger.debug("using PacketHandler: " + packetHandler.toString());
-		logger.debug("using encoding outgoing: " + encoding);
-		logger.debug("using encoding incoming: " + Encoding.JSON);
+		if (packetReader == null)
+			throw new IllegalStateException("reader is null");
+		if (packetWriter == null)
+			throw new IllegalStateException("writer is null");
 
 		try {
-			inputStream = socket.getInputStream();
-			outputStream = socket.getOutputStream();
+			InputStream inputStream = socket.getInputStream();
+			OutputStream outputStream = socket.getOutputStream();
+
+			packetReader.setInputStream(inputStream);
+			packetWriter.setOutputStream(outputStream);
 		} catch (IOException e) {
 			logger.error("cant get stream from socket: " + e.getMessage());
 			return;
 		}
 
-		packetReader = new PacketReader(inputStream);
-		packetWriter = new PacketWriter(outputStream);
+		logger.debug("debug: " + debug);
+		logger.debug("running: " + running);
+		logger.debug("using PacketHandler: " + packetHandler.toString());
+		logger.debug("using encoding outgoing: " + encoding);
+		logger.debug("using encoding incoming: " + Encoding.JSON);
 
 		while (running) {
 			running = socket.isConnected();
@@ -58,7 +61,6 @@ public class Connection implements Runnable {
 				Packet packet = packetReader.readPacket();
 				if (debug) {
 					logger.warn("debug is enabled, discarding packet");
-					continue;
 				}
 				packetHandler.handlePacket(packet);
 
@@ -111,6 +113,14 @@ public class Connection implements Runnable {
 			logger.warn("debug is enabled, PacketHandler will remain default");
 		else
 			this.packetHandler = handler;
+	}
+
+	public void setReader(Reader reader) {
+		this.packetReader = reader;
+	}
+
+	public void setWriter(Writer writer) {
+		this.packetWriter = writer;
 	}
 
 }

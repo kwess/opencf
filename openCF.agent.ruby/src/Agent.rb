@@ -14,6 +14,8 @@ $os = $config['os']
 $version = $config['version']
 $server = $config['server']
 $port = $config['port']
+$heartbeat_sleep = $config['heartbeat']
+$agent_id = $config['hostname']
 
 $logger.info("os=#{$port}")
 $logger.info("version=#{$version}")
@@ -33,6 +35,7 @@ class Agent
   def initialize(host, port)
     @hostname = host
     @port = port
+    @mutex = Mutex.new
   end
   
   
@@ -52,10 +55,10 @@ class Agent
     $logger.debug "writing bytes: #{json.bytesize}"
     $logger.debug "writing data:  #{json}"
     
-    @socket.write([json.bytesize + 1].pack('N'))
-    @socket.puts(json)
-    
-    $logger.debug "written bytes (BIG_ENDIAN) #{[json.bytesize + 1].pack('N')}"
+    @mutex.synchronize do    
+      @socket.write(Protocol::htonl(json.bytesize))
+      @socket.write(json)
+    end
     
     @socket.flush()
   end
@@ -64,10 +67,10 @@ class Agent
   def read()
     begin
       loop {
-        response = @socket.read(4).unpack('N')
+        response = Protocol::ntohl(@socket.read(4))
         #bytes = [response].pack('N')
-        $logger.debug "#{response[0]} zu lesen"
-        json = JSON.parse(@socket.read(response[0]))
+        $logger.debug "#{response} zu lesen"
+        json = JSON.parse(@socket.read(response))
         $logger.debug "gelesen #{json}"
         
         handlePacket(json)
@@ -156,15 +159,26 @@ class Agent
 end
 
 
+$hn = Socket.gethostname
+if ($agent_id != nil)
+  $hn = $agent_id
+end
+$logger.info("hostname=#{$hn}")
+
 
 agent = Agent.new($server, $port)
 agent.connect
 
 thread = Thread.new{agent.read()}
 
-
-agent.send(Protocol::agent_hello(Socket.gethostname, $version, $os))
-  
+agent.send(Protocol::agent_hello($hn, $version, $os))
+t = Thread.new begin
+  loop {
+    $logger.debug("sleeping #{$heartbeat_sleep * 60} seconds")
+    sleep($heartbeat_sleep * 60);
+    agent.send(Protocol::heartbeat());
+  }
+end
 
 thread.join()
 

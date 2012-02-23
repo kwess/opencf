@@ -4,6 +4,9 @@ import std.process;
 import std.concurrency;
 import std.string;
 import std.utf;
+import std.conv;
+
+import util.Logger;
 
 class AutomationThread : Thread {
 	
@@ -12,13 +15,15 @@ class AutomationThread : Thread {
 	}
 	
 	private void run() {
+		Logger.myInfo("AutomationThread startet, pid " ~ text(getpid()), __FILE__, __LINE__);
 		string result;
 		try {
-			result = shell("ping 192.168.1.101");
+			result = shell("hostname");
 		} catch(UTFException e) {
-			writefln("wasn hier los mit utf8? %s", e.toString);
+			Logger.myError("wasn hier los mit utf8? " ~ e.toString(), __FILE__, __LINE__);
+			result = e.toString();
 		}
-		writefln("ich bin Automationthread mit pid %d; result war %s", getpid(), result);
+		Logger.myInfo("ich bin Automationthread mit pid " ~ text(getpid()) ~ "; result war " ~ result, __FILE__, __LINE__);
 		
 
 	} 

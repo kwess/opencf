@@ -1,11 +1,24 @@
 require('socket')
 require('json')
 require('logger')
+require('yaml')
 require('src/protocol')
 
 
 $logger = Logger.new(STDOUT)
 $logger.level = Logger::Severity::DEBUG
+
+
+$config = YAML.load_file(File.absolute_path('config/agent.ruby.yaml'))
+$os = $config['os']
+$version = $config['version']
+$server = $config['server']
+$port = $config['port']
+
+$logger.info("os=#{$port}")
+$logger.info("version=#{$version}")
+$logger.info("server=#{$server}")
+$logger.info("port=#{$port}")
 
 class Agent
   
@@ -144,13 +157,13 @@ end
 
 
 
-agent = Agent.new("localhost", 5678)
+agent = Agent.new($server, $port)
 agent.connect
 
 thread = Thread.new{agent.read()}
 
 
-agent.send(Protocol::agent_hello("test2", "r_v1", "windows"))
+agent.send(Protocol::agent_hello(Socket.gethostname, $version, $os))
   
 
 thread.join()

@@ -19,6 +19,8 @@ import de.openCF.protocol.PacketHelper.Encoding;
 import de.openCF.protocol.PacketReader;
 import de.openCF.protocol.PacketWriter;
 
+// {type:13, agent_id:["agent"], automation_action:"start"}
+
 public class Controller implements Runnable {
 
 	public static void main(String[] args) {

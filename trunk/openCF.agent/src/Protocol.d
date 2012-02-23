@@ -10,10 +10,12 @@ import std.string;
 class Packet {
 	
 	public enum Type : int {
-		INVALID               = -1,
-		HEARTBEAT		      = 0,
-		AGENT_HELLO           = 1,
-		AGENT_HELLO_RESPONSE  = 2
+		INVALID					= -1,
+		HEARTBEAT				= 0,
+		AGENT_HELLO				= 1,
+		AGENT_HELLO_RESPONSE	= 2,
+		AUTOMATION_CONTROL		= 13,
+		AUTOMATION_STATUS		= 20
 	}
 	
 	public enum Keys : string {

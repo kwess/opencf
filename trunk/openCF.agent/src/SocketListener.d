@@ -33,25 +33,32 @@ class SocketListener : Thread {
 			
 			switch(p.getType()) {
 				case Packet.Type.AGENT_HELLO_RESPONSE:
-					handleAgentHelloResponse(connectionTid, p);
+					handleAgentHelloResponse(p);
+					break;
+				case Packet.Type.AUTOMATION_CONTROL:
+					handleAutomationControl(p);
 					break;
 				default:
-					
+					Logger.myInfo("invalid packet type received: " ~ text(p.getType()), __FILE__, __LINE__);
 			}
 		}
 		Logger.myInfo("SocketListener thread ended", __FILE__, __LINE__);
 	}
 	
-	private void handleAgentHelloResponse(Tid connectionTid, Packet p) {
+	private void handleAgentHelloResponse(Packet p) {
 		Logger.myDebug("handleAgentHelloResponse function", __FILE__, __LINE__);
 		bool success;
 		auto doc = new Document(p.getXmlString());
-			foreach(element; doc.elements) {
-				if(element.tag.name.icmp(Packet.Keys.TYPE) == 0) {
-					string successfullString = element.text;
-					success = parse!bool(successfullString);
-				}
+		foreach(element; doc.elements) {
+			if(element.tag.name.icmp(Packet.Keys.SUCCESSFULL) == 0) {
+				string successfullString = element.text;
+				success = parse!bool(successfullString);
 			}
+		}
 		send(connectionTid, success);
+	}
+	
+	private void handleAutomationControl(Packet p) {
+		//TODO
 	}
 }

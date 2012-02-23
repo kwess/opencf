@@ -18,11 +18,11 @@ class SocketWriter : Thread {
 		super(&run);
 		this.stream = stream;
 		this.connectionTid = tid;
-		Logger.myInfo(__FILE__ ~ __LINE__ ~ ": SocketWriter ready to send data");
+		Logger.myInfo("SocketWriter ready to send data", __FILE__, __LINE__);
 	}
 	
 	private void run() {
-		Logger.myInfo(__FILE__ ~ __LINE__ ~ ": SocketWriter starting to heartbeat");
+		Logger.myInfo("SocketWriter starting to heartbeat", __FILE__, __LINE__);
 		while(this.isRunning) {
 			JSONValue json;
 			json.type = JSON_TYPE.OBJECT;
@@ -37,12 +37,12 @@ class SocketWriter : Thread {
 			
 			Thread.sleep(dur!("seconds")(1));
 		}
-		Logger.myInfo(__FILE__ ~ __LINE__ ~ ": SocketWriter Thread (plus heartbeat) ended");
+		Logger.myInfo("SocketWriter Thread (plus heartbeat) ended", __FILE__, __LINE__);
 	}
 	
 	public bool send(Packet p) {
 		string text = p.toString();
-		Logger.myDebug(__FILE__ ~ __LINE__ ~ ": sending " ~ text);
+		Logger.myDebug("sending " ~ text, __FILE__, __LINE__);
 		this.stream.write(p.getSize());
 		this.stream.writeString(text);
 		

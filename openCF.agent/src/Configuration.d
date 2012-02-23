@@ -24,7 +24,7 @@ class Configuration {
 				string value = chomp(line[1]);
 				configMap[key] = value;
 			} catch (Exception e) {
-				Logger.myError(__FILE__ ~ __LINE__ ~ ": Exception caught -> malformed line in config file, skipping line");
+				Logger.myError("Exception caught -> malformed line in config file, skipping line", __FILE__, __LINE__);
 			}
 		}
 	}
@@ -53,7 +53,7 @@ class Configuration {
 		try {
 			value = configMap[key];
 		} catch (RangeError e) {
-			Logger.myError(__FILE__ ~ __LINE__ ~ ": RangeError caught -> no key [" ~ key ~ "] found");
+			Logger.myError("RangeError caught -> no key [" ~ key ~ "] found", __FILE__, __LINE__);
 			value = "";
 		}
 		return value;

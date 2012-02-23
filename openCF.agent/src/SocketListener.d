@@ -21,14 +21,14 @@ class SocketListener : Thread {
 	}
 	
 	private void run() {
-		Logger.myInfo(__FILE__ ~ __LINE__ ~ ": SocketListener ready to receive data");
+		Logger.myInfo("SocketListener ready to receive data", __FILE__, __LINE__);
 		send(connectionTid, true);
 		while (!stream.eof()) {
 			int n = 0;
 			stream.read(n);
-			Logger.myDebug(__FILE__ ~ __LINE__ ~ ": " ~ new string(bswap(n)) ~ " byte kommen im naechsten block");
+			Logger.myDebug(text(bswap(n)) ~ " byte kommen im naechsten block", __FILE__, __LINE__);
 			string datastring = cast(string) stream.readString(bswap(n));
-			Logger.myDebug(__FILE__ ~ __LINE__ ~ ": gelesen: " ~ datastring);
+			Logger.myDebug("gelesen: " ~ datastring, __FILE__, __LINE__);
 			Packet p = new Packet(datastring);
 			
 			switch(p.getType()) {
@@ -39,11 +39,11 @@ class SocketListener : Thread {
 					
 			}
 		}
-		Logger.myInfo(__FILE__ ~ __LINE__ ~ ": SocketListener thread ended");
+		Logger.myInfo("SocketListener thread ended", __FILE__, __LINE__);
 	}
 	
 	private void handleAgentHelloResponse(Tid connectionTid, Packet p) {
-		Logger.myDebug(__FILE__ ~ __LINE__ ~ ": handleAgentHelloResponse function");
+		Logger.myDebug("handleAgentHelloResponse function", __FILE__, __LINE__);
 		bool success;
 		auto doc = new Document(p.getXmlString());
 			foreach(element; doc.elements) {

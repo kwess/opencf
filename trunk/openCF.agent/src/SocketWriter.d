@@ -35,7 +35,7 @@ class SocketWriter : Thread {
 			Packet p = new Packet(json);
 			send(p);
 			
-			Thread.sleep(dur!("seconds")(1));
+			Thread.sleep(dur!("minutes")(1));
 		}
 		Logger.myInfo("SocketWriter Thread (plus heartbeat) ended", __FILE__, __LINE__);
 	}

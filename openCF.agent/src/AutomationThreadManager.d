@@ -1,18 +1,22 @@
 import core.thread;
+import std.array;
+import std.concurrency;
 
 import AutomationThread;
 
-class AutomationThreadManager : ThreadGroup {
+class AutomationThreadManager {
+	
+	private synchronized AutomationThread[int] automationThreads = null;
 	
 	
-	public void getRunningThreads() {
-		
+	
+	public int[] getRunningThreadIDs() {
+		return this.automationThreads.keys;
 	}
 	
 	public bool startNewAutomation() {
-		Thread t = new AutomationThread();
-		add(t);
-		
+		AutomationThread t = new AutomationThread(thisTid(), automationThreads.length);
+		automationThreads[t.getAutomationID()] = t;
 		t.start();
 		
 		return true;

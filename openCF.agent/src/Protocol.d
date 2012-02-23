@@ -26,7 +26,8 @@ class Packet {
 		SUCCESSFULL = "successfull",
 		RETURN_CODE = "return_code",
 		MESSAGE = "message",
-		LOCAL_TIME = "local_time"
+		LOCAL_TIME = "local_time",
+		AUTOMATION_ID = "automation_id"
 	}
 	
 	private string xmlString;

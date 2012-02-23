@@ -35,7 +35,7 @@ class Connection {
 		this.socket = new TcpSocket(new InternetAddress(this.hostname, this.port));
 		this.stream = new SocketStream(socket);
 		
-		this.socketListener = new SocketListener(this.stream, thisTid);
+		this.socketListener = new SocketListener(this.stream, thisTid());
 		this.socketListener.start();
 		bool listeningOK;
 		receive(

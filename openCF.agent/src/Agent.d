@@ -37,10 +37,9 @@ void main() {
 	string plattform = configuration.get("plattform");
 	connection.sendHello(agent, myversion, plattform);
 
-	Logger.myDebug("Endlosschleife - hier muss der reconnect rein");
+	Logger.myDebug("Endlosschleife - hier muss der reconnect rein", __FILE__, __LINE__);
 
 	AutomationThreadManager manager = new AutomationThreadManager();
-	manager.startNewAutomation();
 
 	while(1) {
 		Thread.sleep(dur!("seconds")(1));

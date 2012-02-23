@@ -1,0 +1,4 @@
+os: windows
+version: v_r.0.1
+server: localhost
+port: 5678

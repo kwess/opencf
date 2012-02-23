@@ -36,12 +36,12 @@ void main() {
 	string myversion = configuration.get("version");
 	string plattform = configuration.get("plattform");
 	connection.sendHello(agent, myversion, plattform);
-	
-
-//	AutomationThreadManager manager = new AutomationThreadManager();
-//	manager.startNewAutomation();
 
 	Logger.myDebug("Endlosschleife - hier muss der reconnect rein");
+
+	AutomationThreadManager manager = new AutomationThreadManager();
+	manager.startNewAutomation();
+
 	while(1) {
 		Thread.sleep(dur!("seconds")(1));
 	}

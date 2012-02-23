@@ -68,7 +68,7 @@ class Logger {
 	
 	public static void myError(string message) {
 		stdout.writeln("---> error");
-		if(getInstance().level == Level.ERROR) { 
+		if(getInstance().level <= Level.ERROR) { 
 			stderr.writeln("<ERROR> " ~ message);
 		}
 		stdout.writeln("<--- error");
@@ -76,7 +76,7 @@ class Logger {
 	
 	public static void myError(string message, string srcFile, int line) {
 		stdout.writeln("---> error");
-		if(getInstance().level == Level.ERROR) { 
+		if(getInstance().level <= Level.ERROR) { 
 			stderr.writefln("<ERROR>  %s, line %s: %s", srcFile, text(line), message);
 		}
 		stdout.writeln("<--- error");

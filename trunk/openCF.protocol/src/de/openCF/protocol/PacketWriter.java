@@ -1,6 +1,5 @@
 package de.openCF.protocol;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -8,16 +7,18 @@ import org.apache.log4j.Logger;
 
 import de.openCF.protocol.PacketHelper.Encoding;
 
-public class PacketWriter {
+public class PacketWriter extends Writer {
 
-	private static Logger		logger				= Logger.getLogger(PacketWriter.class);
+	private static Logger	logger	= Logger.getLogger(PacketWriter.class);
 
-	private DataOutputStream	dataOutputStream	= null;
+	public PacketWriter() {
+		super();
+		logger.trace("new");
+	}
 
 	public PacketWriter(OutputStream outputStream) {
-		super();
+		super(outputStream);
 		logger.trace("new(OutputStream)");
-		this.dataOutputStream = new DataOutputStream(outputStream);
 	}
 
 	public int writePacket(Packet packet, Encoding encoding) throws IOException {

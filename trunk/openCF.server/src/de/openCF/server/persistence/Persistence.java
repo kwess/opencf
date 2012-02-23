@@ -17,7 +17,7 @@ public abstract class Persistence {
 	private static Logger				logger	= Logger.getLogger(Persistence.class);
 	public static final Configuration	CONFIGURATION;
 	protected static SessionFactory		SESSION_FACTORY;
-	// protected static Session session;
+	protected static Session			session;
 
 	static {
 		logger.trace("static");
@@ -37,11 +37,11 @@ public abstract class Persistence {
 
 	public synchronized static Session getSession() {
 		logger.trace("getSession");
-		// if (session == null || !session.isConnected()) {
-		// logger.info("open fresh session");
-		// session = SESSION_FACTORY.openSession();
-		// }
-		return SESSION_FACTORY.openSession();
+		if (session == null || !session.isConnected()) {
+			logger.info("open fresh session");
+			session = SESSION_FACTORY.openSession();
+		}
+		return session;
 	}
 
 }

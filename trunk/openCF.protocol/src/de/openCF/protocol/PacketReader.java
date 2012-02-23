@@ -1,23 +1,24 @@
 package de.openCF.protocol;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.log4j.Logger;
 
-public class PacketReader {
+public class PacketReader extends Reader {
 
 	private static Logger	logger			= Logger.getLogger(PacketReader.class);
 
 	public static final int	MAX_PACKET_SIZE	= 2048;
 
-	private DataInputStream	dataInputStream	= null;
+	public PacketReader() {
+		super();
+		logger.trace("new");
+	}
 
 	public PacketReader(InputStream inputStream) {
-		super();
+		super(inputStream);
 		logger.trace("new(InputStream)");
-		this.dataInputStream = new DataInputStream(inputStream);
 	}
 
 	public Packet readPacket() throws IOException {

@@ -31,7 +31,7 @@ public class Connection implements Runnable {
 
 	@Override
 	public void run() {
-		logger.trace("run start");
+		logger.trace("run");
 
 		if (packetReader == null)
 			throw new IllegalStateException("reader is null");
@@ -53,9 +53,9 @@ public class Connection implements Runnable {
 
 		logger.debug("debug: " + debug);
 		logger.debug("running: " + running);
-		logger.debug("using PacketHandler: " + packetHandler.toString());
-		logger.debug("using encoding outgoing: " + encoding);
-		logger.debug("using encoding incoming: " + Encoding.JSON);
+		logger.info("using PacketHandler: " + packetHandler.toString());
+		logger.info("using encoding outgoing: " + encoding);
+		logger.info("using encoding incoming: " + Encoding.JSON);
 
 		while (running) {
 			running = socket.isConnected();
@@ -73,21 +73,23 @@ public class Connection implements Runnable {
 		}
 
 		packetHandler.handleClose();
-
-		logger.trace("run finished");
 	}
 
 	public void setSocket(Socket socket) {
-		logger.trace("setSocket");
+		logger.trace("setSocket(Socket)");
 		this.socket = socket;
+		logger.debug("socket set to: " + socket);
 	}
 
 	public void forward(Packet packet) {
-		logger.trace("forward");
+		logger.trace("forward(Packet)");
 		if (packet != null)
 			try {
 				logger.debug("forwarding packet as " + encoding);
-				packetWriter.writePacket(packet, encoding);
+				if (debug)
+					logger.warn("debung is enabled, not forwarding packet");
+				else
+					packetWriter.writePacket(packet, encoding);
 			} catch (IOException e) {
 				logger.error("cant forward Packet: " + e.getMessage());
 				running = false;
@@ -95,6 +97,7 @@ public class Connection implements Runnable {
 	}
 
 	public Encoding getEncoding() {
+		logger.trace("getEncoding");
 		return encoding;
 	}
 
@@ -102,31 +105,35 @@ public class Connection implements Runnable {
 		logger.trace("setEncoding");
 		if (this.encoding.equals(encoding))
 			return;
-		logger.debug("encoding changed to " + encoding);
+		logger.info("encoding changed to " + encoding);
 		this.encoding = encoding;
 	}
 
 	public boolean isDebug() {
+		logger.trace("isDebug");
 		return debug;
 	}
 
 	public void setPacketHandler(PacketHandler handler) {
 		logger.trace("setPacketHandler");
-		logger.debug("packet handler changed to " + handler);
 		if (debug)
 			logger.warn("debug is enabled, PacketHandler will remain default");
-		else
+		else {
 			this.packetHandler = handler;
+			logger.debug("packet handler changed to " + handler);
+		}
 	}
 
 	public void setReader(Reader reader) {
 		logger.trace("setReader(Reader)");
 		this.packetReader = reader;
+		logger.debug("Reader set to: " + reader);
 	}
 
 	public void setWriter(Writer writer) {
 		logger.trace("setWriter(Writer)");
 		this.packetWriter = writer;
+		logger.debug("Writer set to: " + writer);
 	}
 
 }

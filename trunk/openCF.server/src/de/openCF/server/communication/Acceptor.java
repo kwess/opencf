@@ -38,30 +38,30 @@ public class Acceptor implements Runnable {
 	public void run() {
 		logger.trace("run");
 
-		logger.debug("using port: " + port);
-		logger.debug("use ssl: " + useSSL);
-		logger.debug("require clientAuth: " + needsClientAuth);
-		logger.debug("using connection pool size: " + connectionPoolSize);
-		logger.debug("using connection factory: " + connectionFactory.getClass());
+		logger.info("using port: " + port);
+		logger.info("use ssl: " + useSSL);
+		logger.info("require clientAuth: " + needsClientAuth);
+		logger.info("using connection pool size: " + connectionPoolSize);
+		logger.info("using connection factory: " + connectionFactory.getClass());
 
 		executorService = Executors.newFixedThreadPool(this.connectionPoolSize);
 
 		String[] supportedCipherSuites = null;
 
 		if (useSSL) {
-			logger.debug("creating ssl session factory");
+			logger.info("creating ssl session factory");
 			SSLServerSocketFactory sslServerSocketFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
 			serverSocketFactory = sslServerSocketFactory;
 
 			supportedCipherSuites = sslServerSocketFactory.getSupportedCipherSuites();
 
-			logger.debug("supported ciphersuites: " + Arrays.toString(supportedCipherSuites));
+			logger.info("supported ciphersuites: " + Arrays.toString(supportedCipherSuites));
 		} else {
+			logger.info("creating session factory");
 			serverSocketFactory = ServerSocketFactory.getDefault();
 		}
 
 		try {
-			logger.debug("creating session factory");
 			serverSocket = serverSocketFactory.createServerSocket(port, this.connectionPoolSize);
 			logger.info("server socket open");
 		} catch (IOException e) {
@@ -83,7 +83,7 @@ public class Acceptor implements Runnable {
 					SSLSocket sslSocket = (SSLSocket) socket;
 					logger.info("starting ssl handshake");
 					sslSocket.startHandshake();
-					logger.debug("active ciphersuite: " + sslSocket.getSession().getCipherSuite());
+					logger.info("active ciphersuite: " + sslSocket.getSession().getCipherSuite());
 				}
 
 				logger.info("got new connection: " + socket.getLocalPort() + " --> " + socket.getRemoteSocketAddress());
@@ -95,44 +95,58 @@ public class Acceptor implements Runnable {
 			Connection serverConnection = this.connectionFactory.createConnection();
 			serverConnection.setSocket(socket);
 
+			logger.info("running worker for connection");
 			executorService.execute(serverConnection);
 		}
 
 	}
 
-	public boolean isUseSSL() {
+	public boolean useSSL() {
+		logger.trace("useSSL");
 		return useSSL;
 	}
 
 	public void setUseSSL(boolean useSSL) {
+		logger.trace("setUseSSL(boolean)");
 		this.useSSL = useSSL;
+		logger.debug("useSSL set to: " + useSSL);
 	}
 
 	public int getPort() {
+		logger.trace("getPort");
 		return port;
 	}
 
 	public void setPort(int port) {
+		logger.trace("setPort(int)");
 		this.port = port;
+		logger.debug("port set to: " + port);
 	}
 
-	public boolean isNeedsClientAuth() {
+	public boolean needsClientAuth() {
+		logger.trace("needsClientAuth");
 		return needsClientAuth;
 	}
 
 	public void setNeedsClientAuth(boolean needsClientAuth) {
+		logger.trace("setNeedsClientAuth(boolean)");
 		this.needsClientAuth = needsClientAuth;
+		logger.debug("needsClientAuth set to: " + needsClientAuth);
 	}
 
 	public int getConnectionPoolSize() {
+		logger.trace("getConnectionPoolSize");
 		return connectionPoolSize;
 	}
 
 	public void setConnectionPoolSize(int connectionPoolSize) {
+		logger.trace("setConnectionPoolSize(int)");
 		this.connectionPoolSize = connectionPoolSize;
+		logger.debug("connectionPoolSize set to: " + connectionPoolSize);
 	}
 
 	public void setConnectionFactory(ConnectionFactory connectionFactory) {
+		logger.trace("setConnectionFactory(ConnectionFactor)");
 		this.connectionFactory = connectionFactory;
 	}
 }

@@ -8,6 +8,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -23,6 +24,8 @@ public class Automation {
 	@OneToMany
 	@JoinTable(name = "automation2messages")
 	private Set<Message>		messages	= null;
+	@ManyToOne
+	private Agent				agent		= null;
 
 	public Integer getId() {
 		return id;
@@ -46,6 +49,14 @@ public class Automation {
 
 	public void setStatus(AutomationStatus status) {
 		this.status = status;
+	}
+
+	public Agent getAgent() {
+		return agent;
+	}
+
+	public void setAgent(Agent agent) {
+		this.agent = agent;
 	}
 
 }

@@ -1,13 +1,16 @@
 package de.openCF.server.data;
 
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import de.openCF.server.Data;
@@ -25,16 +28,19 @@ public class Agent {
 	};
 
 	@Id
-	private String		id			= null;
-	private String		version		= null;
+	private String			id			= null;
+	private String			version		= null;
 	@Enumerated(value = EnumType.STRING)
-	private Plattform	plattform	= null;
+	private Plattform		plattform	= null;
 	@Enumerated(value = EnumType.STRING)
-	private Status		status		= Status.OFFLINE;
+	private Status			status		= Status.OFFLINE;
 	@ManyToOne
-	private Server		server		= Data.getServer();
+	private Server			server		= Data.getServer();
 	@Column(nullable = false)
-	private Date		updated		= null;
+	private Date			updated		= null;
+	@OneToMany
+	@JoinTable(name = "agent2automation")
+	private Set<Automation>	automations	= null;
 
 	public String getId() {
 		return id;
@@ -82,6 +88,14 @@ public class Agent {
 
 	public void setUpdated(Date updated) {
 		this.updated = updated;
+	}
+
+	public Set<Automation> getAutomations() {
+		return automations;
+	}
+
+	public void setAutomations(Set<Automation> automations) {
+		this.automations = automations;
 	}
 
 }

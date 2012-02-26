@@ -13,6 +13,7 @@ import de.openCF.protocol.PacketHandler;
 import de.openCF.protocol.PacketKeys;
 import de.openCF.protocol.PacketType;
 import de.openCF.server.Data;
+import de.openCF.server.data.Agent;
 import de.openCF.server.data.Automation;
 import de.openCF.server.data.AutomationAction;
 import de.openCF.server.data.AutomationStatus;
@@ -76,34 +77,70 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 			return;
 		}
 
-		for (String s : agent_ids) {
-			Packet p = new Packet();
-			p.setData(data);
-			logger.info("forewarding to " + s + ": " + p);
-			if (Data.isAgenOnline(s)) {
-				if (automationAction == AutomationAction.start) {
-					logger.info("starting new automation");
-					Automation automation = new Automation();
-					Persistence.save(automation);
-					automation_ids = new ArrayList<Integer>();
-					automation_ids.add(automation.getId());
-					data.put(PacketKeys.AUTOMATION_ID, automation.getId());
-				}
-
-				if (automation_ids == null)
-					continue;
-
-				for (Integer id : automation_ids) {
-					if (automationAction != AutomationAction.listen) {
-						logger.info("forward command");
-						Data.getConnection(s).forward(p);
+		switch (automationAction) {
+			case stop:
+				logger.debug("action stop");
+				for (Integer i : automation_ids) {
+					Automation a = (Automation) Persistence.get(Automation.class, i);
+					if (a == null) {
+						logger.warn("cant stop unknown automation with id: " + i);
+						continue;
 					}
-
-					Data.addAutomationStatusListerner(id, this);
+					String a_id = a.getAgent().getId();
+					if (Data.isAgenOnline(a_id)) {
+						Connection c = Data.getConnection(a_id);
+						Map<String, Object> d = new HashMap<String, Object>();
+						d.put(PacketKeys.TYPE, PacketType.AUTOMATION_CONTROL);
+						d.put(PacketKeys.AUTOMATION_ACTION, automationAction.toString());
+						d.put(PacketKeys.AUTOMATION_ID, i);
+						Packet p = new Packet();
+						p.setData(d);
+						c.forward(p);
+					}
 				}
-			} else {
-				statusChanged(0, AutomationStatus.start_failed, "Agent not online");
-			}
+				break;
+			case listen:
+				logger.debug("action listen");
+				for (Integer i : automation_ids) {
+					Data.addAutomationStatusListerner(i, this);
+				}
+				break;
+			case start:
+				logger.debug("action start");
+				for (String s : agent_ids) {
+					Packet p = new Packet();
+					p.setData(data);
+					logger.info("forewarding to " + s + ": " + p);
+					if (Data.isAgenOnline(s)) {
+						if (automationAction == AutomationAction.start) {
+							logger.info("starting new automation");
+							Automation automation = new Automation();
+							automation.setAgent((Agent) Persistence.get(Agent.class, s));
+							Persistence.save(automation);
+							automation_ids = new ArrayList<Integer>();
+							automation_ids.add(automation.getId());
+							data.put(PacketKeys.AUTOMATION_ID, automation.getId());
+						}
+
+						if (automation_ids == null)
+							continue;
+
+						for (Integer id : automation_ids) {
+							if (automationAction != AutomationAction.listen) {
+								logger.info("forward command");
+								Data.getConnection(s).forward(p);
+							}
+
+							Data.addAutomationStatusListerner(id, this);
+						}
+					} else {
+						statusChanged(0, AutomationStatus.start_failed, "Agent not online");
+					}
+				}
+				break;
+			default:
+				logger.warn("unexpected action: " + automationAction);
+				break;
 		}
 	}
 

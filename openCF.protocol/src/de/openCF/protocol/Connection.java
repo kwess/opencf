@@ -11,14 +11,14 @@ import de.openCF.protocol.PacketHelper.Encoding;
 
 public class Connection implements Runnable {
 
-	private Logger			logger			= Logger.getLogger(Connection.class);
-	private Socket			socket			= null;
-	private Reader			packetReader	= null;
-	private Writer			packetWriter	= null;
-	private PacketHandler	packetHandler	= new DefaultPacketHandler();
-	private Encoding		encoding		= Encoding.JSON;
-	private boolean			debug			= false;
-	private boolean			running			= true;
+	private Logger				logger			= Logger.getLogger(Connection.class);
+	private Socket				socket			= null;
+	private Reader				packetReader	= null;
+	private Writer				packetWriter	= null;
+	private PacketHandler		packetHandler	= new DefaultPacketHandler();
+	private Encoding			encoding		= Encoding.JSON;
+	private boolean				debug			= false;
+	private volatile boolean	running			= true;
 
 	public Connection() {
 		logger.trace("new");
@@ -44,6 +44,8 @@ public class Connection implements Runnable {
 
 			packetReader.setInputStream(inputStream);
 			packetWriter.setOutputStream(outputStream);
+
+			packetHandler.handleOpen();
 		} catch (IOException e) {
 			logger.error("cant get stream from socket: " + e.getMessage());
 			return;
@@ -66,10 +68,12 @@ public class Connection implements Runnable {
 
 			} catch (IOException e) {
 				logger.error("error while reading from socket: " + e.getMessage());
-				packetHandler.handleClose();
 				running = false;
 			}
 		}
+
+		packetHandler.handleClose();
+
 		logger.trace("run finished");
 	}
 

@@ -1,21 +1,25 @@
 package de.openCF.protocol;
 
+import org.apache.log4j.Logger;
+
 public class DefaultPacketHandler implements PacketHandler {
+
+	private static Logger	logger	= Logger.getLogger(DefaultPacketHandler.class);
 
 	@Override
 	public void handlePacket(Packet packet) {
-		System.out.println("handlePacket");
-		System.out.println(packet.dump());
+		logger.trace("handlePacket(Packet)");
+		logger.debug(packet.dump());
 	}
 
 	@Override
 	public void handleClose() {
-		System.out.println("handleClose");
+		logger.trace("handleClose");
 	}
 
 	@Override
 	public void handleOpen() {
-		System.out.println("handleOpen");
+		logger.trace("handleOpen");
 	}
 
 }

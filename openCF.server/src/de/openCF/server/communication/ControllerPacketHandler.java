@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Session;
 
 import de.openCF.protocol.Connection;
 import de.openCF.protocol.Packet;
@@ -77,9 +76,6 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 			return;
 		}
 
-		Session session = Persistence.getSession();
-		session.beginTransaction();
-
 		for (String s : agent_ids) {
 			Packet p = new Packet();
 			p.setData(data);
@@ -88,7 +84,7 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 				if (automationAction == AutomationAction.start) {
 					logger.info("starting new automation");
 					Automation automation = new Automation();
-					session.save(automation);
+					Persistence.save(automation);
 					automation_ids = new ArrayList<Integer>();
 					automation_ids.add(automation.getId());
 					data.put(PacketKeys.AUTOMATION_ID, automation.getId());
@@ -109,8 +105,6 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 				statusChanged(0, AutomationStatus.start_failed, "Agent not online");
 			}
 		}
-
-		session.getTransaction().commit();
 	}
 
 	@Override

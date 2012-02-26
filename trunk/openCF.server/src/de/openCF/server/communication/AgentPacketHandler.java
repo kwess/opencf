@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Session;
 
 import de.openCF.protocol.Connection;
 import de.openCF.protocol.Packet;
@@ -91,14 +90,10 @@ public class AgentPacketHandler implements PacketHandler {
 			return;
 		}
 
-		Session session = Persistence.getSession();
-		session.beginTransaction();
-
-		Automation automation = (Automation) session.get(Automation.class, id);
+		Automation automation = (Automation) Persistence.get(Automation.class, id);
 
 		if (automation == null) {
 			logger.error("got statusupdate for not existing automation with id " + id);
-			session.getTransaction().commit();
 			return;
 		}
 
@@ -109,12 +104,10 @@ public class AgentPacketHandler implements PacketHandler {
 
 		if (automationStatus == AutomationStatus.talking) {
 			automation.setStatus(automationStatus);
-			session.update(automation);
+			Persistence.update(automation);
 		}
 
-		session.save(message2db);
-
-		session.getTransaction().commit();
+		Persistence.save(message2db);
 
 		Data.notifyAutomationStatusListener(id, automationStatus, message);
 
@@ -136,10 +129,7 @@ public class AgentPacketHandler implements PacketHandler {
 		heartbeat.setAgent_localtime(agent_localtime);
 		heartbeat.setAgent(this.agent);
 
-		Session session = Persistence.getSession();
-		session.beginTransaction();
-		session.save(heartbeat);
-		session.getTransaction().commit();
+		Persistence.save(heartbeat);
 
 		logger.trace("handleAgentHeartbeat finished");
 	}
@@ -161,10 +151,7 @@ public class AgentPacketHandler implements PacketHandler {
 			connection.setEncoding(e);
 		}
 
-		Session session = Persistence.getSession();
-		session.beginTransaction();
-
-		Agent agent = (Agent) session.get(Agent.class, agent_id);
+		Agent agent = (Agent) Persistence.get(Agent.class, agent_id);
 		Server server = Data.getServer();
 
 		boolean agentOnline = false;
@@ -187,7 +174,7 @@ public class AgentPacketHandler implements PacketHandler {
 			agent.setUpdated(new Date());
 
 			this.agent = agent;
-			session.save(agent);
+			Persistence.save(agent);
 
 			Data.addConnection(agent_id, connection);
 
@@ -206,7 +193,7 @@ public class AgentPacketHandler implements PacketHandler {
 			agent.setUpdated(new Date());
 
 			this.agent = agent;
-			session.update(agent);
+			Persistence.update(agent);
 
 			Data.addConnection(agent_id, connection);
 
@@ -233,8 +220,6 @@ public class AgentPacketHandler implements PacketHandler {
 			registered = false;
 		}
 
-		session.getTransaction().commit();
-
 		Packet p = new Packet();
 		p.setData(response);
 
@@ -253,14 +238,9 @@ public class AgentPacketHandler implements PacketHandler {
 			return;
 		}
 
-		Session session = Persistence.getSession();
-		session.beginTransaction();
-
 		agent.setStatus(Agent.Status.OFFLINE);
 		agent.setUpdated(new Date());
-		session.update(agent);
-
-		session.getTransaction().commit();
+		Persistence.update(agent);
 
 		Data.removeConnection(agent.getId());
 

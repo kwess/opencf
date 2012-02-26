@@ -9,7 +9,6 @@ import java.util.Properties;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Session;
 
 import de.openCF.protocol.PacketHelper.Encoding;
 import de.openCF.server.communication.Acceptor;
@@ -70,10 +69,7 @@ public class Server implements Runnable {
 		server.setId(server_id);
 		Data.setServer(server);
 
-		Session session = Persistence.getSession();
-		session.beginTransaction();
-		session.saveOrUpdate(server);
-		session.getTransaction().commit();
+		Persistence.saveOrUpdate(server);
 
 		Integer agentPort = Integer.parseInt(this.properties.getProperty(AGENT_PORT, "12345"));
 		Boolean agentNeedsClientAuth = Boolean.parseBoolean(this.properties.getProperty(AGENT_NEEDSCLIENTAUTH, "false"));

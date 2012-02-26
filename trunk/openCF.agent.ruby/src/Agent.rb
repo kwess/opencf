@@ -2,6 +2,8 @@ require('socket')
 require('json')
 require('logger')
 require('yaml')
+require('fileutils')
+require('net/http')
 require('src/protocol')
 
 
@@ -36,6 +38,7 @@ class Agent
     @hostname = host
     @port = port
     @mutex = Mutex.new
+    @jobs = Hash.new
   end
   
   
@@ -128,21 +131,107 @@ class Agent
     case action
     when Protocol::Action::START
       $logger.info "automation start action"
+      Thread.abort_on_exception = true
       thread = Thread.new {
-        send(Protocol::automation_status(id, Protocol::Status::STARTED, "started"))
-        IO.popen("D:/test.bat", "r+")  do |pipe|
-          pipe.sync = true
-          while str = pipe.gets
-              puts str
-              send (Protocol::automation_status(id, Protocol::Status::TALKING, str))
-            end
+        $logger.info("job thread started")
+        $logger.debug(@jobs)
+        @jobs[id] = Hash.new
+        $logger.debug(@jobs[id])
+        send(Protocol::automation_status(id, Protocol::Status::PREPARING, "prepareing"))
+        ret = loadJob(json)
+        if (ret == true)
+          send(Protocol::automation_status(id, Protocol::Status::PREPARED, "prepared"))
+        else
+          send(Protocol::automation_status(id, Protocol::Status::PREPARE_FAILED, "prepare_failed"))
         end
+        send(Protocol::automation_status(id, Protocol::Status::STARTED, "started"))
+        Dir.chdir("executing/#{id}") do
+          IO.popen("#{@jobs[id]['descriptor']['command']}", "r+")  do |pipe|
+            pipe.sync = true
+            while str = pipe.gets
+                puts str
+                send (Protocol::automation_status(id, Protocol::Status::TALKING, str))
+              end
+          end
+        end
+        removeJobDir(id)
         send(Protocol::automation_status(id, Protocol::Status::FINISHED, "finished"))
       }
     when Protocol::Action::STOP
       $logger.info "automation stop action"
     end
     
+  end
+  
+  
+  def createJobDir(id)
+    begin
+      Dir.chdir("executing") do
+        puts Dir.pwd
+        Dir::mkdir("#{id}")
+      end
+      return true
+    rescue
+      $logger.warn("job dir already exists")
+      return false
+    end
+  end
+  
+  
+  def removeJobDir(id)
+    FileUtils.rm_rf("executing/#{id}")
+  end
+  
+  
+  def loadJob(json)
+    url = json[Protocol::Keys::REPOSTITORY_URL]
+    descriptor = json[Protocol::Keys::AUTOMATION_DESCRIPTOR]
+    id = json[Protocol::Keys::AUTOMATION_ID]
+
+    descriptorUri = URI(url + descriptor)
+    
+    $logger.debug("url: #{url}")
+    $logger.debug("descriptor: #{descriptor}")
+    $logger.debug("id: #{id}")
+    
+    $logger.debug("descriptorUri: #{descriptorUri}")
+    
+    resp = Net::HTTP.get(descriptorUri)
+    
+    $logger.debug("loaded data: #{resp}")
+    
+    descriptor = JSON.parse(resp)
+    
+    $logger.info("descriptor loaded: #{descriptor}")
+    
+    @jobs[id]['descriptor'] = descriptor
+    
+    uri = URI(url + descriptor['file'])
+      
+    $logger.debug("job uri: #{uri}")
+    
+    Net::HTTP.start(uri.host, uri.port) do |http|
+      request = Net::HTTP::Get.new uri.request_uri
+    
+      createJobDir(id)
+      
+      http.request request do |response|
+      case response
+        when Net::HTTPOK
+          Dir.chdir "executing/#{id}" do
+            open "#{descriptor['file']}", 'w' do |io|
+              response.read_body do |chunk|
+                io.write chunk
+              end
+            end
+          end
+          return true
+        when Net::HTTPNotFound
+          $logger.warn("job not found")
+          return false
+        end
+      end
+    end
   end
   
   
@@ -158,7 +247,7 @@ class Agent
   
 end
 
-
+#{type:13, agent_id:["ruby_agent"], automation_action:"start","repository_url":"http://localhost:8080/jobs/", "automation_descriptor":"test.json"}
 $hn = Socket.gethostname
 if ($agent_id != nil)
   $hn = $agent_id

@@ -10,19 +10,22 @@ module Protocol
   end
   
   module Keys
-    TYPE                = "type"
-    SUCCESSFULL         = "successfull"
-    RETURN_CODE         = "return_code"
-    MESSAGE             = "message"
-    AGENT_ID            = "agent_id"
-    AGENT_VERSION       = "agent_version"
-    AGENT_PLATTFORM     = "agent_plattform"
-    AGENT_ENCODING      = "agent_encoding"
-    AUTOMATION_STATUS   = "automation_status"
-    AUTOMATION_ACTION   = "automation_action"
-    AUTOMATION_ID       = "automation_id"
-    AUTOMATION_MESSAGE  = "automation_message"
-    LOCAL_TIME          = "local_time"
+    TYPE                  = "type"
+    SUCCESSFULL           = "successfull"
+    RETURN_CODE           = "return_code"
+    MESSAGE               = "message"
+    AGENT_ID              = "agent_id"
+    AGENT_VERSION         = "agent_version"
+    AGENT_PLATTFORM       = "agent_plattform"
+    AGENT_ENCODING        = "agent_encoding"
+    AUTOMATION_STATUS     = "automation_status"
+    AUTOMATION_ACTION     = "automation_action"
+    AUTOMATION_ID         = "automation_id"
+    AUTOMATION_MESSAGE    = "automation_message"
+    AUTOMATION_DESCRIPTOR = "automation_descriptor"
+    AUTOMATION_PARAMETER  = "automation_parameter"
+    REPOSTITORY_URL       = "repository_url"
+    LOCAL_TIME            = "local_time"
   end
   
   module Action
@@ -31,10 +34,14 @@ module Protocol
   end
   
   module Status
-    STARTED   = "started"
-    STOPED    = "stoped"
-    FINISHED  = "finished"
-    TALKING   = "talking"
+    STARTED         = "started"
+    STOPED          = "stoped"
+    FINISHED        = "finished"
+    TALKING         = "talking"
+    PREPARING       = "preparing"
+    PREPARED        = "prepared"
+    PREPARE_FAILED  = "prepare_failed"
+    START_FAILED    = "start_failed"
   end
   
   def Protocol.htonl(h)

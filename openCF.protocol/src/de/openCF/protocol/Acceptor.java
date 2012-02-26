@@ -1,4 +1,4 @@
-package de.openCF.server.communication;
+package de.openCF.protocol;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -14,8 +14,6 @@ import javax.net.ssl.SSLSocket;
 
 import org.apache.log4j.Logger;
 
-import de.openCF.protocol.Connection;
-import de.openCF.protocol.ConnectionFactory;
 
 public class Acceptor implements Runnable {
 

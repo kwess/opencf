@@ -99,13 +99,13 @@ public class Controller implements Runnable {
 					list.add(args[i]);
 
 				Map<String, Object> data = new HashMap<String, Object>();
-				data.put(PacketKeys.TYPE, 13);
+				data.put(PacketKeys.TYPE, PacketType.AUTOMATION_CONTROL);
 				data.put(PacketKeys.AUTOMATION_ACTION, args[0]);
 				if ("start".equals(args[0])) {
 					data.put(PacketKeys.AUTOMATION_DESCRIPTOR, args[1]);
 					data.put(PacketKeys.REPOSITORY_URL, "http://localhost:8080/jobs/");
 					data.put(PacketKeys.AGENT_ID, list);
-				} else if ("stop".equals(args[0])) {
+				} else if ("stop".equals(args[0]) || "listen".equals(args[0])) {
 					data.put(PacketKeys.AUTOMATION_ID, list);
 				}
 

@@ -4,14 +4,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.ByteOrder;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 
-import de.openCF.protocol.Acceptor;
 import de.openCF.protocol.PacketHelper.Encoding;
+import de.openCF.server.communication.Acceptor;
 import de.openCF.server.communication.AgentConnectionFactory;
 import de.openCF.server.communication.ControllerConnectionFactory;
 import de.openCF.server.persistence.Persistence;
@@ -64,12 +66,7 @@ public class Server implements Runnable {
 
 		logger.debug("native byte order: " + byteOrder);
 
-		String server_id = this.properties.getProperty(SERVER_ID);
-		de.openCF.server.data.Server server = new de.openCF.server.data.Server();
-		server.setId(server_id);
-		Data.setServer(server);
-
-		Persistence.saveOrUpdate(server);
+		logger.info("loading settings");
 
 		Integer agentPort = Integer.parseInt(this.properties.getProperty(AGENT_PORT, "12345"));
 		Boolean agentNeedsClientAuth = Boolean.parseBoolean(this.properties.getProperty(AGENT_NEEDSCLIENTAUTH, "false"));
@@ -78,6 +75,40 @@ public class Server implements Runnable {
 		Boolean agentDebug = Boolean.parseBoolean(this.properties.getProperty(AGENT_DEBUG, "false"));
 		Encoding agentEncoding = Encoding.valueOf(this.properties.getProperty(AGENT_PROTOCOL_ENCODING));
 
+		Integer controllerPort = Integer.parseInt(this.properties.getProperty(CONTROLLER_PORT, "12346"));
+		Boolean controllerNeedsClientAuth = Boolean.parseBoolean(this.properties.getProperty(CONTROLLER_NEEDSCLIENTAUTH, "false"));
+		Integer controllerConnectionPoolSize = Integer.parseInt(this.properties.getProperty(CONTROLLER_POOLSIZE, "1024"));
+		Boolean controllerUseSSL = Boolean.parseBoolean(this.properties.getProperty(CONTROLLER_USE_SSL, "false"));
+		Boolean controllerDebug = Boolean.parseBoolean(this.properties.getProperty(CONTROLLER_DEBUG, "false"));
+
+		String hostname = "unknown";
+		try {
+			hostname = InetAddress.getLocalHost().getHostName();
+			logger.debug("got hostname: " + hostname);
+		} catch (UnknownHostException e) {
+			logger.warn("cant get hostname of localhost", e);
+		}
+
+		String server_id = this.properties.getProperty(SERVER_ID);
+		de.openCF.server.data.Server server = (de.openCF.server.data.Server) Persistence.get(Server.class, server_id);
+		if (server != null) {
+			logger.info("server loaded");
+		} else {
+			logger.info("server online for first time");
+			server = new de.openCF.server.data.Server(server_id);
+		}
+		server.setAgentPort(agentPort);
+		server.setControllerPort(controllerPort);
+		if (!server.getHostname().equals(hostname))
+			logger.warn("server switched system since last startup: " + server.getHostname() + " --> " + hostname);
+		server.setHostname(hostname);
+
+		logger.info("publish server");
+		Data.setServer(server);
+		Persistence.saveOrUpdate(server);
+
+		logger.debug("createing acceptor for agents");
+
 		Acceptor acceptorAgents = new Acceptor();
 		acceptorAgents.setPort(agentPort);
 		acceptorAgents.setNeedsClientAuth(agentNeedsClientAuth);
@@ -85,11 +116,7 @@ public class Server implements Runnable {
 		acceptorAgents.setUseSSL(agentUseSSL);
 		acceptorAgents.setConnectionFactory(new AgentConnectionFactory(agentDebug, agentEncoding));
 
-		Integer controllerPort = Integer.parseInt(this.properties.getProperty(CONTROLLER_PORT, "12346"));
-		Boolean controllerNeedsClientAuth = Boolean.parseBoolean(this.properties.getProperty(CONTROLLER_NEEDSCLIENTAUTH, "false"));
-		Integer controllerConnectionPoolSize = Integer.parseInt(this.properties.getProperty(CONTROLLER_POOLSIZE, "1024"));
-		Boolean controllerUseSSL = Boolean.parseBoolean(this.properties.getProperty(CONTROLLER_USE_SSL, "false"));
-		Boolean controllerDebug = Boolean.parseBoolean(this.properties.getProperty(CONTROLLER_DEBUG, "false"));
+		logger.debug("createing acceptor for controllers");
 
 		Acceptor acceptorControllers = new Acceptor();
 		acceptorControllers.setPort(controllerPort);
@@ -97,6 +124,9 @@ public class Server implements Runnable {
 		acceptorControllers.setConnectionPoolSize(controllerConnectionPoolSize);
 		acceptorControllers.setUseSSL(controllerUseSSL);
 		acceptorControllers.setConnectionFactory(new ControllerConnectionFactory(controllerDebug));
+
+		logger.info("server online");
+		logger.debug(server);
 
 		logger.info("starting acceptor for agents");
 		Executors.newSingleThreadExecutor().execute(acceptorAgents);

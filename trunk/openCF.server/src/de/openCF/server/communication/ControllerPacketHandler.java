@@ -16,6 +16,7 @@ import de.openCF.server.Data;
 import de.openCF.server.data.Agent;
 import de.openCF.server.data.Automation;
 import de.openCF.server.data.AutomationAction;
+import de.openCF.server.data.AutomationControl;
 import de.openCF.server.data.AutomationStatus;
 import de.openCF.server.persistence.Persistence;
 
@@ -82,12 +83,20 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 				logger.debug("action stop");
 				for (Integer i : automation_ids) {
 					Automation a = (Automation) Persistence.get(Automation.class, i);
+					AutomationControl automationControl = new AutomationControl();
+					automationControl.setAutomation(a);
+					automationControl.setAction(automationAction);
+
 					if (a == null) {
 						logger.warn("cant stop unknown automation with id: " + i);
+						automationControl.setSuccessfull(false);
 						continue;
 					}
+
 					String a_id = a.getAgent().getId();
 					if (Data.isAgenOnline(a_id)) {
+						automationControl.setSuccessfull(true);
+
 						Connection c = Data.getConnection(a_id);
 						Map<String, Object> d = new HashMap<String, Object>();
 						d.put(PacketKeys.TYPE, PacketType.AUTOMATION_CONTROL);
@@ -96,13 +105,30 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 						Packet p = new Packet();
 						p.setData(d);
 						c.forward(p);
+					} else {
+						automationControl.setSuccessfull(false);
 					}
+
+					Persistence.save(automationControl);
 				}
 				break;
 			case listen:
 				logger.debug("action listen");
 				for (Integer i : automation_ids) {
 					Data.addAutomationStatusListerner(i, this);
+
+					Automation a = (Automation) Persistence.get(Automation.class, i);
+					AutomationControl automationControl = new AutomationControl();
+					automationControl.setAutomation(a);
+					automationControl.setAction(automationAction);
+
+					if (a == null) {
+						logger.warn("cant listen to unknown automation with id: " + i);
+						automationControl.setSuccessfull(false);
+						continue;
+					}
+
+					Persistence.save(automationControl);
 				}
 				break;
 			case start:
@@ -111,6 +137,10 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 					Packet p = new Packet();
 					p.setData(data);
 					logger.info("forewarding to " + s + ": " + p);
+
+					AutomationControl automationControl = new AutomationControl();
+					automationControl.setAction(automationAction);
+
 					if (Data.isAgenOnline(s)) {
 						if (automationAction == AutomationAction.start) {
 							logger.info("starting new automation");
@@ -120,6 +150,8 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 							automation_ids = new ArrayList<Integer>();
 							automation_ids.add(automation.getId());
 							data.put(PacketKeys.AUTOMATION_ID, automation.getId());
+
+							automationControl.setAutomation(automation);
 						}
 
 						if (automation_ids == null)
@@ -134,8 +166,11 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 							Data.addAutomationStatusListerner(id, this);
 						}
 					} else {
+						automationControl.setSuccessfull(false);
 						statusChanged(0, AutomationStatus.start_failed, "Agent not online");
 					}
+
+					Persistence.save(automationControl);
 				}
 				break;
 			default:

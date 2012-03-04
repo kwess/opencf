@@ -90,6 +90,10 @@ public class Data {
 		logger.debug("Automation Status: " + status);
 		logger.debug("Automation Message: " + message);
 		List<AutomationStatusListener> list = Data.automationStatusListener.get(aid);
+		if (list == null) {
+			logger.warn("no listeners to inform");
+			return;
+		}
 		for (AutomationStatusListener l : list) {
 			logger.debug("notify " + l);
 			l.statusChanged(aid, status, message);

@@ -3,8 +3,6 @@ package de.openCF.server.data;
 import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
@@ -21,7 +19,6 @@ public class Automation {
 	@Id
 	@GeneratedValue
 	private Integer				id			= null;
-	@Enumerated(value = EnumType.STRING)
 	private AutomationStatus	status		= AutomationStatus.unknown;
 	@OneToMany
 	@JoinTable(name = "automation2messages")
@@ -63,7 +60,8 @@ public class Automation {
 
 	@Override
 	public String toString() {
-		return "Automation [id=" + id + ", status=" + status + ", messages=" + messages.size() + ", agent=" + agent.getId() + "]";
+		int size = messages != null ? messages.size() : 0;
+		return "Automation [id=" + id + ", status=" + status + ", messages=" + size + ", agent=" + agent.getId() + "]";
 	}
 
 }

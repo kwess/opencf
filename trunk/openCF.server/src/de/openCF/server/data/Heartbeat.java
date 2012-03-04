@@ -54,4 +54,9 @@ public class Heartbeat {
 		this.agent = agent;
 	}
 
+	@Override
+	public String toString() {
+		return "Heartbeat [id=" + id + ", agent=" + agent.getId() + ", agent_localtime=" + agent_localtime + ", server_receive=" + server_receive + "]";
+	}
+
 }

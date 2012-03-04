@@ -1,8 +1,6 @@
 package de.openCF.server.data;
 
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -19,7 +17,6 @@ public class Message {
 	private Integer				id			= null;
 	@ManyToOne
 	private Automation			automation	= null;
-	@Enumerated(value = EnumType.STRING)
 	private AutomationStatus	status		= AutomationStatus.unknown;
 	private String				message		= null;
 

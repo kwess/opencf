@@ -12,8 +12,8 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 
+import de.openCF.protocol.Acceptor;
 import de.openCF.protocol.PacketHelper.Encoding;
-import de.openCF.server.communication.Acceptor;
 import de.openCF.server.communication.AgentConnectionFactory;
 import de.openCF.server.communication.ControllerConnectionFactory;
 import de.openCF.server.persistence.Persistence;

@@ -1,5 +1,8 @@
 package de.openCF.server.data;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public enum AutomationStatus {
 	unknown, preparing, prepared, started, paused, resumed, finished, stopped, start_failed, prepare_failed, pause_failed, resume_failed, stopped_failed, talking, timeout;
 

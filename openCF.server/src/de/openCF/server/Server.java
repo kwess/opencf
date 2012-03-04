@@ -90,7 +90,7 @@ public class Server implements Runnable {
 		}
 
 		String server_id = this.properties.getProperty(SERVER_ID);
-		de.openCF.server.data.Server server = (de.openCF.server.data.Server) Persistence.get(Server.class, server_id);
+		de.openCF.server.data.Server server = (de.openCF.server.data.Server) Persistence.get(de.openCF.server.data.Server.class, server_id);
 		if (server != null) {
 			logger.info("server loaded");
 		} else {
@@ -99,7 +99,7 @@ public class Server implements Runnable {
 		}
 		server.setAgentPort(agentPort);
 		server.setControllerPort(controllerPort);
-		if (!server.getHostname().equals(hostname))
+		if (!hostname.equals(server.getHostname()))
 			logger.warn("server switched system since last startup: " + server.getHostname() + " --> " + hostname);
 		server.setHostname(hostname);
 

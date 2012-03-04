@@ -61,4 +61,9 @@ public class Automation {
 		this.agent = agent;
 	}
 
+	@Override
+	public String toString() {
+		return "Automation [id=" + id + ", status=" + status + ", messages=" + messages.size() + ", agent=" + agent.getId() + "]";
+	}
+
 }

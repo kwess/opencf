@@ -102,56 +102,8 @@ public class Agent {
 
 	@Override
 	public String toString() {
-		return "Agent [id=" + id + ", version=" + version + ", plattform=" + plattform + ", status=" + status + ", server=" + server + ", updated=" + updated + "]";
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((plattform == null) ? 0 : plattform.hashCode());
-		result = prime * result + ((server == null) ? 0 : server.hashCode());
-		result = prime * result + ((status == null) ? 0 : status.hashCode());
-		result = prime * result + ((updated == null) ? 0 : updated.hashCode());
-		result = prime * result + ((version == null) ? 0 : version.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Agent other = (Agent) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (plattform != other.plattform)
-			return false;
-		if (server == null) {
-			if (other.server != null)
-				return false;
-		} else if (!server.equals(other.server))
-			return false;
-		if (status != other.status)
-			return false;
-		if (updated == null) {
-			if (other.updated != null)
-				return false;
-		} else if (!updated.equals(other.updated))
-			return false;
-		if (version == null) {
-			if (other.version != null)
-				return false;
-		} else if (!version.equals(other.version))
-			return false;
-		return true;
+		return "Agent [id=" + id + ", version=" + version + ", plattform=" + plattform + ", status=" + status + ", server=" + server.getId() + ", updated="
+				+ updated + "]";
 	}
 
 }

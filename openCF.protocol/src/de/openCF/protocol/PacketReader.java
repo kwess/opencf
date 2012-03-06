@@ -21,7 +21,7 @@ public class PacketReader extends Reader {
 		logger.trace("new(InputStream)");
 	}
 
-	public Packet readPacket() throws IOException {
+	public synchronized Packet readPacket() throws IOException {
 		logger.trace("readPacket(Encoding)");
 
 		Packet packet = new Packet();

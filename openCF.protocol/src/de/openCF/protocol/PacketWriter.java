@@ -21,7 +21,7 @@ public class PacketWriter extends Writer {
 		logger.trace("new(OutputStream)");
 	}
 
-	public int writePacket(Packet packet, Encoding encoding) throws IOException {
+	public synchronized int writePacket(Packet packet, Encoding encoding) throws IOException {
 		logger.trace("writePacket(Packet, Encoding)");
 
 		logger.trace("generating raw data");
@@ -47,7 +47,7 @@ public class PacketWriter extends Writer {
 		return sumBytes;
 	}
 
-	public int writePacket(Packet packet) throws IOException {
+	public synchronized int writePacket(Packet packet) throws IOException {
 		logger.trace("writePacket(Packet)");
 		return writePacket(packet, Encoding.JSON);
 	}

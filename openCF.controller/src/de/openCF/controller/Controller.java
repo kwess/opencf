@@ -24,6 +24,9 @@ import de.openCF.protocol.PacketWriter;
 
 public class Controller implements Runnable {
 
+	private Connection	c			= null;
+	private boolean		connected	= false;
+
 	public static void main(String[] args) {
 		Runnable runnable = new Controller();
 		runnable.run();
@@ -59,13 +62,9 @@ public class Controller implements Runnable {
 
 	}
 
-	@Override
-	public void run() {
-		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-		Connection c = null;
-
+	private boolean connect(String host) {
 		try {
-			Socket socket = new Socket("localhost", 6789);
+			Socket socket = new Socket(host, 6789);
 			c = new Connection();
 			c.setReader(new PacketReader());
 			c.setWriter(new PacketWriter());
@@ -75,11 +74,17 @@ public class Controller implements Runnable {
 			Executors.newSingleThreadExecutor().execute(c);
 		} catch (UnknownHostException e1) {
 			System.err.println("! " + e1.getMessage());
-			return;
+			return false;
 		} catch (IOException e1) {
 			System.err.println("! " + e1.getMessage());
-			return;
+			return false;
 		}
+		return true;
+	}
+
+	@Override
+	public void run() {
+		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
 		do {
 			try {
@@ -89,9 +94,24 @@ public class Controller implements Runnable {
 					continue;
 
 				String[] args = line.split(" ");
-				if (args.length < 2) {
+				if (args.length < 2 && !"logout".equals(args[0])) {
 					System.err.println("! not enough arguments");
 					continue;
+				}
+
+				if (!connected && !"connect".equals(args[0])) {
+					System.err.println("! yre not connected");
+					continue;
+				} else if (!connected && "connect".equals(args[0])) {
+					this.connected = connect(args[1]);
+					if (!connected)
+						System.err.println("! connect failed");
+					continue;
+				} else if (connected && "connect".equals(args[0])) {
+					System.err.println("! yre already connected");
+					continue;
+				} else if (connected && "logout".equals(args[0])) {
+					System.exit(0);
 				}
 
 				List<String> list = new ArrayList<String>();
@@ -119,6 +139,6 @@ public class Controller implements Runnable {
 				System.err.println("! failed reading line");
 				break;
 			}
-		} while (true);
+		} while (connected);
 	}
 }

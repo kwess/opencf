@@ -73,6 +73,12 @@ public class Connection implements Runnable {
 		}
 
 		packetHandler.handleClose();
+
+		try {
+			socket.close();
+		} catch (IOException e) {
+			logger.warn("disconnect failed: " + e.getMessage());
+		}
 	}
 
 	public void setSocket(Socket socket) {

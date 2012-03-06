@@ -17,12 +17,12 @@ import de.openCF.server.data.Heartbeat;
 import de.openCF.server.data.Message;
 import de.openCF.server.data.Server;
 
-public abstract class Persistence {
+public class Persistence {
 
 	private static Logger				logger	= Logger.getLogger(Persistence.class);
 	public static final Configuration	CONFIGURATION;
 	protected static SessionFactory		SESSION_FACTORY;
-	protected static Session			session;
+	protected Session					session;
 
 	static {
 		logger.trace("static");
@@ -40,10 +40,17 @@ public abstract class Persistence {
 
 		logger.info("building session factory");
 		SESSION_FACTORY = CONFIGURATION.buildSessionFactory();
+	}
+
+	private Persistence() {
 		session = getSession();
 	}
 
-	protected synchronized static Session getSession() {
+	public synchronized static Persistence getInstance() {
+		return new Persistence();
+	}
+
+	protected synchronized Session getSession() {
 		logger.trace("getSession");
 		if (session == null || !session.isConnected()) {
 			logger.info("open fresh session");
@@ -52,7 +59,7 @@ public abstract class Persistence {
 		return session;
 	}
 
-	public synchronized static Object save(Object o) {
+	public synchronized Object save(Object o) {
 		logger.trace("save(Object)");
 		Transaction transaction = session.beginTransaction();
 		Object id = session.save(o);
@@ -61,7 +68,7 @@ public abstract class Persistence {
 		return id;
 	}
 
-	public synchronized static void saveOrUpdate(Object o) {
+	public synchronized void saveOrUpdate(Object o) {
 		logger.trace("saveOrUpdate(Object)");
 		Transaction transaction = session.beginTransaction();
 		session.saveOrUpdate(o);
@@ -69,7 +76,7 @@ public abstract class Persistence {
 		transaction.commit();
 	}
 
-	public synchronized static void delete(Object o) {
+	public synchronized void delete(Object o) {
 		logger.trace("delete(Object)");
 		Transaction transaction = session.beginTransaction();
 		session.delete(o);
@@ -77,7 +84,7 @@ public abstract class Persistence {
 		transaction.commit();
 	}
 
-	public synchronized static void update(Object o) {
+	public synchronized void update(Object o) {
 		logger.trace("update(Object)");
 		Transaction transaction = session.beginTransaction();
 		session.update(o);
@@ -85,7 +92,7 @@ public abstract class Persistence {
 		transaction.commit();
 	}
 
-	public synchronized static Object get(Class<?> c, Serializable id) {
+	public synchronized Object get(Class<?> c, Serializable id) {
 		logger.trace("get(Object)");
 		Object result = session.get(c, id);
 		logger.debug("loaded by Class [" + c.getSimpleName() + "] and id [" + id + "]: " + result);

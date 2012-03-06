@@ -148,6 +148,8 @@ class Agent
         Dir.chdir("executing/#{id}") do
           IO.popen("#{@jobs[id]['descriptor']['command']}", "r+")  do |pipe|
             pipe.sync = true
+            @jobs[id]['pid'] = pipe.pid
+            $logger.debug("job running with pid #{pipe.pid}")
             while str = pipe.gets
                 puts str
                 send (Protocol::automation_status(id, Protocol::Status::TALKING, str))
@@ -159,6 +161,10 @@ class Agent
       }
     when Protocol::Action::STOP
       $logger.info "automation stop action"
+      pid = @jobs[id]['pid']
+      Process.kill('TERM', pid)
+      $logger.info("process with pid #{pid} killed")
+      send (Protocol::automation_status(id, Protocol::Status::STOPED, "job stopped with TERM"))
     end
     
   end

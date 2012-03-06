@@ -1,6 +1,11 @@
 package de.openCF.server.data;
 
+import java.util.Date;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -11,10 +16,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Server {
 
 	@Id
-	private String	id				= null;
-	private String	hostname		= null;
-	private Integer	agentPort		= null;
-	private Integer	controllerPort	= null;
+	private String		id				= null;
+	private String		hostname		= null;
+	private Integer		agentPort		= null;
+	private Integer		controllerPort	= null;
+	@Enumerated(EnumType.STRING)
+	private Plattform	plattform		= null;
+	@Enumerated(EnumType.STRING)
+	private Status		status			= Status.OFFLINE;
+	@Column(nullable = false)
+	private Date		updated			= null;
 
 	public Server() {
 		super();
@@ -55,6 +66,30 @@ public class Server {
 
 	public void setControllerPort(Integer controllerPort) {
 		this.controllerPort = controllerPort;
+	}
+
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
+	}
+
+	public Plattform getPlattform() {
+		return plattform;
+	}
+
+	public void setPlattform(Plattform plattform) {
+		this.plattform = plattform;
+	}
+
+	public Date getUpdated() {
+		return updated;
+	}
+
+	public void setUpdated(Date updated) {
+		this.updated = updated;
 	}
 
 	@Override

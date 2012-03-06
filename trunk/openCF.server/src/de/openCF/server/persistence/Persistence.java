@@ -10,9 +10,7 @@ import org.hibernate.cfg.Configuration;
 
 import de.openCF.server.data.Agent;
 import de.openCF.server.data.Automation;
-import de.openCF.server.data.AutomationAction;
 import de.openCF.server.data.AutomationControl;
-import de.openCF.server.data.AutomationStatus;
 import de.openCF.server.data.Heartbeat;
 import de.openCF.server.data.Message;
 import de.openCF.server.data.Server;
@@ -35,8 +33,6 @@ public class Persistence {
 		CONFIGURATION.addAnnotatedClass(Automation.class);
 		CONFIGURATION.addAnnotatedClass(Message.class);
 		CONFIGURATION.addAnnotatedClass(AutomationControl.class);
-		CONFIGURATION.addAnnotatedClass(AutomationStatus.class);
-		CONFIGURATION.addAnnotatedClass(AutomationAction.class);
 
 		logger.info("building session factory");
 		SESSION_FACTORY = CONFIGURATION.buildSessionFactory();

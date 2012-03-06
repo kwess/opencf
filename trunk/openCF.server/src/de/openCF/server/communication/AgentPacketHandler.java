@@ -18,7 +18,9 @@ import de.openCF.server.data.Automation;
 import de.openCF.server.data.AutomationStatus;
 import de.openCF.server.data.Heartbeat;
 import de.openCF.server.data.Message;
+import de.openCF.server.data.Plattform;
 import de.openCF.server.data.Server;
+import de.openCF.server.data.Status;
 import de.openCF.server.persistence.Persistence;
 
 public class AgentPacketHandler implements PacketHandler {
@@ -165,7 +167,7 @@ public class AgentPacketHandler implements PacketHandler {
 		boolean agentConnectedToDifferendServer = false;
 
 		if (agent != null) {
-			agentOnline = agent.getStatus() == Agent.Status.OFFLINE ? false : true;
+			agentOnline = agent.getStatus() == Status.OFFLINE ? false : true;
 			agentConnectedToDifferendServer = server.getId().equals(agent.getServer().getId()) ? false : true;
 		}
 
@@ -178,8 +180,8 @@ public class AgentPacketHandler implements PacketHandler {
 
 			agent = new Agent();
 			agent.setId(agent_id);
-			agent.setPlattform(Agent.Plattform.valueOf(plattform.toUpperCase()));
-			agent.setStatus(Agent.Status.ONLINE);
+			agent.setPlattform(Plattform.valueOf(plattform.toUpperCase()));
+			agent.setStatus(Status.ONLINE);
 			agent.setVersion(version);
 			agent.setUpdated(new Date());
 
@@ -194,10 +196,10 @@ public class AgentPacketHandler implements PacketHandler {
 
 			setRegistered(true);
 		} else if (!agentOnline || (agentOnline && agentConnectedHere) || (agentOnline && !agentConnectedToDifferendServer)) {
-			logger.info("agent [" + agent_id + "] was known since " + agent.getUpdated() + ", but is offline, changing status to online, updating prefs");
+			logger.info("agent [" + agent_id + "] was last seen at " + agent.getUpdated() + ", but is offline, changing status to online, updating prefs");
 
-			agent.setStatus(Agent.Status.ONLINE);
-			agent.setPlattform(Agent.Plattform.valueOf(plattform.toUpperCase()));
+			agent.setStatus(Status.ONLINE);
+			agent.setPlattform(Plattform.valueOf(plattform.toUpperCase()));
 			agent.setVersion(version);
 			agent.setServer(server);
 			agent.setUpdated(new Date());
@@ -248,7 +250,7 @@ public class AgentPacketHandler implements PacketHandler {
 			return;
 		}
 
-		agent.setStatus(Agent.Status.OFFLINE);
+		agent.setStatus(Status.OFFLINE);
 		agent.setUpdated(new Date());
 		persistence.update(agent);
 

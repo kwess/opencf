@@ -4,6 +4,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -22,6 +24,7 @@ public class AutomationControl {
 	private Automation			automation	= null;
 	private boolean				successfull	= true;
 	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
 	private AutomationAction	action		= null;
 	@Column(nullable = false)
 	// TODO Der initiator muss noch verdratet werden
@@ -79,7 +82,7 @@ public class AutomationControl {
 
 	@Override
 	public String toString() {
-		return "AutomationControl [id=" + id + ", automation=" + automation.getId() + ", successfull=" + successfull + ", action=" + action + ", initiator=" + initiator + ", date=" + date + "]";
+		return "AutomationControl [id=" + id + ", automation=" + (automation != null ? automation.getId() : "?") + ", successfull=" + successfull + ", action=" + action + ", initiator=" + initiator + ", date=" + date + "]";
 	}
 
 }

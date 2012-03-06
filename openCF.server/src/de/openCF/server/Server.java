@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteOrder;
+import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 
@@ -16,6 +17,8 @@ import de.openCF.protocol.Acceptor;
 import de.openCF.protocol.PacketHelper.Encoding;
 import de.openCF.server.communication.AgentConnectionFactory;
 import de.openCF.server.communication.ControllerConnectionFactory;
+import de.openCF.server.data.Plattform;
+import de.openCF.server.data.Status;
 import de.openCF.server.persistence.Persistence;
 
 public class Server implements Runnable {
@@ -101,6 +104,9 @@ public class Server implements Runnable {
 		}
 		server.setAgentPort(agentPort);
 		server.setControllerPort(controllerPort);
+		server.setPlattform(Plattform.GENERIC);
+		server.setStatus(Status.ONLINE);
+		server.setUpdated(new Date());
 		if (!hostname.equals(server.getHostname()))
 			logger.warn("server switched system since last startup: " + server.getHostname() + " --> " + hostname);
 		server.setHostname(hostname);

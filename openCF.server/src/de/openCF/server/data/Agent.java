@@ -21,20 +21,12 @@ import de.openCF.server.Data;
 @XmlRootElement
 public class Agent {
 
-	public enum Plattform {
-		LINUX, UNIX, WINDOWS
-	};
-
-	public enum Status {
-		ONLINE, OFFLINE
-	};
-
 	@Id
 	private String			id			= null;
 	private String			version		= null;
-	@Enumerated(value = EnumType.STRING)
+	@Enumerated(EnumType.STRING)
 	private Plattform		plattform	= null;
-	@Enumerated(value = EnumType.STRING)
+	@Enumerated(EnumType.STRING)
 	private Status			status		= Status.OFFLINE;
 	@ManyToOne
 	private Server			server		= Data.getServer();
@@ -102,8 +94,7 @@ public class Agent {
 
 	@Override
 	public String toString() {
-		return "Agent [id=" + id + ", version=" + version + ", plattform=" + plattform + ", status=" + status + ", server=" + server.getId() + ", updated="
-				+ updated + "]";
+		return "Agent [id=" + id + ", version=" + version + ", plattform=" + plattform + ", status=" + status + ", server=" + server.getId() + ", updated=" + updated + "]";
 	}
 
 }

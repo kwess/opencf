@@ -23,11 +23,12 @@ import de.openCF.server.persistence.Persistence;
 
 public class AgentPacketHandler implements PacketHandler {
 
-	private static Logger	logger		= Logger.getLogger(AgentPacketHandler.class);
+	private static Logger		logger		= Logger.getLogger(AgentPacketHandler.class);
 
-	private Agent			agent		= null;
-	private Connection		connection	= null;
-	private boolean			registered	= false;
+	private Agent				agent		= null;
+	private Connection			connection	= null;
+	private boolean				registered	= false;
+	private static Persistence	persistence	= Persistence.getInstance();
 
 	public AgentPacketHandler(Connection c) {
 		logger.trace("new(Connection)");
@@ -92,7 +93,7 @@ public class AgentPacketHandler implements PacketHandler {
 			return;
 		}
 
-		Automation automation = (Automation) Persistence.get(Automation.class, id);
+		Automation automation = (Automation) persistence.get(Automation.class, id);
 
 		if (automation == null) {
 			logger.error("got statusupdate for not existing automation with id " + id);
@@ -107,12 +108,12 @@ public class AgentPacketHandler implements PacketHandler {
 		if (automationStatus == AutomationStatus.talking) {
 			logger.debug("automation [" + id + "] says: " + message);
 			automation.setStatus(automationStatus);
-			Persistence.update(automation);
+			persistence.update(automation);
 		} else {
 			logger.info("automation [" + id + "] notifies [" + automationStatus + "] " + message);
 		}
 
-		Persistence.save(message2db);
+		persistence.save(message2db);
 
 		Data.notifyAutomationStatusListener(id, automationStatus, message);
 
@@ -134,7 +135,7 @@ public class AgentPacketHandler implements PacketHandler {
 		heartbeat.setAgent_localtime(agent_localtime);
 		heartbeat.setAgent(this.agent);
 
-		Persistence.save(heartbeat);
+		persistence.save(heartbeat);
 
 		logger.trace("handleAgentHeartbeat finished");
 	}
@@ -156,7 +157,7 @@ public class AgentPacketHandler implements PacketHandler {
 			connection.setEncoding(e);
 		}
 
-		Agent agent = (Agent) Persistence.get(Agent.class, agent_id);
+		Agent agent = (Agent) persistence.get(Agent.class, agent_id);
 		Server server = Data.getServer();
 
 		boolean agentOnline = false;
@@ -183,7 +184,7 @@ public class AgentPacketHandler implements PacketHandler {
 			agent.setUpdated(new Date());
 
 			this.agent = agent;
-			Persistence.save(agent);
+			persistence.save(agent);
 
 			Data.addConnection(agent_id, connection);
 
@@ -202,7 +203,7 @@ public class AgentPacketHandler implements PacketHandler {
 			agent.setUpdated(new Date());
 
 			this.agent = agent;
-			Persistence.update(agent);
+			persistence.update(agent);
 
 			Data.addConnection(agent_id, connection);
 
@@ -249,7 +250,7 @@ public class AgentPacketHandler implements PacketHandler {
 
 		agent.setStatus(Agent.Status.OFFLINE);
 		agent.setUpdated(new Date());
-		Persistence.update(agent);
+		persistence.update(agent);
 
 		Data.removeConnection(agent.getId());
 

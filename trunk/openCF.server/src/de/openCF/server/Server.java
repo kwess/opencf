@@ -62,6 +62,8 @@ public class Server implements Runnable {
 	public void run() {
 		logger.trace("run");
 
+		Persistence persistence = Persistence.getInstance();
+
 		ByteOrder byteOrder = ByteOrder.nativeOrder();
 
 		logger.debug("native byte order: " + byteOrder);
@@ -90,7 +92,7 @@ public class Server implements Runnable {
 		}
 
 		String server_id = this.properties.getProperty(SERVER_ID);
-		de.openCF.server.data.Server server = (de.openCF.server.data.Server) Persistence.get(de.openCF.server.data.Server.class, server_id);
+		de.openCF.server.data.Server server = (de.openCF.server.data.Server) persistence.get(de.openCF.server.data.Server.class, server_id);
 		if (server != null) {
 			logger.info("server loaded");
 		} else {
@@ -105,7 +107,7 @@ public class Server implements Runnable {
 
 		logger.info("publish server");
 		Data.setServer(server);
-		Persistence.saveOrUpdate(server);
+		persistence.saveOrUpdate(server);
 
 		logger.debug("createing acceptor for agents");
 

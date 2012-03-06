@@ -22,9 +22,9 @@ import de.openCF.server.persistence.Persistence;
 
 public class ControllerPacketHandler implements PacketHandler, AutomationStatusListener {
 
-	private static Logger	logger		= Logger.getLogger(ControllerPacketHandler.class);
-
-	private Connection		connection	= null;
+	private static Logger		logger		= Logger.getLogger(ControllerPacketHandler.class);
+	private static Persistence	persistence	= Persistence.getInstance();
+	private Connection			connection	= null;
 
 	public ControllerPacketHandler(Connection controllerConnection) {
 		this.connection = controllerConnection;
@@ -82,7 +82,7 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 			case stop:
 				logger.debug("action stop");
 				for (Integer i : automation_ids) {
-					Automation a = (Automation) Persistence.get(Automation.class, i);
+					Automation a = (Automation) persistence.get(Automation.class, i);
 					AutomationControl automationControl = new AutomationControl();
 					automationControl.setAutomation(a);
 					automationControl.setAction(automationAction);
@@ -109,7 +109,7 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 						automationControl.setSuccessfull(false);
 					}
 
-					Persistence.save(automationControl);
+					persistence.save(automationControl);
 				}
 				break;
 			case listen:
@@ -117,7 +117,7 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 				for (Integer i : automation_ids) {
 					Data.addAutomationStatusListerner(i, this);
 
-					Automation a = (Automation) Persistence.get(Automation.class, i);
+					Automation a = (Automation) persistence.get(Automation.class, i);
 					AutomationControl automationControl = new AutomationControl();
 					automationControl.setAutomation(a);
 					automationControl.setAction(automationAction);
@@ -128,7 +128,7 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 						continue;
 					}
 
-					Persistence.save(automationControl);
+					persistence.save(automationControl);
 				}
 				break;
 			case start:
@@ -145,8 +145,8 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 						if (automationAction == AutomationAction.start) {
 							logger.info("starting new automation");
 							Automation automation = new Automation();
-							automation.setAgent((Agent) Persistence.get(Agent.class, s));
-							Persistence.save(automation);
+							automation.setAgent((Agent) persistence.get(Agent.class, s));
+							persistence.save(automation);
 							automation_ids = new ArrayList<Integer>();
 							automation_ids.add(automation.getId());
 							data.put(PacketKeys.AUTOMATION_ID, automation.getId());
@@ -170,7 +170,7 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 						statusChanged(0, AutomationStatus.start_failed, "Agent not online");
 					}
 
-					Persistence.save(automationControl);
+					persistence.save(automationControl);
 				}
 				break;
 			default:

@@ -154,7 +154,7 @@ public class AgentPacketHandler implements PacketHandler {
 		String encoding = (String) data.get(PacketKeys.AGENT_ENCODING);
 
 		if (encoding != null && !"".equals(encoding)) {
-			Encoding e = Encoding.valueOf(encoding);
+			Encoding e = Encoding.valueOf(encoding.toUpperCase());
 			logger.info("agent requested encoding change from " + connection.getEncoding() + " to " + e);
 			connection.setEncoding(e);
 		}

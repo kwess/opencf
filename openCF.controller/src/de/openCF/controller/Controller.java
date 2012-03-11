@@ -126,7 +126,10 @@ public class Controller implements Runnable {
 					data.put(PacketKeys.REPOSITORY_URL, "http://localhost:8080/jobs/");
 					data.put(PacketKeys.AGENT_ID, list);
 				} else if ("stop".equals(args[0]) || "listen".equals(args[0])) {
-					data.put(PacketKeys.AUTOMATION_ID, list);
+					List<Integer> convert = new ArrayList<Integer>();
+					for (String s : list)
+						convert.add(Integer.parseInt(s));
+					data.put(PacketKeys.AUTOMATION_ID, convert);
 				}
 
 				System.out.println("< " + data);

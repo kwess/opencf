@@ -44,7 +44,7 @@ public class Packet {
 			}
 			if (i % 2 == 0)
 				dump.append(' ');
-			dump.append(Integer.toHexString(rawData[i]));
+			dump.append(String.format("%02X", rawData[i]));
 		}
 		StringBuffer dataFormatted = new StringBuffer();
 		for (Map.Entry<String, Object> e : data.entrySet()) {

@@ -17,15 +17,15 @@ public class Server {
 
 	@Id
 	private String		id				= null;
-	private String		hostname		= null;
-	private Integer		agentPort		= null;
-	private Integer		controllerPort	= null;
+	private String		hostname		= "";
+	private Integer		agentPort		= 0;
+	private Integer		controllerPort	= 0;
 	@Enumerated(EnumType.STRING)
-	private Plattform	plattform		= null;
+	private Plattform	plattform		= Plattform.UNKNOWN;
 	@Enumerated(EnumType.STRING)
 	private Status		status			= Status.OFFLINE;
 	@Column(nullable = false)
-	private Date		updated			= null;
+	private Date		updated			= new Date();
 
 	public Server() {
 		super();

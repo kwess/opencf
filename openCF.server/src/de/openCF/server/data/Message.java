@@ -18,7 +18,7 @@ public class Message {
 	@ManyToOne
 	private Automation			automation	= null;
 	private AutomationStatus	status		= AutomationStatus.unknown;
-	private String				message		= null;
+	private String				message		= "";
 
 	public Integer getId() {
 		return id;

@@ -14,7 +14,6 @@ import javax.net.ssl.SSLSocket;
 
 import org.apache.log4j.Logger;
 
-
 public class Acceptor implements Runnable {
 
 	private Logger				logger				= Logger.getLogger(Acceptor.class);
@@ -40,7 +39,7 @@ public class Acceptor implements Runnable {
 		logger.info("use ssl: " + useSSL);
 		logger.info("require clientAuth: " + needsClientAuth);
 		logger.info("using connection pool size: " + connectionPoolSize);
-		logger.info("using connection factory: " + connectionFactory.getClass());
+		logger.info("using connection factory: " + connectionFactory.getClass().getName());
 
 		executorService = Executors.newFixedThreadPool(this.connectionPoolSize);
 

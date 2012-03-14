@@ -2,5 +2,5 @@ os: windows
 version: v_r.0.1
 server: localhost
 port: 5678
-heartbeat: 1
-hostname: ruby_agent
+heartbeat: 0.001
+hostname: ruby_agente

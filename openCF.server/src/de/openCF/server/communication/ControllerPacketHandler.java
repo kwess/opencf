@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.hibernate.criterion.DetachedCriteria;
 
 import de.openCF.protocol.Connection;
 import de.openCF.protocol.Packet;
@@ -17,7 +18,9 @@ import de.openCF.server.data.Agent;
 import de.openCF.server.data.Automation;
 import de.openCF.server.data.AutomationAction;
 import de.openCF.server.data.AutomationControl;
+import de.openCF.server.data.AutomationQueryType;
 import de.openCF.server.data.AutomationStatus;
+import de.openCF.server.data.Server;
 import de.openCF.server.persistence.Persistence;
 
 public class ControllerPacketHandler implements PacketHandler, AutomationStatusListener {
@@ -47,12 +50,82 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 				logger.debug("automation control");
 				handleAutomationControl(data);
 				break;
+			case PacketType.AUTOMATION_QUERY:
+				logger.debug("automation query");
+				handleAutomationQuery(data);
+				break;
 			default:
 				logger.warn("unexpected type: " + type);
 				break;
 		}
 
 		logger.trace("handle packet finished");
+	}
+
+	@SuppressWarnings("unchecked")
+	private void handleAutomationQuery(Map<String, Object> data) {
+		logger.trace("handleAutomationQuery");
+
+		String query = (String) data.get(PacketKeys.AUTOMATION_QUERY);
+		AutomationQueryType automationQueryType = AutomationQueryType.valueOf(query.toUpperCase());
+
+		if (automationQueryType == null) {
+			logger.warn("unknown automation query type");
+			return;
+		}
+
+		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+
+		switch (automationQueryType) {
+			case AGENT:
+				DetachedCriteria c = DetachedCriteria.forClass(Agent.class);
+				List<Agent> agents = (List<Agent>) persistence.list(c);
+				for (Agent a : agents) {
+					Map<String, Object> element = new HashMap<String, Object>();
+					element.put(PacketKeys.AGENT_ID, a.getId());
+					element.put(PacketKeys.AGENT_PLATTFORM, a.getPlattform().toString());
+					element.put(PacketKeys.AGENT_VERSION, a.getVersion());
+					element.put(PacketKeys.STATUS, a.getStatus().toString());
+					element.put(PacketKeys.SERVER_ID, a.getServer().getId());
+					result.add(element);
+				}
+				break;
+			case SERVER:
+				DetachedCriteria c2 = DetachedCriteria.forClass(Server.class);
+				List<Server> server = (List<Server>) persistence.list(c2);
+				for (Server s : server) {
+					Map<String, Object> element = new HashMap<String, Object>();
+					element.put(PacketKeys.SERVER_ID, s.getId());
+					element.put(PacketKeys.SERVER_PLATTFORM, s.getPlattform().toString());
+					element.put(PacketKeys.SERVER_HOSTNAME, s.getHostname());
+					result.add(element);
+				}
+				break;
+			case AUTOMATION:
+				DetachedCriteria c3 = DetachedCriteria.forClass(Automation.class);
+				List<Automation> automation = (List<Automation>) persistence.list(c3);
+				for (Automation a : automation) {
+					Map<String, Object> element = new HashMap<String, Object>();
+					element.put(PacketKeys.AUTOMATION_ID, a.getId());
+					element.put(PacketKeys.AUTOMATION_STATUS, a.getStatus().toString());
+					element.put(PacketKeys.AUTOMATION_AGENT, a.getAgent().getId());
+					result.add(element);
+				}
+				break;
+			default:
+				logger.warn("unexpected automation query type: " + query);
+				break;
+		}
+
+		Map<String, Object> d = new HashMap<String, Object>();
+		d.put(PacketKeys.TYPE, PacketType.AUTOMATION_QUERY);
+		d.put(PacketKeys.AUTOMATION_QUERY, query);
+		d.put(PacketKeys.AUTOMATION_QUERY_RESULT, result);
+
+		Packet p = new Packet();
+		p.setData(d);
+
+		connection.forward(p);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -94,7 +94,13 @@ sub handlePacket {
 	
 	if ($type eq Protocol::Types::AGENT_HELLO_RESPONSE) {
 		$logger->info("agent hello response");
+		handleAgentHelloResponse($packet);
 	}
+}
+
+sub handleAgentHelloResponse {
+	my $packet = @_;
+	
 }
 
 sub sendPacket {

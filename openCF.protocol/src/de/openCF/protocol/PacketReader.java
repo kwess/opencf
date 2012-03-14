@@ -9,7 +9,8 @@ public class PacketReader extends Reader {
 
 	private static Logger	logger			= Logger.getLogger(PacketReader.class);
 
-	public static final int	MAX_PACKET_SIZE	= 2048;
+	// 2^20 byte
+	public static final int	MAX_PACKET_SIZE	= 2 << 20;
 
 	public PacketReader() {
 		super();

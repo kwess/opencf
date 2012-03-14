@@ -8,5 +8,6 @@ public abstract class PacketType {
 	public static final int	AGENT_HELLO_RESPONSE	= 2;
 	public static final int	AUTOMATION_CONTROL		= 13;
 	public static final int	AUTOMATION_STATUS		= 20;
+	public static final int	AUTOMATION_QUERY		= 30;
 
 }

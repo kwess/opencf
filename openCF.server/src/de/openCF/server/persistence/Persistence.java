@@ -1,12 +1,14 @@
 package de.openCF.server.persistence;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.DetachedCriteria;
 
 import de.openCF.server.data.Agent;
 import de.openCF.server.data.Automation;
@@ -92,6 +94,13 @@ public class Persistence {
 		logger.trace("get(Object)");
 		Object result = session.get(c, id);
 		logger.debug("loaded by Class [" + c.getSimpleName() + "] and id [" + id + "]: " + result);
+		return result;
+	}
+
+	public synchronized List<?> list(DetachedCriteria d) {
+		logger.trace("list(DetachedCriteria)");
+		List<?> result = d.getExecutableCriteria(session).list();
+		logger.debug("list of " + result.size() + " from " + d);
 		return result;
 	}
 

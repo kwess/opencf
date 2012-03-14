@@ -109,11 +109,12 @@ public class AgentPacketHandler implements PacketHandler {
 
 		if (automationStatus == AutomationStatus.talking) {
 			logger.debug("automation [" + id + "] says: " + message);
-			automation.setStatus(automationStatus);
-			persistence.update(automation);
 		} else {
 			logger.info("automation [" + id + "] notifies [" + automationStatus + "] " + message);
 		}
+
+		automation.setStatus(automationStatus);
+		persistence.update(automation);
 
 		persistence.save(message2db);
 

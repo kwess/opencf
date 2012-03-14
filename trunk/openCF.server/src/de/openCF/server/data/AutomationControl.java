@@ -25,7 +25,7 @@ public class AutomationControl {
 	private boolean				successfull	= true;
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
-	private AutomationAction	action		= null;
+	private AutomationAction	action		= AutomationAction.nop;
 	@Column(nullable = false)
 	// TODO Der initiator muss noch verdratet werden
 	private String				initiator	= "unknown";

@@ -23,15 +23,15 @@ public class Agent {
 
 	@Id
 	private String			id			= null;
-	private String			version		= null;
+	private String			version		= "?";
 	@Enumerated(EnumType.STRING)
-	private Plattform		plattform	= null;
+	private Plattform		plattform	= Plattform.UNKNOWN;
 	@Enumerated(EnumType.STRING)
 	private Status			status		= Status.OFFLINE;
 	@ManyToOne
 	private Server			server		= Data.getServer();
 	@Column(nullable = false)
-	private Date			updated		= null;
+	private Date			updated		= new Date();
 	@OneToMany
 	@JoinTable(name = "agent2automation")
 	private Set<Automation>	automations	= null;

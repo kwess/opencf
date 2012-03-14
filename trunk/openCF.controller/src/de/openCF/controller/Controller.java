@@ -34,6 +34,7 @@ public class Controller implements Runnable {
 
 	private class ControllerPacketHandler implements PacketHandler {
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public void handlePacket(Packet packet) {
 			Map<String, Object> data = packet.getData();
@@ -47,6 +48,15 @@ public class Controller implements Runnable {
 				} else {
 					System.out.println("> " + data.get(PacketKeys.AUTOMATION_ID) + " --> " + status);
 				}
+			} else if (type == PacketType.AUTOMATION_QUERY) {
+				int i = 0;
+				for (Map<String, Object> s : (List<Map<String, Object>>) data.get(PacketKeys.AUTOMATION_QUERY_RESULT)) {
+					System.out.println("> [" + ++i + "]-------------------------------");
+					for (String key : s.keySet())
+						System.out.println("> " + key + " = " + s.get(key));
+				}
+				if (i == 0)
+					System.out.println("> query returned no results");
 			}
 		}
 
@@ -130,6 +140,9 @@ public class Controller implements Runnable {
 					for (String s : list)
 						convert.add(Integer.parseInt(s));
 					data.put(PacketKeys.AUTOMATION_ID, convert);
+				} else if ("query".equals(args[0])) {
+					data.put(PacketKeys.TYPE, PacketType.AUTOMATION_QUERY);
+					data.put(PacketKeys.AUTOMATION_QUERY, args[1]);
 				}
 
 				System.out.println("< " + data);

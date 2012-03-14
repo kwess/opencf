@@ -53,7 +53,7 @@ public class Connection implements Runnable {
 
 		logger.debug("debug: " + debug);
 		logger.debug("running: " + running);
-		logger.info("using PacketHandler: " + packetHandler.toString());
+		logger.info("using PacketHandler: " + packetHandler.getClass().getName());
 		logger.info("using encoding outgoing: " + encoding);
 		logger.info("using encoding incoming: " + Encoding.JSON);
 
@@ -126,20 +126,20 @@ public class Connection implements Runnable {
 			logger.warn("debug is enabled, PacketHandler will remain default");
 		else {
 			this.packetHandler = handler;
-			logger.debug("packet handler changed to " + handler);
+			logger.debug("packet handler changed to " + handler.getClass().getName());
 		}
 	}
 
 	public void setReader(Reader reader) {
 		logger.trace("setReader(Reader)");
 		this.packetReader = reader;
-		logger.debug("Reader set to: " + reader);
+		logger.debug("Reader set to: " + reader.getClass().getName());
 	}
 
 	public void setWriter(Writer writer) {
 		logger.trace("setWriter(Writer)");
 		this.packetWriter = writer;
-		logger.debug("Writer set to: " + writer);
+		logger.debug("Writer set to: " + writer.getClass().getName());
 	}
 
 }

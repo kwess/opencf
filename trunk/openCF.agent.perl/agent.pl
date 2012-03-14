@@ -117,14 +117,28 @@ sub sendPacket {
 
 package main;
 
-my $connection = Connection->new('localhost', 5678);
+open (my $fh, '<', 'agent.properties') or die ("unable to open configuration file");
+my $properties = Config::Properties->new();
+$properties->load($fh);
+my $version = $properties->getProperty("version");
+my $server = $properties->getProperty("server");
+my $os = $properties->getProperty("os");
+my $port = $properties->getProperty("port");
+my $hostname = $properties->getProperty("hostname");
+
+
+$logger->debug("server: $server");
+$logger->debug("port: $port");
+
+
+my $connection = Connection->new($server, $port);
 $connection->connect();
 $connection->sendPacket({
 	Protocol::Keys::TYPE 			=> 1,
 	Protocol::Keys::AGENT_ENCODING 	=> "json",
-	Protocol::Keys::AGENT_ID 		=> "perl_agent",
-	Protocol::Keys::AGENT_VERSION 	=> "v_pl.0.1",
-	Protocol::Keys::AGENT_PLATTFORM	=> "windows"
+	Protocol::Keys::AGENT_ID 		=> $hostname,
+	Protocol::Keys::AGENT_VERSION 	=> $version,
+	Protocol::Keys::AGENT_PLATTFORM	=> $os
 });
 
 while (1) {

@@ -63,7 +63,25 @@ class SocketListener : Thread {
 		Logger.myDebug("handleAutomationControl function", __FILE__, __LINE__);
 		auto doc = new Document(p.getXmlString());
 		foreach(element; doc.elements) {
-			Logger.myDebug(element.tag.name);
+			switch(element.tag.name) {
+				case Packet.Keys.REPOSITORY_URL:
+					Logger.myDebug("repository_url:" ~ element.text);
+					break;
+				case Packet.Keys.AUTOMATION_DESCRIPTOR:
+					Logger.myDebug("automation_descriptor:" ~ element.text);
+					break;
+				case Packet.Keys.AUTOMATION_ID:
+					Logger.myDebug("automation_id:" ~ element.text);
+					break;
+				case Packet.Keys.AUTOMATION_ACTION:
+					Logger.myDebug("automation_action:" ~ element.text);
+					break;
+				case Packet.Keys.AUTOMATION_PARAMETER:
+					Logger.myDebug("automation_parameter:" ~ element.text);
+					break;
+				default:
+					
+			}
 		}
 	}
 }

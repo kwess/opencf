@@ -24,17 +24,7 @@ class SocketWriter : Thread {
 	private void run() {
 		Logger.myInfo("SocketWriter starting to heartbeat", __FILE__, __LINE__);
 		while(this.isRunning) {
-			JSONValue json;
-			json.type = JSON_TYPE.OBJECT;
-			json.object[Packet.Keys.TYPE] = JSONValue();
-			json.object[Packet.Keys.TYPE].type = JSON_TYPE.INTEGER;
-			json.object[Packet.Keys.TYPE].integer = Packet.Type.HEARTBEAT;
-			json.object[Packet.Keys.LOCAL_TIME] = JSONValue();
-			json.object[Packet.Keys.LOCAL_TIME].type = JSON_TYPE.STRING;
-			json.object[Packet.Keys.LOCAL_TIME].str = text(core.stdc.time.time(null));
-			Packet p = new Packet(json);
-			send(p);
-			
+			sendHeartbeat();
 			Thread.sleep(dur!("minutes")(1));
 		}
 		Logger.myInfo("SocketWriter Thread (plus heartbeat) ended", __FILE__, __LINE__);
@@ -47,5 +37,18 @@ class SocketWriter : Thread {
 		this.stream.writeString(text);
 		
 		return true;
+	}
+	
+	private bool sendHeartbeat() {
+		JSONValue json;
+		json.type = JSON_TYPE.OBJECT;
+		json.object[Packet.Keys.TYPE] = JSONValue();
+		json.object[Packet.Keys.TYPE].type = JSON_TYPE.INTEGER;
+		json.object[Packet.Keys.TYPE].integer = Packet.Type.HEARTBEAT;
+		json.object[Packet.Keys.LOCAL_TIME] = JSONValue();
+		json.object[Packet.Keys.LOCAL_TIME].type = JSON_TYPE.STRING;
+		json.object[Packet.Keys.LOCAL_TIME].str = text(core.stdc.time.time(null));
+		Packet p = new Packet(json);
+		return send(p);
 	}
 }	

@@ -27,7 +27,15 @@ class Packet {
 		RETURN_CODE = "return_code",
 		MESSAGE = "message",
 		LOCAL_TIME = "local_time",
-		AUTOMATION_ID = "automation_id"
+		AUTOMATION_ID = "automation_id",
+		AUTOMATION_DESCRIPTOR = "automation_descriptor",
+		AUTOMATION_ACTION = "automation_action",
+		AUTOMATION_PARAMETER = "automation_parameter",
+		TIMEOUT = "timeout",
+		ARGUMENTS = "arguments",
+		USER = "user",
+		GROUP = "group",
+		REPOSITORY_URL = "repository_url"
 	}
 	
 	private string xmlString;

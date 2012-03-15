@@ -23,26 +23,40 @@ void main() {
 	    
 	/* read configuration from agent.cfg */
 	Configuration configuration = new Configuration("agent.cfg");
-	Logger.myDebug("agent.cfg configuration:\n" ~ configuration.toString());
-	
-	/* setup socket connection */
+//	Logger.myDebug("agent.cfg configuration:\n" ~ configuration.toString());
 	string hostname = configuration.get("hostname");
 	ushort port = to!short(configuration.get("port"));
-	Connection connection = new Connection(hostname, port);
-	connection.connect();
-	
-	/* send hello packet to management server */
 	string agent = configuration.get("agentid");
 	string myversion = configuration.get("version");
 	string plattform = configuration.get("plattform");
-	connection.sendHello(agent, myversion, plattform);
-
-	Logger.myDebug("Endlosschleife - hier muss der reconnect rein", __FILE__, __LINE__);
-
-	AutomationThreadManager manager = new AutomationThreadManager();
-
+	
 	while(1) {
-		Thread.sleep(dur!("seconds")(1));
+		
+		/* setup socket connection */
+		Connection connection = new Connection(hostname, port);
+		
+		if( connection.connect() ) {
+			/* send hello packet to management server */
+			bool helloAccepted = connection.sendHello(agent, myversion, plattform);
+		
+			if(helloAccepted) {
+				AutomationThreadManager manager = new AutomationThreadManager();
+				
+				
+				receive(
+					(bool b) {
+						Logger.myInfo("bla");
+					}
+				);
+				Logger.myInfo("blub");
+			}
+			else {
+				Logger.myDebug("sendHello fehlgeschlagen", __FILE__, __LINE__);
+			}
+		}
+		
+		Logger.myDebug("keine Connection zum Server, retry in 10 Sekunden", __FILE__, __LINE__);
+		Thread.sleep(dur!("seconds")(10));
 	}
-	Logger.myDebug("main zuende", __FILE__, __LINE__);
+	Logger.myDebug("openCFAgent beendet", __FILE__, __LINE__);
 }

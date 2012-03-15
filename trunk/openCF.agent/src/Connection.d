@@ -24,30 +24,55 @@ class Connection {
 	private Socket socket;
 	private Thread socketListener;
 	private SocketWriter socketWriter;
+	private Thread connectionWatchdog;
 	
 	this(string hostname, ushort port) {
 		this.hostname = hostname;
 		this.port = port;
 		this.connected = false;
+		this.connectionWatchdog = new Thread(&checkConnection);
 	}
 	
 	public bool connect() {
-		this.socket = new TcpSocket(new InternetAddress(this.hostname, this.port));
+		try {
+			this.socket = new TcpSocket(new InternetAddress(this.hostname, this.port));
+		} catch (SocketOSException e) {
+			Logger.myInfo(e.msg, __FILE__, __LINE__);
+			return false;
+		}
 		this.stream = new SocketStream(socket);
 		
 		this.socketListener = new SocketListener(this.stream, thisTid());
 		this.socketListener.start();
-		bool listeningOK;
 		receive(
 			(bool b) {
-				listeningOK = b;
+				this.connected = b;
 			}
 		);
 		
 		this.socketWriter = new SocketWriter(this.stream, thisTid);
 		
-		this.connected = listeningOK;
+		if(this.connected) {
+			//TODO aktivieren, sobald checkConnection funktioniert
+			//this.connectionWatchdog.start();
+		}
+		
 		return this.connected;
+	}
+	
+	//TODO das klappt noch nicht; keine Ahnung, wie man herausfinden soll, ob die Verbindung abgebrochen ist
+	public void checkConnection() {
+		Logger.myInfo("checkConnection");
+		while(this.connected) {
+			if(this.socket.isAlive() == false) {
+				Logger.myInfo("isAlive == false");
+				this.connected = false;
+				break;
+			}
+			Logger.myInfo("isAlive == true");
+			
+			Thread.sleep(dur!("seconds")(1));
+		}
 	}
 	
 	public bool sendHello(string agent, string myversion, string plattform) {

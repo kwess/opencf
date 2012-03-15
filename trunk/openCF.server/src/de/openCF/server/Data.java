@@ -10,12 +10,11 @@ import org.apache.log4j.Logger;
 import de.openCF.protocol.Connection;
 import de.openCF.server.communication.AutomationStatusListener;
 import de.openCF.server.data.AutomationStatus;
-import de.openCF.server.data.Server;
 
 public class Data {
 
 	private static Logger										logger						= Logger.getLogger(Data.class);
-	private static Server										server						= null;
+	private static String										server_id					= null;
 	private static Map<String, Connection>						connections					= new HashMap<String, Connection>();
 	private static Map<Integer, List<AutomationStatusListener>>	automationStatusListener	= new HashMap<Integer, List<AutomationStatusListener>>();
 
@@ -34,14 +33,14 @@ public class Data {
 		return connections.remove(key);
 	}
 
-	public synchronized static void setServer(Server server) {
+	public synchronized static void setServer(String server) {
 		logger.trace("setServer(Server)");
-		Data.server = server;
+		Data.server_id = server;
 	}
 
-	public synchronized static Server getServer() {
+	public synchronized static String getServer() {
 		logger.trace("getServer");
-		return Data.server;
+		return Data.server_id;
 	}
 
 	public synchronized static boolean isAgenOnline(String aid) {

@@ -112,7 +112,7 @@ public class Server implements Runnable {
 		server.setHostname(hostname);
 
 		logger.info("publish server");
-		Data.setServer(server);
+		Data.setServer(server.getId());
 		persistence.saveOrUpdate(server);
 
 		logger.debug("createing acceptor for agents");

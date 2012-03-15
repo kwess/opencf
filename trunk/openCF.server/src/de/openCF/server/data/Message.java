@@ -14,7 +14,7 @@ public class Message {
 
 	@Id
 	@GeneratedValue
-	private Integer				id			= null;
+	private Integer				id			= 0;
 	@ManyToOne
 	private Automation			automation	= null;
 	private AutomationStatus	status		= AutomationStatus.unknown;

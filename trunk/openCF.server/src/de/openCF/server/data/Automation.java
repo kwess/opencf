@@ -1,13 +1,13 @@
 package de.openCF.server.data;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -24,8 +24,7 @@ public class Automation {
 	@Enumerated(EnumType.STRING)
 	private AutomationStatus	status		= AutomationStatus.unknown;
 	@OneToMany
-	@JoinTable(name = "automation2messages")
-	private Set<Message>		messages	= null;
+	private List<Message>		messages	= null;
 	@ManyToOne
 	private Agent				agent		= null;
 
@@ -37,11 +36,13 @@ public class Automation {
 		this.id = id;
 	}
 
-	public Set<Message> getMessages() {
+	public List<Message> getMessages() {
+		if (messages == null)
+			messages = new ArrayList<Message>();
 		return messages;
 	}
 
-	public void setMessages(Set<Message> messages) {
+	public void setMessages(List<Message> messages) {
 		this.messages = messages;
 	}
 

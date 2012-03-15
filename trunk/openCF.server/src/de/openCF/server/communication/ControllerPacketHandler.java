@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Restrictions;
 
 import de.openCF.protocol.Connection;
 import de.openCF.protocol.Packet;
@@ -102,7 +103,12 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 				}
 				break;
 			case AUTOMATION:
+				String status = (String) data.get(PacketKeys.AUTOMATION_QUERY_PARAMETER);
 				DetachedCriteria c3 = DetachedCriteria.forClass(Automation.class);
+				if (status != null) {
+					AutomationStatus automationStatus = AutomationStatus.valueOf(status.toLowerCase());
+					c3.add(Restrictions.eq("status", automationStatus));
+				}
 				List<Automation> automation = (List<Automation>) persistence.list(c3);
 				for (Automation a : automation) {
 					Map<String, Object> element = new HashMap<String, Object>();
@@ -218,8 +224,10 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 						if (automationAction == AutomationAction.start) {
 							logger.info("starting new automation");
 							Automation automation = new Automation();
-							automation.setAgent((Agent) persistence.get(Agent.class, s));
+							Agent agent = (Agent) persistence.get(Agent.class, s);
+							automation.setAgent(agent);
 							persistence.save(automation);
+							persistence.saveOrUpdate(agent);
 							automation_ids = new ArrayList<Integer>();
 							automation_ids.add(automation.getId());
 							data.put(PacketKeys.AUTOMATION_ID, automation.getId());

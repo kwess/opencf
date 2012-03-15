@@ -1,20 +1,15 @@
 package de.openCF.server.data;
 
 import java.util.Date;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import de.openCF.server.Data;
 
 @Entity
 @Table(name = "Agent")
@@ -22,19 +17,16 @@ import de.openCF.server.Data;
 public class Agent {
 
 	@Id
-	private String			id			= null;
-	private String			version		= "?";
+	private String		id			= null;
+	private String		version		= "?";
 	@Enumerated(EnumType.STRING)
-	private Plattform		plattform	= Plattform.UNKNOWN;
+	private Plattform	plattform	= Plattform.UNKNOWN;
 	@Enumerated(EnumType.STRING)
-	private Status			status		= Status.OFFLINE;
+	private Status		status		= Status.OFFLINE;
 	@ManyToOne
-	private Server			server		= Data.getServer();
+	private Server		server		= null;
 	@Column(nullable = false)
-	private Date			updated		= new Date();
-	@OneToMany
-	@JoinTable(name = "agent2automation")
-	private Set<Automation>	automations	= null;
+	private Date		updated		= new Date();
 
 	public String getId() {
 		return id;
@@ -82,14 +74,6 @@ public class Agent {
 
 	public void setUpdated(Date updated) {
 		this.updated = updated;
-	}
-
-	public Set<Automation> getAutomations() {
-		return automations;
-	}
-
-	public void setAutomations(Set<Automation> automations) {
-		this.automations = automations;
 	}
 
 	@Override

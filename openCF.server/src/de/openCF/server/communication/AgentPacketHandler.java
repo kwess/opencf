@@ -113,10 +113,11 @@ public class AgentPacketHandler implements PacketHandler {
 			logger.info("automation [" + id + "] notifies [" + automationStatus + "] " + message);
 		}
 
-		automation.setStatus(automationStatus);
-		persistence.update(automation);
-
 		persistence.save(message2db);
+
+		automation.setStatus(automationStatus);
+		automation.getMessages().add(message2db);
+		persistence.update(automation);
 
 		Data.notifyAutomationStatusListener(id, automationStatus, message);
 
@@ -161,7 +162,7 @@ public class AgentPacketHandler implements PacketHandler {
 		}
 
 		Agent agent = (Agent) persistence.get(Agent.class, agent_id);
-		Server server = Data.getServer();
+		Server server = (Server) persistence.get(Server.class, Data.getServer());
 
 		boolean agentOnline = false;
 		boolean agentConnectedHere = Data.getConnection(agent_id) == null ? false : true;
@@ -184,6 +185,7 @@ public class AgentPacketHandler implements PacketHandler {
 			agent.setPlattform(Plattform.valueOf(plattform.toUpperCase()));
 			agent.setStatus(Status.ONLINE);
 			agent.setVersion(version);
+			agent.setServer(server);
 			agent.setUpdated(new Date());
 
 			this.agent = agent;
@@ -206,7 +208,7 @@ public class AgentPacketHandler implements PacketHandler {
 			agent.setUpdated(new Date());
 
 			this.agent = agent;
-			persistence.update(agent);
+			persistence.saveOrUpdate(agent);
 
 			Data.addConnection(agent_id, connection);
 

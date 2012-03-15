@@ -44,5 +44,5 @@ void main() {
 	while(1) {
 		Thread.sleep(dur!("seconds")(1));
 	}
-	Logger.myDebug("main zuende");
+	Logger.myDebug("main zuende", __FILE__, __LINE__);
 }

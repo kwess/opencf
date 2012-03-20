@@ -143,7 +143,8 @@ public class Controller implements Runnable {
 				} else if ("query".equals(args[0])) {
 					data.put(PacketKeys.TYPE, PacketType.AUTOMATION_QUERY);
 					data.put(PacketKeys.AUTOMATION_QUERY, args[1]);
-					data.put(PacketKeys.AUTOMATION_QUERY_PARAMETER, args[2]);
+					if (args.length > 2)
+						data.put(PacketKeys.AUTOMATION_QUERY_PARAMETER, args[2]);
 				}
 
 				System.out.println("< " + data);

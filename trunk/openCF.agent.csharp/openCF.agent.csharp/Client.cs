@@ -4,14 +4,12 @@ using System.Net;
 
 namespace openCF.agent.csharp {
 	public class Client {
-		private String server = null;
-		private int port = 0;
-		private Boolean connected = false;
-		private TcpClient tcpClient = null;
+		public Configuration config {get; set;}
+		public Boolean connected {get; set;}
+		public TcpClient tcpClient {get; set;}
 
-		public Client (String server, int port) {
-			this.server = server;
-			this.port = port;
+		public Client (Configuration config) {
+			this.config = config;
 		}
 
 		private bool send(String message) {
@@ -31,25 +29,53 @@ namespace openCF.agent.csharp {
 
 			return true;
 		}
+		
+		private bool send(Packet packet) {
+			if(connected == false) {
+				return false;
+			}
+			
+			NetworkStream stream = this.tcpClient.GetStream();
+			
+			String message = packet.getJSONString();
+			
+			Byte[] data = System.Text.Encoding.UTF8.GetBytes(message);
+			int len = IPAddress.HostToNetworkOrder(data.Length);
+			Byte[] lenData = BitConverter.GetBytes(len);
+			stream.Write(lenData, 0, lenData.Length);
+			stream.Write(data, 0, data.Length);
+
+			Console.WriteLine("Sent: {0}", message);
+
+			return true;
+		}
 
 		public void connect() {
 			try {
-				this.tcpClient = new TcpClient(this.server, this.port);
+				this.tcpClient = new TcpClient(this.config.hostname, this.config.port);
 				this.connected = true;
-				String helloMessage = "{\"agent_id\":\"TODO-AGENTID-IN-agent.cfg\",\"type\":1,\"agent_version\":\"1\",\"agent_plattform\":\"windows\"}";
-				this.send(helloMessage);
+				HelloPacket packet = new HelloPacket();
+				packet.agent_id = this.config.agentID;
+				packet.agent_encoding = this.config.encoding;
+				packet.agent_plattform = this.config.platform;
+				packet.agent_version = this.config.version;
+				//packet.agentID = this.config.agentID;
+				this.send (packet);
 				
 				// Receive the TcpServer.response.
 				Byte[] data = new Byte[256];
-
-				/*String responseData = String.Empty;
+				
+				//TODO response lesen
+				String responseData = String.Empty;
 				NetworkStream stream = this.tcpClient.GetStream();
 				Int32 bytes = stream.Read(data, 0, data.Length);
+				int bytes2 = IPAddress.NetworkToHostOrder(bytes);
+				Console.WriteLine ("blub: {0}", bytes2);
 				responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
-				Console.WriteLine("Received: {0}", responseData);*/
+				Console.WriteLine("Received: {0}", responseData);
 	
 				// Close everything.
-				stream.Close();
+				this.tcpClient.GetStream().Close();
 				this.tcpClient.Close();
 			}
 			catch (ArgumentNullException e) {
@@ -58,9 +84,6 @@ namespace openCF.agent.csharp {
 			catch (SocketException e) {
 				Console.WriteLine("SocketException: {0}", e);
 			}
-
-			Console.WriteLine("\n Press Enter to continue...");
-			Console.Read();
 		}
 	}
 }

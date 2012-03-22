@@ -10,6 +10,7 @@
     <RootNamespace>openCF.agent.csharp</RootNamespace>
     <AssemblyName>openCF.agent.csharp</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <StartupObject>openCF.agent.csharp.Agent</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,8 +36,12 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Main.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Agent.cs" />
+    <Compile Include="Client.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="model\" />
+  </ItemGroup>
 </Project>

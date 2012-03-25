@@ -15,10 +15,9 @@ import de.openCF.protocol.Connection;
 import de.openCF.protocol.Packet;
 import de.openCF.protocol.PacketHandler;
 import de.openCF.protocol.PacketHelper.Encoding;
-import de.openCF.protocol.PacketKeys;
 import de.openCF.protocol.PacketReader;
-import de.openCF.protocol.PacketType;
 import de.openCF.protocol.PacketWriter;
+import de.openCF.protocol.Protocol;
 
 /**
  * 
@@ -53,21 +52,21 @@ public class Controller implements Runnable {
 			if (debug)
 				System.out.println("* " + data.toString().replace("\n", ""));
 
-			Integer type = (Integer) data.get(PacketKeys.TYPE);
-			if (type == PacketType.AUTOMATION_STATUS) {
-				String status = (String) data.get(PacketKeys.AUTOMATION_STATUS);
+			Integer type = (Integer) data.get(Protocol.Key.TYPE);
+			if (type == Protocol.AUTOMATION_STATUS) {
+				String status = (String) data.get(Protocol.Key.AUTOMATION_STATUS);
 
 				if ("talking".equals(status)) {
-					String message = (String) data.get(PacketKeys.AUTOMATION_MESSAGE);
-					System.out.println("> " + data.get(PacketKeys.AUTOMATION_ID) + " +-> " + message.replace('\n', '.'));
+					String message = (String) data.get(Protocol.Key.AUTOMATION_MESSAGE);
+					System.out.println("> " + data.get(Protocol.Key.AUTOMATION_ID) + " +-> " + message.replace('\n', '.'));
 				} else {
-					System.out.println("> " + data.get(PacketKeys.AUTOMATION_ID) + " --> " + status);
+					System.out.println("> " + data.get(Protocol.Key.AUTOMATION_ID) + " --> " + status);
 					if (status.contains("failed"))
-						System.err.println("! " + data.get(PacketKeys.AUTOMATION_ID) + " --> " + data.get(PacketKeys.AUTOMATION_MESSAGE));
+						System.err.println("! " + data.get(Protocol.Key.AUTOMATION_ID) + " --> " + data.get(Protocol.Key.AUTOMATION_MESSAGE));
 				}
-			} else if (type == PacketType.AUTOMATION_QUERY) {
+			} else if (type == Protocol.AUTOMATION_QUERY) {
 				int i = 0;
-				for (Map<String, Object> s : (List<Map<String, Object>>) data.get(PacketKeys.AUTOMATION_QUERY_RESULT)) {
+				for (Map<String, Object> s : (List<Map<String, Object>>) data.get(Protocol.Key.AUTOMATION_QUERY_RESULT)) {
 					System.out.println("> [" + ++i + "]-------------------------------");
 					for (String key : s.keySet())
 						System.out.println("> " + key + " = " + s.get(key));
@@ -146,22 +145,22 @@ public class Controller implements Runnable {
 					list.add(args[i]);
 
 				Map<String, Object> data = new HashMap<String, Object>();
-				data.put(PacketKeys.TYPE, PacketType.AUTOMATION_CONTROL);
-				data.put(PacketKeys.AUTOMATION_ACTION, args[0]);
+				data.put(Protocol.Key.TYPE, Protocol.AUTOMATION_CONTROL);
+				data.put(Protocol.Key.AUTOMATION_ACTION, args[0]);
 				if ("start".equals(args[0])) {
-					data.put(PacketKeys.AUTOMATION_DESCRIPTOR, args[1]);
-					data.put(PacketKeys.REPOSITORY_URL, "http://localhost:8080/jobs/");
-					data.put(PacketKeys.AGENT_ID, list);
+					data.put(Protocol.Key.AUTOMATION_DESCRIPTOR, args[1]);
+					data.put(Protocol.Key.REPOSITORY_URL, "http://localhost:8080/jobs/");
+					data.put(Protocol.Key.AGENT_ID, list);
 				} else if ("stop".equals(args[0]) || "listen".equals(args[0])) {
 					List<Integer> convert = new ArrayList<Integer>();
 					for (String s : list)
 						convert.add(Integer.parseInt(s));
-					data.put(PacketKeys.AUTOMATION_ID, convert);
+					data.put(Protocol.Key.AUTOMATION_ID, convert);
 				} else if ("query".equals(args[0])) {
-					data.put(PacketKeys.TYPE, PacketType.AUTOMATION_QUERY);
-					data.put(PacketKeys.AUTOMATION_QUERY, args[1]);
+					data.put(Protocol.Key.TYPE, Protocol.AUTOMATION_QUERY);
+					data.put(Protocol.Key.AUTOMATION_QUERY, args[1]);
 					if (args.length > 2)
-						data.put(PacketKeys.AUTOMATION_QUERY_PARAMETER, args[2]);
+						data.put(Protocol.Key.AUTOMATION_QUERY_PARAMETER, args[2]);
 				}
 
 				if (debug)

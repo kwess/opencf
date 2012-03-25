@@ -10,8 +10,7 @@ import de.openCF.protocol.Connection;
 import de.openCF.protocol.Packet;
 import de.openCF.protocol.PacketHandler;
 import de.openCF.protocol.PacketHelper.Encoding;
-import de.openCF.protocol.PacketKeys;
-import de.openCF.protocol.PacketType;
+import de.openCF.protocol.Protocol;
 import de.openCF.server.Data;
 import de.openCF.server.data.Agent;
 import de.openCF.server.data.Automation;
@@ -43,33 +42,33 @@ public class AgentPacketHandler implements PacketHandler {
 
 		Map<String, Object> data = packet.getData();
 
-		String key = PacketKeys.TYPE;
+		String key = Protocol.Key.TYPE;
 		Integer type = (Integer) data.get(key);
 
 		if (type == null) {
 			logger.debug("type is null, setting type to invalid");
-			type = PacketType.INVALID;
+			type = Protocol.INVALID;
 		}
 
 		logger.debug("type: " + type);
 
 		logger.debug("is registered: " + registered);
 
-		if (!registered && type != PacketType.AGENT_HELLO) {
+		if (!registered && type != Protocol.AGENT_HELLO) {
 			logger.warn("got unexpected Packet from unregistered Agent, discarding");
 			return;
 		}
 
 		switch (type) {
-			case PacketType.AGENT_HELLO:
+			case Protocol.AGENT_HELLO:
 				logger.debug("agent hello");
 				handleAgentHello(data);
 				break;
-			case PacketType.AGENT_HEARTBEAT:
+			case Protocol.AGENT_HEARTBEAT:
 				logger.debug("agent heartbeat");
 				handleAgentHeartbeat(data);
 				break;
-			case PacketType.AUTOMATION_STATUS:
+			case Protocol.AUTOMATION_STATUS:
 				logger.debug("automation status");
 				handleAutomationStatus(data);
 				break;
@@ -84,9 +83,9 @@ public class AgentPacketHandler implements PacketHandler {
 	private void handleAutomationStatus(Map<String, Object> data) {
 		logger.trace("handleAutomationStatus(Map)");
 
-		Integer id = (Integer) data.get(PacketKeys.AUTOMATION_ID);
-		String status = (String) data.get(PacketKeys.AUTOMATION_STATUS);
-		String message = (String) data.get(PacketKeys.AUTOMATION_MESSAGE);
+		Integer id = (Integer) data.get(Protocol.Key.AUTOMATION_ID);
+		String status = (String) data.get(Protocol.Key.AUTOMATION_STATUS);
+		String message = (String) data.get(Protocol.Key.AUTOMATION_MESSAGE);
 
 		AutomationStatus automationStatus = AutomationStatus.valueOf(status.toLowerCase());
 
@@ -132,7 +131,7 @@ public class AgentPacketHandler implements PacketHandler {
 	private void handleAgentHeartbeat(Map<String, Object> data) {
 		logger.trace("handleAgentHeartbeat(Map)");
 
-		String date = (String) data.get(PacketKeys.AGENT_LOCAL_TIME);
+		String date = (String) data.get(Protocol.Key.AGENT_LOCAL_TIME);
 		Date agent_localtime = new Date(Long.parseLong(date) * 1000);
 
 		Heartbeat heartbeat = new Heartbeat();
@@ -148,12 +147,12 @@ public class AgentPacketHandler implements PacketHandler {
 		logger.trace("handleAgentHello(Map)");
 
 		Map<String, Object> response = new HashMap<String, Object>();
-		response.put(PacketKeys.TYPE, PacketType.AGENT_HELLO_RESPONSE);
+		response.put(Protocol.Key.TYPE, Protocol.AGENT_HELLO_RESPONSE);
 
-		String agent_id = (String) data.get(PacketKeys.AGENT_ID);
-		String plattform = (String) data.get(PacketKeys.AGENT_PLATTFORM);
-		String version = (String) data.get(PacketKeys.AGENT_VERSION);
-		String encoding = (String) data.get(PacketKeys.AGENT_ENCODING);
+		String agent_id = (String) data.get(Protocol.Key.AGENT_ID);
+		String plattform = (String) data.get(Protocol.Key.AGENT_PLATTFORM);
+		String version = (String) data.get(Protocol.Key.AGENT_VERSION);
+		String encoding = (String) data.get(Protocol.Key.AGENT_ENCODING);
 
 		if (encoding != null && !"".equals(encoding)) {
 			Encoding e = Encoding.valueOf(encoding.toUpperCase());
@@ -193,9 +192,9 @@ public class AgentPacketHandler implements PacketHandler {
 
 			Data.addConnection(agent_id, connection);
 
-			response.put(PacketKeys.RETURN_CODE, 0);
-			response.put(PacketKeys.SUCCESSFULL, true);
-			response.put(PacketKeys.MESSAGE, "congratulations " + agent_id + ", youre registered!");
+			response.put(Protocol.Key.RETURN_CODE, 0);
+			response.put(Protocol.Key.SUCCESSFULL, true);
+			response.put(Protocol.Key.MESSAGE, "congratulations " + agent_id + ", youre registered!");
 
 			setRegistered(true);
 		} else if (!agentOnline || (agentOnline && agentConnectedHere) || (agentOnline && !agentConnectedToDifferendServer)) {
@@ -212,25 +211,25 @@ public class AgentPacketHandler implements PacketHandler {
 
 			Data.addConnection(agent_id, connection);
 
-			response.put(PacketKeys.RETURN_CODE, 1);
-			response.put(PacketKeys.SUCCESSFULL, true);
-			response.put(PacketKeys.MESSAGE, "hello back again " + agent_id + " :)");
+			response.put(Protocol.Key.RETURN_CODE, 1);
+			response.put(Protocol.Key.SUCCESSFULL, true);
+			response.put(Protocol.Key.MESSAGE, "hello back again " + agent_id + " :)");
 
 			setRegistered(true);
 		} else if (agentOnline && agentConnectedHere) {
 			logger.warn("agent [" + agent_id + "] already registered, rejecting request");
 
-			response.put(PacketKeys.RETURN_CODE, -1);
-			response.put(PacketKeys.SUCCESSFULL, false);
-			response.put(PacketKeys.MESSAGE, "agent [" + agent_id + "] already registered and online");
+			response.put(Protocol.Key.RETURN_CODE, -1);
+			response.put(Protocol.Key.SUCCESSFULL, false);
+			response.put(Protocol.Key.MESSAGE, "agent [" + agent_id + "] already registered and online");
 
 			setRegistered(false);
 		} else {
 			logger.warn("agent [" + agent_id + "] is alredy connected to server " + agent.getServer().getId() + ", rejecting request");
 
-			response.put(PacketKeys.RETURN_CODE, -2);
-			response.put(PacketKeys.SUCCESSFULL, false);
-			response.put(PacketKeys.MESSAGE, "agent [" + agent_id + "] already registered to " + agent.getServer().getId() + " and online");
+			response.put(Protocol.Key.RETURN_CODE, -2);
+			response.put(Protocol.Key.SUCCESSFULL, false);
+			response.put(Protocol.Key.MESSAGE, "agent [" + agent_id + "] already registered to " + agent.getServer().getId() + " and online");
 
 			setRegistered(false);
 		}

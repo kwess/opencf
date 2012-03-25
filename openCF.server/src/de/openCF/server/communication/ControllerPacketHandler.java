@@ -12,8 +12,7 @@ import org.hibernate.criterion.Restrictions;
 import de.openCF.protocol.Connection;
 import de.openCF.protocol.Packet;
 import de.openCF.protocol.PacketHandler;
-import de.openCF.protocol.PacketKeys;
-import de.openCF.protocol.PacketType;
+import de.openCF.protocol.Protocol;
 import de.openCF.server.Data;
 import de.openCF.server.data.Agent;
 import de.openCF.server.data.Automation;
@@ -40,18 +39,18 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 
 		Map<String, Object> data = packet.getData();
 
-		String key = PacketKeys.TYPE;
+		String key = Protocol.Key.TYPE;
 		Integer type = (Integer) data.get(key);
 
 		if (type == null)
-			type = PacketType.INVALID;
+			type = Protocol.INVALID;
 
 		switch (type) {
-			case PacketType.AUTOMATION_CONTROL:
+			case Protocol.AUTOMATION_CONTROL:
 				logger.debug("automation control");
 				handleAutomationControl(data);
 				break;
-			case PacketType.AUTOMATION_QUERY:
+			case Protocol.AUTOMATION_QUERY:
 				logger.debug("automation query");
 				handleAutomationQuery(data);
 				break;
@@ -67,7 +66,7 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 	private void handleAutomationQuery(Map<String, Object> data) {
 		logger.trace("handleAutomationQuery");
 
-		String query = (String) data.get(PacketKeys.AUTOMATION_QUERY);
+		String query = (String) data.get(Protocol.Key.AUTOMATION_QUERY);
 		AutomationQueryType automationQueryType = AutomationQueryType.valueOf(query.toUpperCase());
 
 		if (automationQueryType == null) {
@@ -83,11 +82,11 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 				List<Agent> agents = (List<Agent>) persistence.list(c);
 				for (Agent a : agents) {
 					Map<String, Object> element = new HashMap<String, Object>();
-					element.put(PacketKeys.AGENT_ID, a.getId());
-					element.put(PacketKeys.AGENT_PLATTFORM, a.getPlattform().toString());
-					element.put(PacketKeys.AGENT_VERSION, a.getVersion());
-					element.put(PacketKeys.STATUS, a.getStatus().toString());
-					element.put(PacketKeys.SERVER_ID, a.getServer().getId());
+					element.put(Protocol.Key.AGENT_ID, a.getId());
+					element.put(Protocol.Key.AGENT_PLATTFORM, a.getPlattform().toString());
+					element.put(Protocol.Key.AGENT_VERSION, a.getVersion());
+					element.put(Protocol.Key.STATUS, a.getStatus().toString());
+					element.put(Protocol.Key.SERVER_ID, a.getServer().getId());
 					result.add(element);
 				}
 				break;
@@ -96,14 +95,14 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 				List<Server> server = (List<Server>) persistence.list(c2);
 				for (Server s : server) {
 					Map<String, Object> element = new HashMap<String, Object>();
-					element.put(PacketKeys.SERVER_ID, s.getId());
-					element.put(PacketKeys.SERVER_PLATTFORM, s.getPlattform().toString());
-					element.put(PacketKeys.SERVER_HOSTNAME, s.getHostname());
+					element.put(Protocol.Key.SERVER_ID, s.getId());
+					element.put(Protocol.Key.SERVER_PLATTFORM, s.getPlattform().toString());
+					element.put(Protocol.Key.SERVER_HOSTNAME, s.getHostname());
 					result.add(element);
 				}
 				break;
 			case AUTOMATION:
-				String status = (String) data.get(PacketKeys.AUTOMATION_QUERY_PARAMETER);
+				String status = (String) data.get(Protocol.Key.AUTOMATION_QUERY_PARAMETER);
 				DetachedCriteria c3 = DetachedCriteria.forClass(Automation.class);
 				if (status != null) {
 					AutomationStatus automationStatus = AutomationStatus.valueOf(status.toLowerCase());
@@ -112,9 +111,9 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 				List<Automation> automation = (List<Automation>) persistence.list(c3);
 				for (Automation a : automation) {
 					Map<String, Object> element = new HashMap<String, Object>();
-					element.put(PacketKeys.AUTOMATION_ID, a.getId());
-					element.put(PacketKeys.AUTOMATION_STATUS, a.getStatus().toString());
-					element.put(PacketKeys.AUTOMATION_AGENT, a.getAgent().getId());
+					element.put(Protocol.Key.AUTOMATION_ID, a.getId());
+					element.put(Protocol.Key.AUTOMATION_STATUS, a.getStatus().toString());
+					element.put(Protocol.Key.AUTOMATION_AGENT, a.getAgent().getId());
 					result.add(element);
 				}
 				break;
@@ -124,9 +123,9 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 		}
 
 		Map<String, Object> d = new HashMap<String, Object>();
-		d.put(PacketKeys.TYPE, PacketType.AUTOMATION_QUERY);
-		d.put(PacketKeys.AUTOMATION_QUERY, query);
-		d.put(PacketKeys.AUTOMATION_QUERY_RESULT, result);
+		d.put(Protocol.Key.TYPE, Protocol.AUTOMATION_QUERY);
+		d.put(Protocol.Key.AUTOMATION_QUERY, query);
+		d.put(Protocol.Key.AUTOMATION_QUERY_RESULT, result);
 
 		Packet p = new Packet();
 		p.setData(d);
@@ -138,12 +137,12 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 	private void handleAutomationControl(Map<String, Object> data) {
 		logger.trace("handleAutomationControl");
 
-		List<String> agent_ids = (List<String>) data.get(PacketKeys.AGENT_ID);
-		List<Integer> automation_ids = (List<Integer>) data.get(PacketKeys.AUTOMATION_ID);
-		String action = (String) data.get(PacketKeys.AUTOMATION_ACTION);
-		String reason = (String) data.get(PacketKeys.AUTOMATION_REASON);
-		String descriptor = (String) data.get(PacketKeys.AUTOMATION_DESCRIPTOR);
-		Map<String, Object> parameter = (Map<String, Object>) data.get(PacketKeys.AUTOMATION_PARAMETER);
+		List<String> agent_ids = (List<String>) data.get(Protocol.Key.AGENT_ID);
+		List<Integer> automation_ids = (List<Integer>) data.get(Protocol.Key.AUTOMATION_ID);
+		String action = (String) data.get(Protocol.Key.AUTOMATION_ACTION);
+		String reason = (String) data.get(Protocol.Key.AUTOMATION_REASON);
+		String descriptor = (String) data.get(Protocol.Key.AUTOMATION_DESCRIPTOR);
+		Map<String, Object> parameter = (Map<String, Object>) data.get(Protocol.Key.AUTOMATION_PARAMETER);
 
 		logger.debug("agent_ids: " + agent_ids);
 		logger.debug("action: " + action);
@@ -178,9 +177,9 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 
 						Connection c = Data.getConnection(a_id);
 						Map<String, Object> d = new HashMap<String, Object>();
-						d.put(PacketKeys.TYPE, PacketType.AUTOMATION_CONTROL);
-						d.put(PacketKeys.AUTOMATION_ACTION, automationAction.toString());
-						d.put(PacketKeys.AUTOMATION_ID, i);
+						d.put(Protocol.Key.TYPE, Protocol.AUTOMATION_CONTROL);
+						d.put(Protocol.Key.AUTOMATION_ACTION, automationAction.toString());
+						d.put(Protocol.Key.AUTOMATION_ID, i);
 						Packet p = new Packet();
 						p.setData(d);
 						c.forward(p);
@@ -230,7 +229,7 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 							persistence.saveOrUpdate(agent);
 							automation_ids = new ArrayList<Integer>();
 							automation_ids.add(automation.getId());
-							data.put(PacketKeys.AUTOMATION_ID, automation.getId());
+							data.put(Protocol.Key.AUTOMATION_ID, automation.getId());
 
 							automationControl.setAutomation(automation);
 						}
@@ -277,10 +276,10 @@ public class ControllerPacketHandler implements PacketHandler, AutomationStatusL
 		logger.trace("statusChanged(Integer, AutomationStatus, String)");
 
 		Map<String, Object> data = new HashMap<String, Object>();
-		data.put(PacketKeys.TYPE, PacketType.AUTOMATION_STATUS);
-		data.put(PacketKeys.AUTOMATION_STATUS, status.toString());
-		data.put(PacketKeys.AUTOMATION_ID, id);
-		data.put(PacketKeys.AUTOMATION_MESSAGE, Message);
+		data.put(Protocol.Key.TYPE, Protocol.AUTOMATION_STATUS);
+		data.put(Protocol.Key.AUTOMATION_STATUS, status.toString());
+		data.put(Protocol.Key.AUTOMATION_ID, id);
+		data.put(Protocol.Key.AUTOMATION_MESSAGE, Message);
 
 		Packet p = new Packet();
 		p.setData(data);

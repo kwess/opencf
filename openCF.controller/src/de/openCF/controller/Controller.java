@@ -20,12 +20,23 @@ import de.openCF.protocol.PacketReader;
 import de.openCF.protocol.PacketType;
 import de.openCF.protocol.PacketWriter;
 
-// {type:13, agent_id:["agent"], automation_action:"start"}
-
+/**
+ * 
+ * Syntax:<br>
+ * connect [server]<br>
+ * logout <br>
+ * start [descriptor] [list o' agents]<br>
+ * stop [automation-id]<br>
+ * query [what to know] [parameter]<br>
+ * 
+ * @author kristian.wessels
+ * 
+ */
 public class Controller implements Runnable {
 
 	private Connection	c			= null;
 	private boolean		connected	= false;
+	private boolean		debug		= false;
 
 	public static void main(String[] args) {
 		Runnable runnable = new Controller();
@@ -39,14 +50,20 @@ public class Controller implements Runnable {
 		public void handlePacket(Packet packet) {
 			Map<String, Object> data = packet.getData();
 
+			if (debug)
+				System.out.println("* " + data.toString().replace("\n", ""));
+
 			Integer type = (Integer) data.get(PacketKeys.TYPE);
 			if (type == PacketType.AUTOMATION_STATUS) {
 				String status = (String) data.get(PacketKeys.AUTOMATION_STATUS);
+
 				if ("talking".equals(status)) {
 					String message = (String) data.get(PacketKeys.AUTOMATION_MESSAGE);
 					System.out.println("> " + data.get(PacketKeys.AUTOMATION_ID) + " +-> " + message.replace('\n', '.'));
 				} else {
 					System.out.println("> " + data.get(PacketKeys.AUTOMATION_ID) + " --> " + status);
+					if (status.contains("failed"))
+						System.err.println("! " + data.get(PacketKeys.AUTOMATION_ID) + " --> " + data.get(PacketKeys.AUTOMATION_MESSAGE));
 				}
 			} else if (type == PacketType.AUTOMATION_QUERY) {
 				int i = 0;
@@ -147,7 +164,8 @@ public class Controller implements Runnable {
 						data.put(PacketKeys.AUTOMATION_QUERY_PARAMETER, args[2]);
 				}
 
-				System.out.println("< " + data);
+				if (debug)
+					System.out.println("* " + data);
 
 				Packet p = new Packet();
 				p.setData(data);

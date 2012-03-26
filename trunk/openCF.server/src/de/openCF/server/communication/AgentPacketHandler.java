@@ -22,6 +22,11 @@ import de.openCF.server.data.Server;
 import de.openCF.server.data.Status;
 import de.openCF.server.persistence.Persistence;
 
+/**
+ * 
+ * @author kristian.wessels
+ * 
+ */
 public class AgentPacketHandler implements PacketHandler {
 
 	private static Logger		logger		= Logger.getLogger(AgentPacketHandler.class);
@@ -31,11 +36,22 @@ public class AgentPacketHandler implements PacketHandler {
 	private boolean				registered	= false;
 	private static Persistence	persistence	= Persistence.getInstance();
 
+	/**
+	 * 
+	 * @param c
+	 *            Connection to work with
+	 */
 	public AgentPacketHandler(Connection c) {
 		logger.trace("new(Connection)");
 		this.connection = c;
 	}
 
+	/**
+	 * Main distributor of all Packages, received from an agent, to the logic.
+	 * 
+	 * @param packet
+	 *            the received Packet
+	 */
 	@Override
 	public void handlePacket(Packet packet) {
 		logger.trace("handlePacket(Packet)");
@@ -74,12 +90,19 @@ public class AgentPacketHandler implements PacketHandler {
 				break;
 			default:
 				logger.warn("unexpected type: " + type);
+				data.put(Protocol.Key.TYPE, type);
+				connection.forward(new Packet(data));
 				break;
 		}
 
 		logger.trace("handle packet finished");
 	}
 
+	/**
+	 * Handle an automation status Packet.
+	 * 
+	 * @param data
+	 */
 	private void handleAutomationStatus(Map<String, Object> data) {
 		logger.trace("handleAutomationStatus(Map)");
 
@@ -87,15 +110,25 @@ public class AgentPacketHandler implements PacketHandler {
 		String status = (String) data.get(Protocol.Key.AUTOMATION_STATUS);
 		String message = (String) data.get(Protocol.Key.AUTOMATION_MESSAGE);
 
-		AutomationStatus automationStatus = AutomationStatus.valueOf(status.toLowerCase());
+		AutomationStatus automationStatus = null;
+		try {
+			// try to pase the status
+			automationStatus = AutomationStatus.valueOf(status.toLowerCase());
+		} catch (IllegalArgumentException ex) {
+			// don't set any default, skipping this packet follows
+			logger.warn("unknown automation status: " + status);
+		}
 
+		// if a status could not be determined, skip packet
 		if (automationStatus == null) {
 			logger.warn("automation status not set");
 			return;
 		}
 
+		// check if the automation exists
 		Automation automation = (Automation) persistence.get(Automation.class, id);
 
+		// if not, skip this status notification
 		if (automation == null) {
 			logger.error("got statusupdate for not existing automation with id " + id);
 			return;
@@ -106,20 +139,26 @@ public class AgentPacketHandler implements PacketHandler {
 		message2db.setStatus(automationStatus);
 		message2db.setMessage(message);
 
+		// only for logging purposes, distinguish between talking and s.th. else
 		if (automationStatus == AutomationStatus.talking) {
 			logger.debug("automation [" + id + "] says: " + message);
 		} else {
 			logger.info("automation [" + id + "] notifies [" + automationStatus + "] " + message);
 		}
 
+		// save the message it's self
 		persistence.save(message2db);
 
+		// store the link to the automation
 		automation.setStatus(automationStatus);
 		automation.getMessages().add(message2db);
 		persistence.update(automation);
 
+		// now notify all those have an interest
 		Data.notifyAutomationStatusListener(id, automationStatus, message);
 
+		// if we don't expect anything further from this automation,
+		// we can remove all Listeners, after they have been notified
 		if (AutomationStatus.isEndState(automationStatus)) {
 			logger.debug("removing this listener for automation: " + id);
 			Data.removeAllAutomationStatusListener(id);
@@ -132,7 +171,17 @@ public class AgentPacketHandler implements PacketHandler {
 		logger.trace("handleAgentHeartbeat(Map)");
 
 		String date = (String) data.get(Protocol.Key.AGENT_LOCAL_TIME);
-		Date agent_localtime = new Date(Long.parseLong(date) * 1000);
+		Long timestamp = 0L;
+		try {
+			// trying to parse a time stamp
+			timestamp = Long.parseLong(date);
+		} catch (NumberFormatException e) {
+			logger.warn("failed parsing timestamp: " + data);
+			// if its invalid, we can't do anything!!!
+			return;
+		}
+		// convert UNIX-like time stamp to java util.Date
+		Date agent_localtime = new Date(timestamp * 1000);
 
 		Heartbeat heartbeat = new Heartbeat();
 		heartbeat.setAgent_localtime(agent_localtime);
@@ -154,16 +203,24 @@ public class AgentPacketHandler implements PacketHandler {
 		String version = (String) data.get(Protocol.Key.AGENT_VERSION);
 		String encoding = (String) data.get(Protocol.Key.AGENT_ENCODING);
 
+		// check if a change is requested by the agent; if not, we would miss
+		// the variable in the data
 		if (encoding != null && !"".equals(encoding)) {
-			Encoding e = Encoding.valueOf(encoding.toUpperCase());
-			logger.info("agent requested encoding change from " + connection.getEncoding() + " to " + e);
-			connection.setEncoding(e);
+			try {
+				Encoding e = Encoding.valueOf(encoding.toUpperCase());
+				logger.info("agent requested encoding change from " + connection.getEncoding() + " to " + e);
+				connection.setEncoding(e);
+			} catch (IllegalArgumentException ex) {
+				logger.warn("agent requested unknown encoding: " + encoding);
+			}
 		}
 
+		// get the persistent equivalents of the server and agent to link'em
 		Agent agent = (Agent) persistence.get(Agent.class, agent_id);
 		Server server = (Server) persistence.get(Server.class, Data.getServer());
 
 		boolean agentOnline = false;
+		// check if the agent is connected to this instance of the server
 		boolean agentConnectedHere = Data.getConnection(agent_id) == null ? false : true;
 		boolean agentConnectedToDifferendServer = false;
 
@@ -181,11 +238,18 @@ public class AgentPacketHandler implements PacketHandler {
 
 			agent = new Agent();
 			agent.setId(agent_id);
-			agent.setPlattform(Plattform.valueOf(plattform.toUpperCase()));
+			try {
+				agent.setPlattform(Plattform.valueOf(plattform.toUpperCase()));
+			} catch (IllegalArgumentException ex) {
+				logger.warn("agent uses unknown plattform: " + plattform);
+				agent.setPlattform(Plattform.UNKNOWN);
+			}
 			agent.setStatus(Status.ONLINE);
 			agent.setVersion(version);
 			agent.setServer(server);
 			agent.setUpdated(new Date());
+
+			logger.debug("new agent registered: " + agent);
 
 			this.agent = agent;
 			persistence.save(agent);
@@ -201,10 +265,17 @@ public class AgentPacketHandler implements PacketHandler {
 			logger.info("agent [" + agent_id + "] was last seen at " + agent.getUpdated() + ", but is offline, changing status to online, updating prefs");
 
 			agent.setStatus(Status.ONLINE);
-			agent.setPlattform(Plattform.valueOf(plattform.toUpperCase()));
+			try {
+				agent.setPlattform(Plattform.valueOf(plattform.toUpperCase()));
+			} catch (IllegalArgumentException ex) {
+				logger.warn("agent uses unknown plattform: " + plattform);
+				agent.setPlattform(Plattform.UNKNOWN);
+			}
 			agent.setVersion(version);
 			agent.setServer(server);
 			agent.setUpdated(new Date());
+
+			logger.debug("agent reregisterd: " + agent);
 
 			this.agent = agent;
 			persistence.saveOrUpdate(agent);

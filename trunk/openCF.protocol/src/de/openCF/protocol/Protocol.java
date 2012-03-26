@@ -9,8 +9,6 @@ public abstract class Protocol {
 	public static final int	AUTOMATION_CONTROL		= 13;
 	public static final int	AUTOMATION_STATUS		= 20;
 	public static final int	AUTOMATION_QUERY		= 30;
-	public static final int	DATA_GET				= 41;
-	public static final int	DATA_PUT				= 42;
 
 	public static abstract class Key {
 
@@ -39,11 +37,6 @@ public abstract class Protocol {
 		public static final String	SERVER_HOSTNAME				= "server_hostname";
 		public static final String	SERVER_PLATTFORM			= "server_plattform";
 		public static final String	STATUS						= "status";
-		public static final String	DATA						= "data";
-		public static final String	DATA_RELATIVE				= "data_relative";
-		public static final String	DATA_SOURCE					= "data_source";
-		public static final String	DATA_SIZE					= "data_size";
-		public static final String	DATA_FORMAT					= "data_format";
 
 	}
 

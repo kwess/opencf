@@ -13,6 +13,11 @@ public class Packet {
 		super();
 	}
 
+	public Packet(Map<String, Object> data) {
+		this();
+		setData(data);
+	}
+
 	public int getDataLengt() {
 		return dataLengt;
 	}

@@ -1,6 +1,8 @@
 #summary Beschreibung der Kommunikation der Komponenten
 #sidebar TableOfContents
 
+<wiki:toc max_depth="4" />
+
 = Introduction =
 
 Alle [Komponenten] kommunizieren über tcp/tls.

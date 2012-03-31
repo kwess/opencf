@@ -157,10 +157,11 @@ Erwartete Antwort: Automation Status (siehe Agent-Server:Automation Status)
 === Automation Query ===
 Sender: Controller
 
-Erwartete Antwort: Automation Query Request
+Erwartete Antwort: Automation Query
 <code language="js">
 {
   automation_query: QUERY
+  automation_query_result: RESULT
   automation_query_parameter : {
     ...
   }
@@ -169,3 +170,4 @@ Erwartete Antwort: Automation Query Request
 || *Feld* || *Datentyp* || *Wert/Beschreibung* ||
 || PACKET_TYPE || Integer || 30 ||
 || QUERY || String || {agents, servers, automations} ||
+|| RESULT || Array || Objekte der Instanzen ||

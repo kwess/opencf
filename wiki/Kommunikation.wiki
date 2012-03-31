@@ -9,12 +9,7 @@ Alle [Komponenten] kommunizieren über tcp/tls.
 Die Kommunikation Agent < - > Server < - > Konsolen/GUI erfolgt über JSON.
 Die Kommunikation Agent Repository erfolgt über HTTPs.
 
-
-= Details =
-
-Hier die Beschreibungen/API rein.
-
-== JSON Protokoll ==
+= JSON Protokoll =
 
 Generell gillt dieser Rumpf des JSON:
 <code language="js">
@@ -26,9 +21,9 @@ Dieser wird um die spezifischen properties erweitert.
 
 Der PACKET_TYPE muss eindeutig über den Kommunikationsscope sein.
 
-=== Agent - Server ===
+== Agent - Server ==
 
-==== Agent Hello ====
+=== Agent Hello ===
 Sender: Agent
 
 Erwartete Antwort: Agent Hello Response
@@ -48,7 +43,7 @@ Erwartete Antwort: Agent Hello Response
 || ENCODING || String || Optional, setzt das Antwortformat {JSON, XML} ||
 
 
-==== Agent Hello Response ====
+=== Agent Hello Response ===
 Sender: Server
 
 Erwartete Antwort: keine
@@ -71,7 +66,7 @@ Erwartete Antwort: keine
 || -1 || Registrierung fehlgeschlagen, Agent ist schon an diesem Server registriert und online ||
 || -2 || Registrierung fehlgeschlagen, Agent ist schon bei einem anderen Server registriert und online ||
 
-==== Agent Heartbeat ====
+=== Agent Heartbeat ===
 Sender: Agent, Server?
 
 Erwartete Antwort: keine
@@ -85,7 +80,7 @@ Erwartete Antwort: keine
 || TIME || timestamp || Lokale Zeit des Agentensystems/Sendezeitpunkt des Heartbeats ||
 
 
-==== Automation Control ====
+=== Automation Control ===
 Sender: Server
 
 Erwartete Antwort: Automation Status
@@ -115,7 +110,7 @@ Erwartete Antwort: Automation Status
 || DESCRIOTOR || String || fq AutomationsDescriptor innerhalb des Repositories ||
 
 
-==== Automation Status ====
+=== Automation Status ===
 Sender: Agent
 
 Erwartete Antwort: keine
@@ -133,9 +128,9 @@ Erwartete Antwort: keine
 || AUTOMATION_ID || Integer|| s.o. ||
 
 
-=== Controller - Server ===
+== Controller - Server ==
 
-==== Automation Control ====
+=== Automation Control ===
 Sender: Controller
 
 Erwartete Antwort: Automation Status (siehe Agent-Server:Automation Status)
@@ -159,7 +154,7 @@ Erwartete Antwort: Automation Status (siehe Agent-Server:Automation Status)
 || PARAMETER || String || s.o. ||
 
 
-==== Automation Query ====
+=== Automation Query ===
 Sender: Controller
 
 Erwartete Antwort: Automation Query Request

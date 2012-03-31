@@ -250,9 +250,9 @@ public class AgentPacketHandler implements PacketHandler {
 			agent.setUpdated(new Date());
 
 			logger.debug("new agent registered: " + agent);
+			persistence.save(agent);
 
 			this.agent = agent;
-			persistence.save(agent);
 
 			Data.addConnection(agent_id, connection);
 
@@ -261,7 +261,15 @@ public class AgentPacketHandler implements PacketHandler {
 			response.put(Protocol.Key.MESSAGE, "congratulations " + agent_id + ", youre registered!");
 
 			setRegistered(true);
-		} else if (!agentOnline || (agentOnline && agentConnectedHere) || (agentOnline && !agentConnectedToDifferendServer)) {
+		} else if (agentOnline && agentConnectedHere) {
+			logger.warn("agent [" + agent_id + "] already registered, rejecting request");
+
+			response.put(Protocol.Key.RETURN_CODE, -1);
+			response.put(Protocol.Key.SUCCESSFULL, false);
+			response.put(Protocol.Key.MESSAGE, "agent [" + agent_id + "] already registered and online");
+
+			setRegistered(false);
+		} else if (!agentOnline || (!agentOnline && agentConnectedHere) || (agentOnline && !agentConnectedToDifferendServer)) {
 			logger.info("agent [" + agent_id + "] was last seen at " + agent.getUpdated() + ", but is offline, changing status to online, updating prefs");
 
 			agent.setStatus(Status.ONLINE);
@@ -287,14 +295,6 @@ public class AgentPacketHandler implements PacketHandler {
 			response.put(Protocol.Key.MESSAGE, "hello back again " + agent_id + " :)");
 
 			setRegistered(true);
-		} else if (agentOnline && agentConnectedHere) {
-			logger.warn("agent [" + agent_id + "] already registered, rejecting request");
-
-			response.put(Protocol.Key.RETURN_CODE, -1);
-			response.put(Protocol.Key.SUCCESSFULL, false);
-			response.put(Protocol.Key.MESSAGE, "agent [" + agent_id + "] already registered and online");
-
-			setRegistered(false);
 		} else {
 			logger.warn("agent [" + agent_id + "] is alredy connected to server " + agent.getServer().getId() + ", rejecting request");
 
@@ -317,15 +317,14 @@ public class AgentPacketHandler implements PacketHandler {
 	public void handleClose() {
 		logger.trace("handleClose");
 
-		if (agent == null || !registered) {
+		if (registered) {
+			logger.info("agend [" + agent.getId() + "] closed connection, updating stats");
+			agent.setStatus(Status.OFFLINE);
+			agent.setUpdated(new Date());
+			persistence.update(agent);
+		} else {
 			logger.warn("connection closed before agent registerd");
-			// nothing to do...
-			return;
 		}
-
-		agent.setStatus(Status.OFFLINE);
-		agent.setUpdated(new Date());
-		persistence.update(agent);
 
 		Data.removeConnection(agent.getId());
 
@@ -348,7 +347,8 @@ public class AgentPacketHandler implements PacketHandler {
 	protected void setRegistered(boolean registered) {
 		logger.trace("setRegistered(boolean)");
 		this.registered = registered;
-		logger.info("agent [" + agent.getId() + "] now is registerd? " + registered);
+		if (agent != null)
+			logger.info("agent [" + agent.getId() + "] now is registerd? " + registered);
 	}
 
 	@Override

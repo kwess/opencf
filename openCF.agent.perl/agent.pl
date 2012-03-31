@@ -19,29 +19,30 @@ package Protocol::Types;
 	sub AUTOMATION_CONTROL    	{return 13;}
 	sub AUTOMATION_STATUS     	{return 20;}
 
-package Protocol::Keys;
-	sub TYPE 				  {return "type";}
-	sub SUCCESSFULL           {return "successfull";}
-	sub RETURN_CODE           {return "return_code";}
-	sub MESSAGE               {return "message";}
-	sub AGENT_ID              {return "agent_id";}
-	sub AGENT_VERSION         {return "agent_version";}
-	sub AGENT_PLATTFORM       {return "agent_plattform";}
-	sub AGENT_ENCODING        {return "agent_encoding";}
-	sub AUTOMATION_STATUS     {return "automation_status";}
-	sub AUTOMATION_ACTION     {return "automation_action";}
-	sub AUTOMATION_ID         {return "automation_id";}
-	sub AUTOMATION_MESSAGE    {return "automation_message";}
-	sub AUTOMATION_DESCRIPTOR {return "automation_descriptor";}
-	sub AUTOMATION_PARAMETER  {return "automation_parameter";}
-	sub REPOSTITORY_URL       {return "repository_url";}
-	sub LOCAL_TIME            {return "local_time";}
+#package Protocol::Keys;
+#	sub TYPE 				  {return "type";}
+#	sub SUCCESSFULL           {return "successfull";}
+#	sub RETURN_CODE           {return "return_code";}
+#	sub MESSAGE               {return "message";}
+#	sub AGENT_ID              {return "agent_id";}
+#	sub AGENT_VERSION         {return "agent_version";}
+#	sub AGENT_PLATTFORM       {return "agent_plattform";}
+#	sub AGENT_ENCODING        {return "agent_encoding";}
+#	sub AUTOMATION_STATUS     {return "automation_status";}
+#	sub AUTOMATION_ACTION     {return "automation_action";}
+#	sub AUTOMATION_ID         {return "automation_id";}
+#	sub AUTOMATION_MESSAGE    {return "automation_message";}
+#	sub AUTOMATION_DESCRIPTOR {return "automation_descriptor";}
+#	sub AUTOMATION_PARAMETER  {return "automation_parameter";}
+#	sub REPOSTITORY_URL       {return "repository_url";}
+#	sub LOCAL_TIME            {return "local_time";}
 
 
 
 package Connection;
 
 sub new {
+	$logger->trace("new");
 	my ($type) = $_[0];
 	my ($this) = {host => $_[1], port => $_[2]};
 
@@ -55,9 +56,10 @@ sub new {
 }
 
 sub connect {
+	$logger->trace("connect");
 	my ($this) = $_[0];
 	
-	$logger->info("connect");
+	$logger->info("connect to $this->{host}:$this->{port} via tcp");
 	
 	my $socket = IO::Socket::INET->new(
 		PeerAddr => $this->{host},
@@ -68,6 +70,8 @@ sub connect {
 }
 
 sub readPacket {
+	$logger->trace("readPacket");
+	
 	my ($this) = $_[0];
 	my $recv_data;
 	my $send_data;
@@ -85,6 +89,8 @@ sub readPacket {
 }
 
 sub handlePacket {
+	$logger->trace("handlePacket");
+	
 	my ($this) = $_[0];
 	my ($packet) = $_[1];
 	
@@ -95,15 +101,37 @@ sub handlePacket {
 	if ($type eq Protocol::Types::AGENT_HELLO_RESPONSE) {
 		$logger->info("agent hello response");
 		handleAgentHelloResponse($packet);
+	} elsif ($type eq Protocol::Types::AUTOMATION_CONTROL) {
+		$logger->info("automation control");
+		handleAutomationControl($packet);
 	}
 }
 
 sub handleAgentHelloResponse {
-	my $packet = @_;
+	$logger->trace("handleAgentHelloResponse");
+	my ($packet) = @_;
+	
+	my $message = $packet->{message};
+	my $successfull = $packet->{successfull};
+	my $return_code = $packet->{return_code};
+	
+	if ($successfull) {
+		$logger->debug("login successfull");
+	} elsif (not $successfull) {
+		$logger->warning("login not successfull");
+		$logger->info("message: $message");
+		exit Protocol::Types::AGENT_HELLO_RESPONSE;
+	}
+}
+
+sub handleAutomationControl {
+	$logger->trace("handleAutomationControl");
+	my ($packet) = @_;
 	
 }
 
 sub sendPacket {
+	$logger->trace("sendPacket");
 	my ($this) = $_[0];
 	my ($scalar) = $_[1];
 	my $json = JSON->new->allow_nonref;
@@ -132,6 +160,12 @@ my $os = $properties->getProperty("os");
 my $port = $properties->getProperty("port");
 my $hostname = $properties->getProperty("hostname");
 
+$logger->debug("version:  $version");
+$logger->debug("server:   $server");
+$logger->debug("os:       $os");
+$logger->debug("port:     $port");
+$logger->debug("hostname: $hostname");
+
 
 $logger->debug("server: $server");
 $logger->debug("port: $port");
@@ -139,15 +173,17 @@ $logger->debug("port: $port");
 
 my $connection = Connection->new($server, $port);
 $connection->connect();
-$connection->sendPacket({
-	Protocol::Keys::TYPE 			=> 1,
-	Protocol::Keys::AGENT_ENCODING 	=> "json",
-	Protocol::Keys::AGENT_ID 		=> $hostname,
-	Protocol::Keys::AGENT_VERSION 	=> $version,
-	Protocol::Keys::AGENT_PLATTFORM	=> $os
-});
+my $helloPacket = {
+	type 			=> 1,
+	agent_encoding 	=> "json",
+	agent_id 		=> $hostname,
+	agent_version 	=> $version,
+	agent_plattform	=> $os
+};
+$connection->sendPacket($helloPacket);
 
 while (1) {
+	$logger->debug("start waiting for Packet");
 	$connection->readPacket();
 }
     

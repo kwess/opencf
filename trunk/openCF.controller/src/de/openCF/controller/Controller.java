@@ -120,6 +120,15 @@ public class Controller implements Runnable {
 					continue;
 
 				String[] args = line.split(" ");
+
+				if ("help".equals(args[0])) {
+					printHelp(args.length > 1 ? args[1] : null);
+					continue;
+				} else if ("exit".equals(args[0])) {
+					System.out.println("! exit");
+					break;
+				}
+
 				if (args.length < 2 && !"logout".equals(args[0])) {
 					System.err.println("! not enough arguments");
 					continue;
@@ -174,6 +183,41 @@ public class Controller implements Runnable {
 				System.err.println("! failed reading line");
 				break;
 			}
-		} while (connected);
+		} while (true);
+	}
+
+	private void printHelp(String a) {
+		if (a == null) {
+			System.out.println("> HELP!");
+			System.out.println("connect [server]");
+			System.out.println("start   [descriptor] [agent]+");
+			System.out.println("stop    [automationid]+");
+			System.out.println("query   [typ] [option]*");
+			System.out.println("help    [detail]");
+		} else if ("connect".equals(a)) {
+			System.out.println("> HELP " + a);
+			System.out.println(a + " [server]");
+			System.out.println("        connects to a given server");
+			System.out.println("        the server must be an url");
+		} else if ("start".equals(a)) {
+			System.out.println("> HELP " + a);
+			System.out.println(a + "  [descriptor] [agent]+");
+			System.out.println("      starts an automation");
+			System.out.println("      descriptor: repository-relative path to the automation descriptor");
+			System.out.println("      agent:      agent-id(s) to run the automation on");
+		} else if ("stop".equals(a)) {
+			System.out.println("> HELP " + a);
+			System.out.println(a + " [automationid]");
+			System.out.println("     stops an automation");
+			System.out.println("     automationid: identifier of the automation to stop");
+		} else if ("query".equals(a)) {
+			System.out.println("> HELP " + a);
+			System.out.println(a + "  [typ] [option]*");
+			System.out.println("      queries informations from the server");
+			System.out.println("      typ:    query typ, can be server, agent, automation");
+			System.out.println("      option: options of the query typ");
+		} else {
+			System.out.println("> HELP! cant help you... " + a);
+		}
 	}
 }
